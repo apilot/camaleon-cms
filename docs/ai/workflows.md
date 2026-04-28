@@ -13,7 +13,16 @@
   - `bin/brakeman --no-pager`
   - `bin/rubocop -A` (Auto-correct only what you touched)
 
-## Phase 3: PR Submission Protocol
+## Phase 3: Commit Guidelines
+
+**STRICT REQUIREMENT:** When committing changes with no code changes (e.g., documentation-only), add `[skip ci]` after an empty line following the commit description:
+```
+Update documentation
+
+[skip ci]
+```
+
+## Phase 4: PR Submission Protocol
 **When you are ready to submit, you must generate a description following these STRICT negative constraints:**
 - **NO** `Files Changed` section.
 - **NO** Test failure/example counts.
@@ -21,6 +30,11 @@
 - **NO** Commit SHAs or history references.
 - **REQUIRED:** One sentence on **User-Visible Impact** (or state "None").
 - **REQUIRED:** A "What and Why" summary.
+
+**STRICT REQUIREMENT:** After creating the PR, you MUST generate a changelog entry. The changelog entry must reference the PR with a full GitHub link placed at the end of the first line:
+```
+- **Security fix:** Fix mass assignment and open redirect vulnerabilities in SitesController, [#1152](https://github.com/owen2345/camaleon-cms/pull/1152)
+```
 
 ## Task Lifecycle Triggers
 - **Before Domain Work:** Check `docs/ai/knowledge/` and `docs/ai/decisions/`.
