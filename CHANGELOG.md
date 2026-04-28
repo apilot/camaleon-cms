@@ -52,7 +52,7 @@
 - **Security fix:** Fix mass assignment and open redirect vulnerabilities in SitesController
   - Replace `permit!` with strong `site_params` allowing only `:name`, `:slug`, `:description`
   - Redirect to `cama_admin_path` instead of `@site.the_admin_url` to prevent open redirect
-  - See PR #1152
+  - See [PR #1152](https://github.com/owen2345/camaleon-cms/pull/1152)
 
 - **Security fix:** Fix Stored XSS in post title rendering
   - Add HTML escaping to post titles when displayed in admin views (e.g., drafts list)
