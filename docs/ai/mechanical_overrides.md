@@ -25,7 +25,9 @@ These are strict execution directives for agent work in this repository.
     - For this Rails repo, use project-equivalent checks:
 
 ```bash
+cd spec/dummy
 bin/rails zeitwerk:check
+cd ../..
 bin/rubocop
 bin/rspec
 ```
