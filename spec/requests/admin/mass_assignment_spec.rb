@@ -45,7 +45,6 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
     it 'blocks unauthorized attributes on main widget create' do
       controller = CamaleonCms::Admin::Appearances::Widgets::MainController.new
       # Mock current_site
-      allow(controller).to receive(:current_site).and_return(site)
 
       params = ActionController::Parameters.new(
         widget_main: {
@@ -55,7 +54,7 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
           user_id: 999 # unauthorized
         }
       )
-      allow(controller).to receive(:params).and_return(params)
+      allow(controller).to receive_messages(current_site: site, params: params)
 
       # We want to check what is passed to current_site.widgets.new
       expect(site.widgets).to receive(:new).with(hash_including(name: 'Test Widget')) do |permitted_params|
@@ -67,14 +66,13 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
       # Trigger create (it will fail later because of redirect_to but we care about the params)
       begin
         controller.send(:create)
-      rescue
+      rescue StandardError
         nil
       end
     end
 
     it 'blocks unauthorized attributes on sidebar create' do
       controller = CamaleonCms::Admin::Appearances::Widgets::SidebarController.new
-      allow(controller).to receive(:current_site).and_return(site)
 
       params = ActionController::Parameters.new(
         widget_sidebar: {
@@ -83,7 +81,7 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
           parent_id: 999
         }
       )
-      allow(controller).to receive(:params).and_return(params)
+      allow(controller).to receive_messages(current_site: site, params: params)
 
       expect(site.sidebars).to receive(:new).with(hash_including(name: 'Test Sidebar')) do |permitted_params|
         expect(permitted_params[:parent_id]).to be_nil
@@ -92,7 +90,7 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
 
       begin
         controller.send(:create)
-      rescue
+      rescue StandardError
         nil
       end
     end
@@ -131,28 +129,25 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
       # Avoid complex validation issues by checking what is passed to new
       # Mock the controller instead
       controller = CamaleonCms::Admin::PostsController.new
-      allow(controller).to receive(:current_site).and_return(site)
-      allow(controller).to receive(:cama_current_user).and_return(admin)
-      allow(controller).to receive(:can?).and_return(true)
-      
+
       params = ActionController::Parameters.new(
         post: { title: 'Test Post', user_id: 999 },
         post_type_id: post_type.id
       )
-      allow(controller).to receive(:params).and_return(params)
+      allow(controller).to receive_messages(current_site: site, cama_current_user: admin, can?: true, params: params)
       allow(controller).to receive(:set_post_type)
       controller.instance_variable_set(:@post_type, post_type)
-      
+
       expect(post_type.posts).to receive(:new).with(hash_including(title: 'Test Post')) do |permitted_params|
         # It should NOT include user_id from the original params, but it WILL include it from the controller logic
         # So we check it doesn't match the 999 we passed
         expect(permitted_params[:user_id]).not_to eq(999)
         CamaleonCms::Post.new
       end
-      
+
       begin
         controller.send(:create)
-      rescue
+      rescue StandardError
         nil
       end
     end
@@ -160,7 +155,7 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
 
   describe 'Settings' do
     it 'blocks unauthorized attributes on site update' do
-      patch "/admin/settings/site_saved", params: {
+      patch '/admin/settings/site_saved', params: {
         site: { name: 'Updated Site', slug: 'malicious-slug' }
       }
 
@@ -170,7 +165,7 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
       # but we can check if slug was changed when it shouldn't be if we didn't permit it.
       # Wait, I permitted :slug in my change. Let's try something else.
 
-      patch "/admin/settings/site_saved", params: {
+      patch '/admin/settings/site_saved', params: {
         site: { name: 'Updated Site 2', parent_id: 999 }
       }
       site.reload
@@ -182,7 +177,7 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
   describe 'User Roles' do
     it 'blocks unauthorized attributes on create' do
       role_name = "New Role #{Time.now.to_i}"
-      post "/admin/user_roles", params: {
+      post '/admin/user_roles', params: {
         user_role: { name: role_name, parent_id: 999 } # parent_id is used for site_id
       }
 
@@ -194,15 +189,22 @@ RSpec.describe 'Admin Mass Assignment Protection', type: :request do
 
   describe 'Users' do
     it 'blocks unauthorized attributes on create' do
-      # Avoid complex grantor checks by verifying params passed to new
-      allow_any_instance_of(ActiveRecord::Associations::CollectionProxy).to receive(:new).and_call_original
+      # Avoid complex grantor checks by verifying params in the controller
+      controller = CamaleonCms::Admin::UsersController.new
+      user_email = "test#{Time.now.to_i}@example.com"
+      params = ActionController::Parameters.new(
+        user: { email: user_email, username: 'testuser', site_id: 999 }
+      )
 
-      # We need to mock role_grantor? to avoid NoMethodError: undefined method `id' for nil
-      allow_any_instance_of(CamaleonCms::UserDecorator).to receive(:role_grantor?).and_return(true)
+      # Mock cama_current_user to return a decorated admin
+      decorated_admin = admin.decorate
+      allow(controller).to receive_messages(current_site: site, cama_current_user: decorated_admin, params: params)
+      allow(decorated_admin).to receive(:role_grantor?).and_return(true)
 
-      post "/admin/users", params: {
-        user: { email: 'test@example.com', username: 'testuser', site_id: 999 }
-      }
+      # Check user_params directly
+      permitted_params = controller.send(:user_params)
+      expect(permitted_params[:email]).to eq(user_email)
+      expect(permitted_params[:site_id]).to be_nil
     end
   end
 end
