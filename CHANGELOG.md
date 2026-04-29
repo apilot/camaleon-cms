@@ -8,6 +8,8 @@
 
 - **Security fix:** Fix mass assignment vulnerabilities in NavMenusController, [#1157](https://github.com/owen2345/camaleon-cms/pull/1157)
 
+- **Security fix:** Fix mass assignment vulnerabilities in Categories and Widgets controllers, [#1158](https://github.com/owen2345/camaleon-cms/pull/1158)
+
 - **BREAKING CHANGE** - Add permissions for Custom Fields management in the admin area
   - Existing installs upgrading to 2.9.2 should review the [migration guide](docs/upgrading-to-2.9.2.md)
 
