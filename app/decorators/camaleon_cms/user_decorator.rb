@@ -53,7 +53,7 @@ module CamaleonCms
     end
 
     def role_grantor?(other_user)
-      h.can?(:manage, :users) && id != other_user.id
+      h.can?(:manage, :users) && (other_user.nil? || id != other_user.id)
     end
 
     def self.object_class_name

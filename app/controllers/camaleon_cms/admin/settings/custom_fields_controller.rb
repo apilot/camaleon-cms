@@ -101,10 +101,26 @@ module CamaleonCms
           redirect_to cama_admin_path
         end
 
+        def permitted_fields
+          return {} unless params[:fields].present?
+
+          params.require(:fields).permit(params[:fields].keys.index_with do
+            %i[id name slug description field_order]
+          end).to_h
+        end
+
+        def permitted_field_options
+          return {} unless params[:field_options].present?
+
+          params.require(:field_options).permit(params[:field_options].keys.index_with do
+            [:field_key, :multiple, :required, :translate, :default_value, :dimension, :width, :height, :class, :placeholder,
+             { default_values: [], multiple_options: %i[title value default] }]
+          end).to_h
+        end
+
         # return boolean: true if all fields were saved successfully
         def _save_fields(group)
-          errors_saved, _all_fields = group.add_fields(params[:fields] ? params[:fields].to_unsafe_h : {},
-                                                       params[:field_options] ? params[:field_options].to_unsafe_h : {})
+          errors_saved, _all_fields = group.add_fields(permitted_fields, permitted_field_options)
           group.set_option('caption', @caption)
           if errors_saved.present?
             flash[:error] = "<b>#{t('camaleon_cms.errors_found_msg', default: 'Several errors were found, please check.')}</b><br>#{errors_saved.map do |field|

@@ -149,10 +149,10 @@ module CamaleonCms
           allowed_keys = allowed_slugs
           return {} if allowed_keys.blank?
 
-          params.require(:field_options).to_unsafe_h.select { |k, _| k.to_s =~ /\A\d+\z/ }.transform_values do |fields|
-            ActionController::Parameters.new(fields)
-                                        .permit(allowed_keys.index_with { [:id, :group_number, { values: {} }] }).to_h
-          end
+          field_options = params.require(:field_options)
+          field_options.permit(field_options.keys.select { |k| k.to_s =~ /\A\d+\z/ }.index_with do
+            allowed_keys.index_with { [:id, :group_number, { values: {} }] }
+          end).to_h
         end
 
         # Only permit external menu options that match registered custom field slug

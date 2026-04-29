@@ -20,7 +20,7 @@ module CamaleonCms
 
         def update
           if @post_type.update(@data_term)
-            @post_type.set_field_values(params[:field_options].to_unsafe_h) if params[:field_options].present?
+            @post_type.set_field_values(permitted_field_options) if params[:field_options].present?
             hooks_run('updated_post_type', { post_type: @post_type })
             flash[:notice] = t('camaleon_cms.admin.post_type.message.updated')
             redirect_to action: :index
@@ -32,7 +32,7 @@ module CamaleonCms
         def create
           @post_type = current_site.post_types.new(@data_term)
           if @post_type.save
-            @post_type.set_field_values(params[:field_options].to_unsafe_h) if params[:field_options].present?
+            @post_type.set_field_values(permitted_field_options) if params[:field_options].present?
             hooks_run('created_post_type', { post_type: @post_type })
             flash[:notice] = t('camaleon_cms.admin.post_type.message.created')
             redirect_to action: :index
@@ -50,8 +50,16 @@ module CamaleonCms
 
         def set_data_term
           data_term = params.require(:post_type).permit(:name, :slug, :description, :parent_id)
-          data_term[:data_options] = params[:meta].present? ? params.require(:meta).permit! : {}
+          data_term[:data_options] = params[:meta].present? ? post_type_meta_params : {}
           @data_term = data_term
+        end
+
+        def post_type_meta_params
+          params.require(:meta).permit(:icon, :has_layout, :default_layout, :has_template, :default_template,
+                                       :has_category, :has_single_category, :has_tags, :has_content, :has_summary,
+                                       :has_comments, :has_featured, :has_seo, :has_parent_structure, :has_picture,
+                                       :posts_image_dimension, :posts_thumb_versions, :posts_thumb_size,
+                                       :is_required_picture, :contents_route_format, :default_thumb)
         end
 
         def set_post_type
@@ -59,6 +67,25 @@ module CamaleonCms
         rescue StandardError
           flash[:error] = t('camaleon_cms.admin.post_type.message.error')
           redirect_to cama_admin_path
+        end
+
+        def permitted_field_options
+          return {} unless params[:field_options].present?
+
+          allowed_keys = allowed_slugs
+          return {} if allowed_keys.blank?
+
+          field_options = params.require(:field_options)
+          field_options.permit(field_options.keys.select { |k| k.to_s =~ /\A\d+\z/ }.index_with do
+            allowed_keys.index_with { [:id, :group_number, { values: {} }] }
+          end).to_h
+        end
+
+        def allowed_slugs
+          @allowed_slugs ||= CamaleonCms::CustomField.where(
+            parent_id: CamaleonCms::CustomFieldGroup.where(object_class: 'PostType').select(:id),
+            object_class: '_fields'
+          ).pluck(:slug).uniq
         end
       end
     end

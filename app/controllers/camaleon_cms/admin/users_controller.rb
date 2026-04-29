@@ -31,8 +31,8 @@ module CamaleonCms
         r = { user: @user }
         hooks_run('user_update', r)
         if @user.update(user_params)
-          @user.set_metas(params[:meta]) if params[:meta].present?
-          @user.set_field_values(params[:field_options])
+          @user.set_metas(user_meta_params) if params[:meta].present?
+          @user.set_field_values(permitted_field_options) if params[:field_options].present?
           r = { user: @user, message: t('camaleon_cms.admin.users.message.updated'), params: params }
           hooks_run('user_after_edited', r)
           flash[:notice] = r[:message]
@@ -97,8 +97,8 @@ module CamaleonCms
         r = { user: @user }
         hooks_run('user_create', r)
         if @user.save
-          @user.set_metas(params[:meta]) if params[:meta].present?
-          @user.set_field_values(params[:field_options])
+          @user.set_metas(user_meta_params) if params[:meta].present?
+          @user.set_field_values(permitted_field_options) if params[:field_options].present?
           r = { user: @user }
           hooks_run('user_created', r)
           flash[:notice] = t('camaleon_cms.admin.users.message.created')
@@ -137,12 +137,32 @@ module CamaleonCms
       end
 
       def user_params
-        parameters = params.require(:user)
-        if cama_current_user.role_grantor?(@user)
-          parameters.permit(:username, :email, :role, :first_name, :last_name, :password, :password_confirmation)
-        else
-          parameters.permit(:username, :email, :first_name, :last_name, :password, :password_confirmation)
-        end
+        p = params.require(:user).permit(:username, :email, :first_name, :last_name, :password, :password_confirmation)
+        p[:role] = params[:user][:role] if cama_current_user.role_grantor?(@user) && params[:user][:role].present?
+        p
+      end
+
+      def user_meta_params
+        params.require(:meta).permit(:avatar, :slogan)
+      end
+
+      def permitted_field_options
+        return {} unless params[:field_options].present?
+
+        allowed_keys = allowed_slugs
+        return {} if allowed_keys.blank?
+
+        field_options = params.require(:field_options)
+        field_options.permit(field_options.keys.select { |k| k.to_s =~ /\A\d+\z/ }.index_with do
+          allowed_keys.index_with { [:id, :group_number, { values: {} }] }
+        end).to_h
+      end
+
+      def allowed_slugs
+        @allowed_slugs ||= CamaleonCms::CustomField.where(
+          parent_id: CamaleonCms::CustomFieldGroup.where(object_class: 'User').select(:id),
+          object_class: '_fields'
+        ).pluck(:slug).uniq
       end
 
       def set_user
