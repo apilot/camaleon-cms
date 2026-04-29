@@ -146,29 +146,30 @@ module CamaleonCms
         def permitted_field_options
           return {} unless params[:field_options].present?
 
-          params
-            .require(:field_options).permit(*allowed_slugs)
-            .select { |_k, v| v.is_a?(Hash) || v.is_a?(ActionController::Parameters) }
-            .transform_values do |field_data|
-            is_params = field_data.is_a?(ActionController::Parameters)
-            (is_params ? field_data : ActionController::Parameters.new(field_data))
-              .permit(:id, :group_number, values: {}).to_h
+          allowed_keys = allowed_slugs
+          return {} if allowed_keys.blank?
+
+          params.require(:field_options).to_unsafe_h.select { |k, _| k.to_s =~ /\A\d+\z/ }.transform_values do |fields|
+            ActionController::Parameters.new(fields).permit(allowed_keys.index_with { [:id, :group_number, values: {}] }).to_h
           end
         end
 
-        # Only permit external menu optionsthat match registered custom field slug
+        # Only permit external menu options that match registered custom field slug
         def permitted_external_options(external_params = nil)
           opts = external_params ? external_params[:options] : params[:options]
           return {} unless opts.present?
 
-          return {} if allowed_slugs.blank?
+          allowed_keys = allowed_slugs
+          return {} if allowed_keys.blank?
 
-          opts.permit(*allowed_slugs).to_h
+          opts.permit(*allowed_keys).to_h
         end
 
         def allowed_slugs
-          CamaleonCms::CustomFieldGroup
-            .where(object_class: 'NavMenuItem').eager_load(:fields).flat_map { |g| g.fields.pluck(:slug) }.uniq
+          @allowed_slugs ||= CamaleonCms::CustomField.where(
+            parent_id: CamaleonCms::CustomField.where(object_class: 'NavMenuItem').select(:id),
+            object_class: '_fields'
+          ).pluck(:slug).uniq
         end
       end
     end

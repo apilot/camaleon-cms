@@ -57,4 +57,46 @@ RSpec.describe 'Security: Nav Menus Mass Assignment', type: :request do
       expect(nav_menu.parent_id).to eq(site.id)
     end
   end
+
+  describe 'POST save_custom_settings' do
+    let!(:nav_menu) { site.nav_menus.create!(name: 'Test Menu', slug: 'test-menu') }
+    let!(:nav_menu_item) { nav_menu.append_menu_item({ label: 'Item', type: 'external', link: '#' }) }
+    let!(:field_group) { CamaleonCms::CustomFieldGroup.create!(name: 'Group', object_class: 'NavMenuItem', site: site) }
+    let!(:field) { field_group.fields.create!(name: 'My Field', slug: 'my-field', object_class: '_fields') }
+
+    it 'permits registered custom fields' do
+      post cama_admin_appearances_nav_menu_save_custom_settings_path(nav_menu_id: nav_menu.id, id: nav_menu_item.id),
+           params: {
+             field_options: {
+               '0' => {
+                 'my-field' => {
+                   id: field.id,
+                   values: { '0' => 'Some Value' }
+                 }
+               }
+             }
+           }
+
+      expect(response.status).to eq(200)
+      nav_menu_item.reload
+      expect(nav_menu_item.get_field_value('my-field')).to eq('Some Value')
+    end
+
+    it 'rejects unregistered custom fields' do
+      post cama_admin_appearances_nav_menu_save_custom_settings_path(nav_menu_id: nav_menu.id, id: nav_menu_item.id),
+           params: {
+             field_options: {
+               '0' => {
+                 'unregistered-field' => {
+                   values: { '0' => 'Malicious Value' }
+                 }
+               }
+             }
+           }
+
+      expect(response.status).to eq(200)
+      nav_menu_item.reload
+      expect(nav_menu_item.get_field_value('unregistered-field')).to be_nil
+    end
+  end
 end
