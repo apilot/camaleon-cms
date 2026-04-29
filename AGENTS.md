@@ -2,7 +2,7 @@
 
 ## 0. Boot Sequence (MANDATORY)
 1. **Read these first:** `docs/ai/workflows.md`, `docs/ai/testing.md`, `docs/ai/mechanical_overrides.md`
-2. **Acknowledge stack:** Ruby `3.4.9`, Rails `8.1.3`
+2. **Acknowledge stack:** Ruby (infer from `.tool-versions`), Rails (infer from `Gemfile` and `Gemfile.lock`)
 3. **Create branch:** Prefix with `feature/`, `fix/`, or `security/`
 
 ## 1. Agent Behaviour
