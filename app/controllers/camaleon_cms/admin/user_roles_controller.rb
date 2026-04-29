@@ -20,7 +20,7 @@ module CamaleonCms
       end
 
       def create
-        user_role_data = params.require(:user_role).permit!
+        user_role_data = params.require(:user_role).permit(:name, :slug, :description)
         @user_role = current_site.user_roles.new(user_role_data)
         if @user_role.save
           @user_role.set_meta("_post_type_#{current_site.id}",
@@ -40,7 +40,7 @@ module CamaleonCms
       end
 
       def update
-        if @user_role.update(params.require(:user_role).permit!)
+        if @user_role.update(params.require(:user_role).permit(:name, :slug, :description))
           if @user_role.editable?
             @user_role.set_meta("_post_type_#{current_site.id}",
                                 defined?(params[:rol_values][:post_type]) ? params[:rol_values][:post_type] : {})

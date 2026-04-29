@@ -27,7 +27,7 @@ module CamaleonCms
       def update
         args = { post_tag: @post_tag, post_type: @post_type }
         hooks_run('before_update_post_tag', args)
-        if @post_tag.update(params.require(:post_tag).permit!)
+        if @post_tag.update(params.require(:post_tag).permit(:name, :slug, :description, :parent_id))
           @post_tag.set_options(params[:meta]) if params[:meta].present?
           @post_tag.set_field_values(params[:field_options])
           hooks_run('after_update_post_tag', args)
@@ -40,7 +40,7 @@ module CamaleonCms
 
       # render post tag create form
       def create
-        @post_tag = @post_type.post_tags.new(params.require(:post_tag).permit!)
+        @post_tag = @post_type.post_tags.new(params.require(:post_tag).permit(:name, :slug, :description, :parent_id))
         args = { post_tag: @post_tag, post_type: @post_type }
         hooks_run('before_create_post_tag', args)
         if @post_tag.save

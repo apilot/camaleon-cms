@@ -85,8 +85,8 @@ module CamaleonCms
         private
 
         def set_post_data
-          @post_data = params.require(:custom_field_group).permit!
-          @post_data[:object_class], @post_data[:objectid] = @post_data.delete(:assign_group).split(',')
+          @post_data = params.require(:custom_field_group).permit(:name, :description, :assign_group, :caption)
+          @post_data[:object_class], @post_data[:objectid] = @post_data.delete(:assign_group).to_s.split(',')
           @caption = @post_data.delete(:caption)
         end
 
@@ -103,8 +103,8 @@ module CamaleonCms
 
         # return boolean: true if all fields were saved successfully
         def _save_fields(group)
-          errors_saved, _all_fields = group.add_fields(params[:fields] ? params.require(:fields).permit! : {},
-                                                       params[:field_options] ? params.require(:field_options).permit! : {})
+          errors_saved, _all_fields = group.add_fields(params[:fields] ? params[:fields].to_unsafe_h : {},
+                                                       params[:field_options] ? params[:field_options].to_unsafe_h : {})
           group.set_option('caption', @caption)
           if errors_saved.present?
             flash[:error] = "<b>#{t('camaleon_cms.errors_found_msg', default: 'Several errors were found, please check.')}</b><br>#{errors_saved.map do |field|

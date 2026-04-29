@@ -19,7 +19,7 @@ module CamaleonCms
       def site_saved
         @site = current_site
         cache_slug = @site.slug
-        if @site.update(params.require(:site).permit!)
+        if @site.update(params.require(:site).permit(:name, :slug, :description))
           @site.set_options(params[:options]) if params[:options].present?
           @site.set_metas(params[:metas]) if params[:metas].present?
           @site.set_field_values(params[:field_options])

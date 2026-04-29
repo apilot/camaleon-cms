@@ -20,7 +20,7 @@ module CamaleonCms
 
         def update
           if @post_type.update(@data_term)
-            @post_type.set_field_values(params.require(:field_options).permit!) if params[:field_options].present?
+            @post_type.set_field_values(params[:field_options].to_unsafe_h) if params[:field_options].present?
             hooks_run('updated_post_type', { post_type: @post_type })
             flash[:notice] = t('camaleon_cms.admin.post_type.message.updated')
             redirect_to action: :index
@@ -32,7 +32,7 @@ module CamaleonCms
         def create
           @post_type = current_site.post_types.new(@data_term)
           if @post_type.save
-            @post_type.set_field_values(params.require(:field_options).permit!) if params[:field_options].present?
+            @post_type.set_field_values(params[:field_options].to_unsafe_h) if params[:field_options].present?
             hooks_run('created_post_type', { post_type: @post_type })
             flash[:notice] = t('camaleon_cms.admin.post_type.message.created')
             redirect_to action: :index
@@ -49,8 +49,8 @@ module CamaleonCms
         private
 
         def set_data_term
-          data_term = params.require(:post_type).permit!
-          data_term[:data_options] = params.require(:meta).permit!
+          data_term = params.require(:post_type).permit(:name, :slug, :description, :parent_id)
+          data_term[:data_options] = params[:meta].present? ? params.require(:meta).permit! : {}
           @data_term = data_term
         end
 

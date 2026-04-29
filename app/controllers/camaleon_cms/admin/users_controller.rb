@@ -93,8 +93,7 @@ module CamaleonCms
       end
 
       def create
-        user_data = params.require(:user).permit!
-        @user = current_site.users.new(user_data)
+        @user = current_site.users.new(user_params)
         r = { user: @user }
         hooks_run('user_create', r)
         if @user.save
@@ -140,9 +139,9 @@ module CamaleonCms
       def user_params
         parameters = params.require(:user)
         if cama_current_user.role_grantor?(@user)
-          parameters.permit(:username, :email, :role, :first_name, :last_name)
+          parameters.permit(:username, :email, :role, :first_name, :last_name, :password, :password_confirmation)
         else
-          parameters.permit(:username, :email, :first_name, :last_name)
+          parameters.permit(:username, :email, :first_name, :last_name, :password, :password_confirmation)
         end
       end
 
