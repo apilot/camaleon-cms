@@ -2,8 +2,11 @@ module CamaleonCms
   module Admin
     class UsersController < CamaleonCms::AdminController
       include CamaleonCms::Admin::CustomFieldsConcern
+
       before_action :validate_role, except: %i[profile profile_edit]
+
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.users'), :cama_admin_users_url
+
       before_action :set_user, only: %i[show edit update destroy impersonate]
 
       def index

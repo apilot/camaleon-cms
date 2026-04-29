@@ -2,8 +2,10 @@ module CamaleonCms
   module Admin
     class SettingsController < CamaleonCms::AdminController
       include CamaleonCms::Admin::CustomFieldsConcern
+
       before_action :validate_role, except: %i[theme save_theme]
       before_action :validate_role_theme, only: %i[theme save_theme]
+
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.settings')
 
       def index

@@ -2,9 +2,9 @@ module CamaleonCms
   module Admin
     module Settings
       class PostTypesController < CamaleonCms::Admin::SettingsController
-        include CamaleonCms::Admin::CustomFieldsConcern
         before_action :set_post_type, only: %i[show edit update destroy]
         before_action :set_data_term, only: %i[create update]
+
         add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.content_groups'), :cama_admin_settings_post_types_path
 
         def index

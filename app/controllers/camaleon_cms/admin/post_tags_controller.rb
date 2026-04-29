@@ -2,7 +2,9 @@ module CamaleonCms
   module Admin
     class PostTagsController < CamaleonCms::AdminController
       include CamaleonCms::Admin::CustomFieldsConcern
+
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.contents')
+
       before_action :set_post_type
       before_action :set_post_tag, only: %w[show edit update destroy]
 

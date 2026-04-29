@@ -2,7 +2,9 @@ module CamaleonCms
   module Admin
     class PostsController < CamaleonCms::AdminController
       include CamaleonCms::Admin::CustomFieldsConcern
+
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.contents')
+
       before_action :set_post_type, except: [:ajax]
       before_action :set_post, only: %w[show edit update destroy]
       skip_before_action :admin_logged_actions, only: %i[trash restore destroy ajax], raise: false

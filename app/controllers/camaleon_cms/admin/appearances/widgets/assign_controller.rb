@@ -4,6 +4,7 @@ module CamaleonCms
       module Widgets
         class AssignController < CamaleonCms::AdminController
           include CamaleonCms::Admin::CustomFieldsConcern
+
           before_action :check_permission_role
           before_action :find_sidebar
           before_action :find_assigned_sidebar, only: %i[update destroy]
