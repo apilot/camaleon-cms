@@ -15,7 +15,7 @@ module CamaleonCms
           end
 
           def update
-            if @assigned.update(params.require(:assign).permit!)
+            if @assigned.update(params.require(:assign).permit(:title, :content, :widget_id, :sidebar_id, :item_order))
               @assigned.set_field_values(params[:field_options])
               flash[:notice] = t('camaleon_cms.admin.widgets.assign.updated')
             else

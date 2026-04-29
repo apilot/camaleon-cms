@@ -20,7 +20,7 @@ module CamaleonCms
       def update
         hooks_run('update_category', { category: @category, post_type: @post_type })
 
-        if @category.update(params.require(:category).permit!)
+        if @category.update(params.require(:category).permit(:name, :slug, :description, :parent_id))
           @category.set_options(params[:meta])
           @category.set_field_values(params[:field_options])
           hooks_run('updated_category', { category: @category, post_type: @post_type })
@@ -32,7 +32,7 @@ module CamaleonCms
       end
 
       def create
-        @category = @post_type.categories.new(params.require(:category).permit!)
+        @category = @post_type.categories.new(params.require(:category).permit(:name, :slug, :description, :parent_id))
         hooks_run('create_category', { category: @category, post_type: @post_type })
 
         if @category.save
