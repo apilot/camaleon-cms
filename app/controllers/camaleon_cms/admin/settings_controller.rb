@@ -1,6 +1,7 @@
 module CamaleonCms
   module Admin
     class SettingsController < CamaleonCms::AdminController
+      include CamaleonCms::Admin::CustomFieldsConcern
       before_action :validate_role, except: %i[theme save_theme]
       before_action :validate_role_theme, only: %i[theme save_theme]
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.settings')
@@ -22,7 +23,7 @@ module CamaleonCms
         if @site.update(params.require(:site).permit(:name, :slug, :description))
           @site.set_options(params[:options]) if params[:options].present?
           @site.set_metas(params[:metas]) if params[:metas].present?
-          @site.set_field_values(params[:field_options])
+          @site.set_field_values(cama_permitted_field_options('Site'))
           flash[:notice] = t('camaleon_cms.admin.settings.message.site_updated')
           args = { action: :site }
           args[:host], args[:port] = @site.get_domain.to_s.split(':') if cache_slug != @site.slug
@@ -62,7 +63,7 @@ module CamaleonCms
         current_theme.set_field_values(params[:theme_fields]) if params[:theme_fields].present?
         current_theme.set_options(params[:theme_option]) if params[:theme_option].present?
         current_theme.set_metas(params[:theme_meta]) if params[:theme_meta].present?
-        current_theme.set_field_values(params[:field_options])
+        current_theme.set_field_values(cama_permitted_field_options('Theme'))
         hook_run(current_theme.settings, 'on_theme_settings', current_theme) # permit to save extra/custom values by this hook
         flash[:notice] = t('camaleon_cms.admin.message.updated_success', default: 'Theme updated successfully')
         redirect_to action: :theme

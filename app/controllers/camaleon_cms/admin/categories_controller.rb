@@ -1,6 +1,7 @@
 module CamaleonCms
   module Admin
     class CategoriesController < CamaleonCms::AdminController
+      include CamaleonCms::Admin::CustomFieldsConcern
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.contents')
       before_action :set_post_type
       before_action :set_category, only: %w[show edit update destroy]
@@ -22,7 +23,7 @@ module CamaleonCms
 
         if @category.update(params.require(:category).permit(:name, :slug, :description, :parent_id))
           @category.set_options(params[:meta])
-          @category.set_field_values(params[:field_options])
+          @category.set_field_values(cama_permitted_field_options('PostType_Category'))
           hooks_run('updated_category', { category: @category, post_type: @post_type })
           flash[:notice] = t('camaleon_cms.admin.post_type.message.updated')
           redirect_to action: :index
@@ -37,7 +38,7 @@ module CamaleonCms
 
         if @category.save
           @category.set_options(params[:meta])
-          @category.set_field_values(params[:field_options])
+          @category.set_field_values(cama_permitted_field_options('PostType_Category'))
           hooks_run('created_category', { category: @category, post_type: @post_type })
           flash[:notice] = t('camaleon_cms.admin.post_type.message.created')
           redirect_to action: :index

@@ -1,6 +1,7 @@
 module CamaleonCms
   module Admin
     class PostsController < CamaleonCms::AdminController
+      include CamaleonCms::Admin::CustomFieldsConcern
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.contents')
       before_action :set_post_type, except: [:ajax]
       before_action :set_post, only: %w[show edit update destroy]
@@ -87,7 +88,7 @@ module CamaleonCms
         @post = r[:post]
         if @post.save
           @post.set_metas(params[:meta])
-          @post.set_field_values(params[:field_options])
+          @post.set_field_values(cama_permitted_field_options('PostType_Post'))
           @post.set_options(params[:options])
           flash[:notice] = t('camaleon_cms.admin.post.message.created', post_type: @post_type.decorate.the_title)
           r = { post: @post, post_type: @post_type }
@@ -129,7 +130,7 @@ module CamaleonCms
           # delete drafts only on successful update operation
           @post.drafts.destroy_all if delete_drafts
           @post.set_metas(params[:meta])
-          @post.set_field_values(params[:field_options])
+          @post.set_field_values(cama_permitted_field_options('PostType_Post'))
           @post.set_options(params[:options])
           hooks_run('updated_post', { post: @post, post_type: @post_type })
           flash[:notice] = t('camaleon_cms.admin.post.message.updated', post_type: @post_type.decorate.the_title)

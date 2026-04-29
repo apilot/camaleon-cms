@@ -2,6 +2,7 @@ module CamaleonCms
   module Admin
     module Settings
       class PostTypesController < CamaleonCms::Admin::SettingsController
+        include CamaleonCms::Admin::CustomFieldsConcern
         before_action :set_post_type, only: %i[show edit update destroy]
         before_action :set_data_term, only: %i[create update]
         add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.content_groups'), :cama_admin_settings_post_types_path
@@ -20,7 +21,7 @@ module CamaleonCms
 
         def update
           if @post_type.update(@data_term)
-            @post_type.set_field_values(permitted_field_options) if params[:field_options].present?
+            @post_type.set_field_values(cama_permitted_field_options('PostType')) if params[:field_options].present?
             hooks_run('updated_post_type', { post_type: @post_type })
             flash[:notice] = t('camaleon_cms.admin.post_type.message.updated')
             redirect_to action: :index
@@ -32,7 +33,7 @@ module CamaleonCms
         def create
           @post_type = current_site.post_types.new(@data_term)
           if @post_type.save
-            @post_type.set_field_values(permitted_field_options) if params[:field_options].present?
+            @post_type.set_field_values(cama_permitted_field_options('PostType')) if params[:field_options].present?
             hooks_run('created_post_type', { post_type: @post_type })
             flash[:notice] = t('camaleon_cms.admin.post_type.message.created')
             redirect_to action: :index
@@ -67,25 +68,6 @@ module CamaleonCms
         rescue StandardError
           flash[:error] = t('camaleon_cms.admin.post_type.message.error')
           redirect_to cama_admin_path
-        end
-
-        def permitted_field_options
-          return {} unless params[:field_options].present?
-
-          allowed_keys = allowed_slugs
-          return {} if allowed_keys.blank?
-
-          field_options = params.require(:field_options)
-          field_options.permit(field_options.keys.select { |k| k.to_s =~ /\A\d+\z/ }.index_with do
-            allowed_keys.index_with { [:id, :group_number, { values: {} }] }
-          end).to_h
-        end
-
-        def allowed_slugs
-          @allowed_slugs ||= CamaleonCms::CustomField.where(
-            parent_id: CamaleonCms::CustomFieldGroup.where(object_class: 'PostType').select(:id),
-            object_class: '_fields'
-          ).pluck(:slug).uniq
         end
       end
     end

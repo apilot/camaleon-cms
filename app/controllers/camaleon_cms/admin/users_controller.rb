@@ -1,6 +1,7 @@
 module CamaleonCms
   module Admin
     class UsersController < CamaleonCms::AdminController
+      include CamaleonCms::Admin::CustomFieldsConcern
       before_action :validate_role, except: %i[profile profile_edit]
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.users'), :cama_admin_users_url
       before_action :set_user, only: %i[show edit update destroy impersonate]
@@ -32,7 +33,7 @@ module CamaleonCms
         hooks_run('user_update', r)
         if @user.update(user_params)
           @user.set_metas(user_meta_params) if params[:meta].present?
-          @user.set_field_values(permitted_field_options) if params[:field_options].present?
+          @user.set_field_values(cama_permitted_field_options('User')) if params[:field_options].present?
           r = { user: @user, message: t('camaleon_cms.admin.users.message.updated'), params: params }
           hooks_run('user_after_edited', r)
           flash[:notice] = r[:message]
@@ -98,7 +99,7 @@ module CamaleonCms
         hooks_run('user_create', r)
         if @user.save
           @user.set_metas(user_meta_params) if params[:meta].present?
-          @user.set_field_values(permitted_field_options) if params[:field_options].present?
+          @user.set_field_values(cama_permitted_field_options('User')) if params[:field_options].present?
           r = { user: @user }
           hooks_run('user_created', r)
           flash[:notice] = t('camaleon_cms.admin.users.message.created')
@@ -144,25 +145,6 @@ module CamaleonCms
 
       def user_meta_params
         params.require(:meta).permit(:avatar, :slogan)
-      end
-
-      def permitted_field_options
-        return {} unless params[:field_options].present?
-
-        allowed_keys = allowed_slugs
-        return {} if allowed_keys.blank?
-
-        field_options = params.require(:field_options)
-        field_options.permit(field_options.keys.select { |k| k.to_s =~ /\A\d+\z/ }.index_with do
-          allowed_keys.index_with { [:id, :group_number, { values: {} }] }
-        end).to_h
-      end
-
-      def allowed_slugs
-        @allowed_slugs ||= CamaleonCms::CustomField.where(
-          parent_id: CamaleonCms::CustomFieldGroup.where(object_class: 'User').select(:id),
-          object_class: '_fields'
-        ).pluck(:slug).uniq
       end
 
       def set_user
