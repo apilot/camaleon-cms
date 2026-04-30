@@ -41,6 +41,21 @@ RSpec.describe 'Security: XSS Vulnerabilities Fixes', type: :request do
       expect(response).to have_http_status(200)
       expect(response.body).to include(escaped_payload)
     end
+
+    it 'includes auto-select JavaScript attributes in shortcodes' do
+      group = current_site.custom_field_groups.create!(name: 'Test Group', object_class: 'PostType_Post', objectid: post_type.id, slug: "test-group-#{SecureRandom.hex(4)}")
+      group.add_field({ name: 'Test Field', slug: 'test-field' }, { field_key: 'text_box' })
+
+      get '/admin/settings/custom_fields/list', params: {
+        post_type: post_type.id
+      }
+      expect(response).to have_http_status(200)
+      expect(response.body).to include('onmousedown="this.clicked = 1;"')
+      expect(response.body).to include('onfocus="if (!this.clicked) this.select(); else this.clicked = 2;"')
+      expect(response.body).to include('onclick="if (this.clicked == 2) this.select(); this.clicked = 0;"')
+      expect(response.body).to include('readonly="readonly"')
+      expect(response.body).to match(/class="[^"]*code_style[^"]*"/)
+    end
   end
 
   describe 'Comments' do
