@@ -173,6 +173,8 @@ Owen Peredo Diaz
 https://camaleon.website/license.html
 
 ## Testing
+> **Note:** Since this project is a gem, Rails commands (e.g., `rails routes`, `zeitwerk:check`) MUST be run from the `spec/dummy` folder. Use subshells to ensure you return to root: `(cd spec/dummy && bin/rails ...)`
+
 - Init DB
 
 ```bash

@@ -1,6 +1,7 @@
 # Testing Guide
 
-> **Important:** Always run the specs with `bin/rspec`
+> **Important:** Always run the specs with `bin/rspec`.
+> Since this project is a gem, Rails commands like `rails routes` or `bin/rails zeitwerk:check` MUST be run from the `spec/dummy` folder. Use subshells to ensure you return to root: `(cd spec/dummy && bin/rails ...)`
 
 ## Running Tests
 
