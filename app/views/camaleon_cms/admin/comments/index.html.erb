@@ -15,7 +15,7 @@
     <div class="panel-body">
         <div class="messages messages-img">
             <%= raw "<div class='alert alert-warning'>#{t('camaleon_cms.admin.comments.message.there_no_comments')}</div>" if @comments.size == 0 %>
-            <%= raw cama_comments_render_html(@comments) %>
+            <%= cama_comments_render_html(@comments) %>
         </div>
     </div>
 </div>

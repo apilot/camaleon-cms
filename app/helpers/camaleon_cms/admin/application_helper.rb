@@ -9,27 +9,27 @@ module CamaleonCms
 
       # render pagination for current items
       # items is a will pagination object
-      # sample: <%= raw cama_do_pagination(@posts) %>
+      # sample: <%= cama_do_pagination(@posts) %>
       def cama_do_pagination(items, *will_paginate_options)
         will_paginate_options = will_paginate_options.extract_options!
-        custom_class = will_paginate_options[:panel_class]
-        will_paginate_options.delete(:panel_class)
-        "<div class='row #{custom_class} pagination_panel cama_ajax_request'>
-        <div class='col-md-10'>
-          #{begin
+        custom_class = will_paginate_options.delete(:panel_class)
+        content_tag(:div, class: "row #{custom_class} pagination_panel cama_ajax_request") do
+          concat(content_tag(:div, class: 'col-md-10') do
             will_paginate(items, will_paginate_options)
           rescue StandardError
             ''
-          end}
-        </div>
-        <div class='col-md-2 text-right total-items'>
-          <strong>#{I18n.t('camaleon_cms.admin.table.total', default: 'Total')}: #{begin
-            items.total_entries
-          rescue StandardError
-            items.count
-          end} </strong>
-        </div>
-    </div>"
+          end)
+          concat(content_tag(:div, class: 'col-md-2 text-right total-items') do
+            content_tag(:strong) do
+              total = begin
+                items.total_entries
+              rescue StandardError
+                items.count
+              end
+              "#{I18n.t('camaleon_cms.admin.table.total', default: 'Total')}: #{total}"
+            end
+          end)
+        end
       end
 
       # return the locale for frontend translations initialized in admin controller
@@ -41,7 +41,7 @@ module CamaleonCms
 
       # print code with auto copy
       def cama_shortcode_print(code)
-        "<input onmousedown=\"this.clicked = 1;\" readonly onfocus=\"if (!this.clicked) this.select(); else this.clicked = 2;\" onclick=\"if (this.clicked == 2) this.select(); this.clicked = 0;\" class='code_style' tabindex='-1' value=\"#{code}\">"
+        content_tag(:input, nil, class: 'code_style', readonly: true, onmousedown: 'this.clicked = 1;', onfocus: 'if (!this.clicked) this.select(); else this.clicked = 2;', onclick: 'if (this.clicked == 2) this.select(); this.clicked = 0;', tabindex: '-1', value: code)
       end
     end
   end
