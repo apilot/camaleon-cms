@@ -46,12 +46,12 @@
                         </div>
                         <% if pt.manage_categories? %>
                             <div class="tab-pane class_type" id="tab-<%= pt.slug %>-categories" data-type="category" data-post_type="<%= pt.slug %>">
-                                <%= raw post_type_html_inputs(pt, "categories", "categories", "checkbox", [], "categorychecklist") %>
+                                <%= post_type_html_inputs(pt, "categories", "categories", "checkbox", [], "categorychecklist") %>
                             </div>
                         <% end %>
                         <% if pt.manage_tags? %>
                             <div class="tab-pane class_type" id="tab-<%= pt.slug %>-tags" data-type="post_tag" data-post_type="<%= pt.slug %>">
-                                <%= raw post_type_html_inputs(pt, "post_tags", "post_tags", "checkbox", [], "categorychecklist") %>
+                                <%= post_type_html_inputs(pt, "post_tags", "post_tags", "checkbox", [], "categorychecklist") %>
                             </div>
                         <% end %>
                     </div>

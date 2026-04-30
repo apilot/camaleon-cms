@@ -11,17 +11,16 @@ module CamaleonCms
       end
 
       def post_type_status(status, color = 'default')
-        "<span class='label label-#{color} label-form'>#{status}</span>"
+        content_tag(:span, status, class: "label label-#{color} label-form")
       end
 
       # taxonomies ->  (categories || post_tags)
       def post_type_list_taxonomy(taxonomies, color = 'primary')
-        html = ''
-        taxonomies.decorate.each do |f|
-          html += "<a class='cama_ajax_request' href='#{cama_admin_post_type_taxonomy_posts_path(@post_type.id,
-                                                                                                 f.taxonomy, f.id)}'><span class='label label-#{color} label-form'>#{f.the_title}</span></a> "
-        end
-        html
+        taxonomies.decorate.map do |f|
+          link_to(cama_admin_post_type_taxonomy_posts_path(@post_type.id, f.taxonomy, f.id), class: 'cama_ajax_request') do
+            content_tag(:span, f.the_title, class: "label label-#{color} label-form")
+          end
+        end.join(' ').html_safe
       end
 
       # sort array of posts to build post's tree
@@ -54,23 +53,26 @@ module CamaleonCms
                                    values = [], class_cat = '', required = false)
         if categories.count < 1
           return t('camaleon_cms.admin.post_type.message.no_created_html',
-                   taxonomy: taxonomy == 'categories' ? t('camaleon_cms.admin.table.categories') : t('camaleon_cms.admin.table.tags')).to_s
+                   taxonomy: taxonomy == 'categories' ? t('camaleon_cms.admin.table.categories') : t('camaleon_cms.admin.table.tags'))
         end
 
-        html = "<ul class='#{class_cat}'>"
-        categories.decorate.each do |f|
-          html += '<li>'
-          html +=  "<label class='class_slug' data-post_link_edit='#{f.the_edit_url}'> "
-          html +=  "<input data-error-place='#validation_error_list_#{name}' type='#{type}' name='#{name}[]' #{values.to_i.include?(f.id) ? 'checked' : ''} value='#{f.id}' class = '#{if required
-                                                                                                                                                                                         'required'
-                                                                                                                                                                                       end}' />"
-          html += "#{f.the_title} </label> "
-          html += post_type_html_inputs(f, 'children', name, type, values, 'children') if f.children.present?
-          html += '</li>'
-        end
-
-        html += "</ul><div id='validation_error_list_#{name}'></div>"
-        html
+        content_tag(:ul, class: class_cat) do
+          categories.decorate.each do |f|
+            concat(content_tag(:li) do
+              concat(content_tag(:label, class: 'class_slug', data: { post_link_edit: f.the_edit_url }) do
+                is_checked = Array(values).map(&:to_s).include?(f.id.to_s)
+                input_options = { class: (required ? 'required' : ''), data: { error_place: "#validation_error_list_#{name}" } }
+                if type == 'radio'
+                  concat(radio_button_tag("#{name}[]", f.id, is_checked, input_options))
+                else
+                  concat(check_box_tag("#{name}[]", f.id, is_checked, input_options))
+                end
+                concat(" #{f.the_title} ")
+              end)
+              concat(post_type_html_inputs(f, 'children', name, type, values, 'children')) if f.children.present?
+            end)
+          end
+        end + content_tag(:div, '', id: "validation_error_list_#{name}")
       end
     end
   end
