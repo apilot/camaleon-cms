@@ -57,21 +57,22 @@ module CamaleonCms
         end
 
         content_tag(:ul, class: class_cat) do
-          categories.decorate.each do |f|
-            concat(content_tag(:li) do
-              concat(content_tag(:label, class: 'class_slug', data: { post_link_edit: f.the_edit_url }) do
-                is_checked = Array(values).map(&:to_s).include?(f.id.to_s)
-                input_options = { class: (required ? 'required' : ''), data: { error_place: "#validation_error_list_#{name}" } }
-                if type == 'radio'
-                  concat(radio_button_tag("#{name}[]", f.id, is_checked, input_options))
-                else
-                  concat(check_box_tag("#{name}[]", f.id, is_checked, input_options))
-                end
-                concat(" #{f.the_title} ")
-              end)
-              concat(post_type_html_inputs(f, 'children', name, type, values, 'children')) if f.children.present?
-            end)
-          end
+          categories.decorate.map do |f|
+            content_tag(:li) do
+              is_checked = Array(values).map(&:to_s).include?(f.id.to_s)
+              input_options = { class: (required ? 'required' : ''), data: { error_place: "#validation_error_list_#{name}" } }
+              input_tag = if type == 'radio'
+                            radio_button_tag("#{name}[]", f.id, is_checked, input_options)
+                          else
+                            check_box_tag("#{name}[]", f.id, is_checked, input_options)
+                          end
+              res = content_tag(:label, class: 'class_slug', data: { post_link_edit: f.the_edit_url }) do
+                "#{input_tag} #{f.the_title} ".html_safe
+              end
+              res << post_type_html_inputs(f, 'children', name, type, values, 'children') if f.children.present?
+              res
+            end
+          end.join.html_safe
         end + content_tag(:div, '', id: "validation_error_list_#{name}")
       end
     end
