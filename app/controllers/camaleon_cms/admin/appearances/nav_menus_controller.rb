@@ -2,6 +2,7 @@ module CamaleonCms
   module Admin
     module Appearances
       class NavMenusController < CamaleonCms::AdminController
+        include CamaleonCms::Admin::CustomFieldsConcern
         include CamaleonCms::Frontend::NavMenuHelper
 
         add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.appearance')
@@ -59,7 +60,7 @@ module CamaleonCms
 
         def save_custom_settings
           @nav_menu_item = current_site.nav_menu_items.find(params[:id])
-          @nav_menu_item.set_field_values(permitted_field_options)
+          @nav_menu_item.set_field_values(cama_permitted_field_options('NavMenuItem'))
           head :ok
         end
 
@@ -142,35 +143,15 @@ module CamaleonCms
           params.require(:nav_menu).permit(:name, :slug)
         end
 
-        # Only permit field_options that match registered custom field slugs
-        def permitted_field_options
-          return {} unless params[:field_options].present?
-
-          allowed_keys = allowed_slugs
-          return {} if allowed_keys.blank?
-
-          params.require(:field_options).to_unsafe_h.select { |k, _| k.to_s =~ /\A\d+\z/ }.transform_values do |fields|
-            ActionController::Parameters.new(fields)
-                                        .permit(allowed_keys.index_with { [:id, :group_number, { values: {} }] }).to_h
-          end
-        end
-
         # Only permit external menu options that match registered custom field slug
         def permitted_external_options(external_params = nil)
           opts = external_params ? external_params[:options] : params[:options]
           return {} unless opts.present?
 
-          allowed_keys = allowed_slugs
+          allowed_keys = cama_custom_field_allowed_slugs('NavMenuItem')
           return {} if allowed_keys.blank?
 
           opts.permit(*allowed_keys).to_h
-        end
-
-        def allowed_slugs
-          @allowed_slugs ||= CamaleonCms::CustomField.where(
-            parent_id: CamaleonCms::CustomField.where(object_class: 'NavMenuItem').select(:id),
-            object_class: '_fields'
-          ).pluck(:slug).uniq
         end
       end
     end

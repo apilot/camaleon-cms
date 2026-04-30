@@ -1,8 +1,12 @@
 module CamaleonCms
   module Admin
     class UsersController < CamaleonCms::AdminController
+      include CamaleonCms::Admin::CustomFieldsConcern
+
       before_action :validate_role, except: %i[profile profile_edit]
+
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.users'), :cama_admin_users_url
+
       before_action :set_user, only: %i[show edit update destroy impersonate]
 
       def index
@@ -31,8 +35,8 @@ module CamaleonCms
         r = { user: @user }
         hooks_run('user_update', r)
         if @user.update(user_params)
-          @user.set_metas(params[:meta]) if params[:meta].present?
-          @user.set_field_values(params[:field_options])
+          @user.set_metas(user_meta_params) if params[:meta].present?
+          @user.set_field_values(cama_permitted_field_options('User')) if params[:field_options].present?
           r = { user: @user, message: t('camaleon_cms.admin.users.message.updated'), params: params }
           hooks_run('user_after_edited', r)
           flash[:notice] = r[:message]
@@ -93,13 +97,12 @@ module CamaleonCms
       end
 
       def create
-        user_data = params.require(:user).permit!
-        @user = current_site.users.new(user_data)
+        @user = current_site.users.new(user_params)
         r = { user: @user }
         hooks_run('user_create', r)
         if @user.save
-          @user.set_metas(params[:meta]) if params[:meta].present?
-          @user.set_field_values(params[:field_options])
+          @user.set_metas(user_meta_params) if params[:meta].present?
+          @user.set_field_values(cama_permitted_field_options('User')) if params[:field_options].present?
           r = { user: @user }
           hooks_run('user_created', r)
           flash[:notice] = t('camaleon_cms.admin.users.message.created')
@@ -138,12 +141,13 @@ module CamaleonCms
       end
 
       def user_params
-        parameters = params.require(:user)
-        if cama_current_user.role_grantor?(@user)
-          parameters.permit(:username, :email, :role, :first_name, :last_name)
-        else
-          parameters.permit(:username, :email, :first_name, :last_name)
-        end
+        p = params.require(:user).permit(:username, :email, :first_name, :last_name, :password, :password_confirmation)
+        p[:role] = params[:user][:role] if cama_current_user.role_grantor?(@user) && params[:user][:role].present?
+        p
+      end
+
+      def user_meta_params
+        params.require(:meta).permit(:avatar, :slogan)
       end
 
       def set_user

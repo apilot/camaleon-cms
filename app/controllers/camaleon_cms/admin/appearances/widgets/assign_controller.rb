@@ -3,6 +3,8 @@ module CamaleonCms
     module Appearances
       module Widgets
         class AssignController < CamaleonCms::AdminController
+          include CamaleonCms::Admin::CustomFieldsConcern
+
           before_action :check_permission_role
           before_action :find_sidebar
           before_action :find_assigned_sidebar, only: %i[update destroy]
@@ -15,8 +17,8 @@ module CamaleonCms
           end
 
           def update
-            if @assigned.update(params.require(:assign).permit!)
-              @assigned.set_field_values(params[:field_options])
+            if @assigned.update(params.require(:assign).permit(:title, :content, :widget_id, :sidebar_id, :item_order))
+              @assigned.set_field_values(cama_permitted_field_options('Widget::Main'))
               flash[:notice] = t('camaleon_cms.admin.widgets.assign.updated')
             else
               flash[:error] = t('camaleon_cms.admin.widgets.assign.error_updated')

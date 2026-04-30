@@ -3,6 +3,7 @@ module CamaleonCms
     module Settings
       class CustomFieldsController < CamaleonCms::Admin::SettingsController
         add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.custom_fields'), :cama_admin_settings_custom_fields_path
+
         before_action :validate_role, only: %i[create update destroy]
         before_action :set_custom_field_group, only: %i[show edit update destroy]
         before_action :set_post_data, only: %i[create update]
@@ -67,15 +68,15 @@ module CamaleonCms
         end
 
         def list
-          p = params.permit(:post_type, :post_id, categories: [])
-          args = {}
-          if p[:post_id].present?
-            post = @current_site.the_post(p[:post_id].to_i)
-            post.update_categories(p[:categories])
+          p = params.permit(:post_type, :post_id)
+          cat_ids = current_site.full_categories.where(id: params[:categories]).pluck(:id)
+          if p[:post_id].present? && (post = current_site.the_post(p[:post_id].to_i)).present?
+            post.update_categories(cat_ids)
+            args = {}
           else
             post = CamaleonCms::Post.new
-            post.taxonomy_id = p[:post_type].to_i
-            args[:cat_ids] = p[:categories]
+            post.taxonomy_id = current_site.the_post_type(p[:post_type].to_i)&.id
+            args = { cat_ids: cat_ids }
           end
           render partial: 'camaleon_cms/admin/settings/custom_fields/render',
                  locals: { record: post, field_groups: post.get_field_groups(args),
@@ -85,8 +86,8 @@ module CamaleonCms
         private
 
         def set_post_data
-          @post_data = params.require(:custom_field_group).permit!
-          @post_data[:object_class], @post_data[:objectid] = @post_data.delete(:assign_group).split(',')
+          @post_data = params.require(:custom_field_group).permit(:name, :description, :assign_group, :caption)
+          @post_data[:object_class], @post_data[:objectid] = @post_data.delete(:assign_group).to_s.split(',')
           @caption = @post_data.delete(:caption)
         end
 
@@ -101,10 +102,26 @@ module CamaleonCms
           redirect_to cama_admin_path
         end
 
+        def permitted_fields
+          return {} unless params[:fields].present?
+
+          params.require(:fields).permit(params[:fields].keys.index_with do
+            %i[id name slug description field_order]
+          end).to_h
+        end
+
+        def permitted_field_options
+          return {} unless params[:field_options].present?
+
+          params.require(:field_options).permit(params[:field_options].keys.index_with do
+            [:field_key, :multiple, :required, :translate, :default_value, :dimension, :width, :height, :class, :placeholder,
+             { default_values: [], multiple_options: %i[title value default] }]
+          end).to_h
+        end
+
         # return boolean: true if all fields were saved successfully
         def _save_fields(group)
-          errors_saved, _all_fields = group.add_fields(params[:fields] ? params.require(:fields).permit! : {},
-                                                       params[:field_options] ? params.require(:field_options).permit! : {})
+          errors_saved, _all_fields = group.add_fields(permitted_fields, permitted_field_options)
           group.set_option('caption', @caption)
           if errors_saved.present?
             flash[:error] = "<b>#{t('camaleon_cms.errors_found_msg', default: 'Several errors were found, please check.')}</b><br>#{errors_saved.map do |field|
