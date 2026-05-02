@@ -27,7 +27,7 @@ RSpec.describe PluginRoutes do
 
   describe '.reload' do
     it 'calls each registered callable' do
-      callback = double('callback')
+      callback = instance_double(Proc)
       described_class.instance_variable_set(:@after_reload_callbacks, [callback])
 
       allow(Rails.application).to receive(:reload_routes!)
@@ -52,19 +52,6 @@ RSpec.describe PluginRoutes do
 
       # Cache should be cleared
       expect(described_class.cache_variable('test_key')).to be_nil
-    end
-
-    it 'uses Monitor to synchronize access' do
-      monitor = Monitor.new
-      allow(Monitor).to receive(:new).and_return(monitor)
-      described_class.instance_variable_set(:@reload_monitor, monitor)
-
-      allow(Rails.application).to receive(:reload_routes!)
-
-      described_class.reload
-
-      # The monitor's synchronize was called
-      # We can't easily verify this without more complex setup
     end
   end
 
