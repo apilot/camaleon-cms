@@ -3,9 +3,7 @@ module CamaleonCms
     class PluginsController < CamaleonCms::AdminController
       before_action :validate_role
       add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.plugins')
-      def index
-        PluginRoutes.reload
-      end
+      def index; end
 
       def toggle
         status = params[:status].to_bool

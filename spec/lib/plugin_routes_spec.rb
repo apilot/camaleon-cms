@@ -5,8 +5,8 @@ require 'rails_helper'
 RSpec.describe PluginRoutes do
   describe '.add_after_reload_routes' do
     after do
-      # Clean up the class variable to avoid polluting other tests
-      described_class.class_variable_set(:@@_after_reload, []) # rubocop:disable Style/ClassVars
+      # Clean up the instance variable to avoid polluting other tests
+      described_class.instance_variable_set(:@after_reload_callbacks, [])
     end
 
     it 'accepts a Proc' do
@@ -28,15 +28,16 @@ RSpec.describe PluginRoutes do
   describe '.reload' do
     it 'calls each registered callable' do
       callback = instance_double(Proc)
-      described_class.class_variable_set(:@@_after_reload, [callback]) # rubocop:disable Style/ClassVars
+      described_class.instance_variable_set(:@after_reload_callbacks, [callback])
 
       allow(Rails.application).to receive(:reload_routes!)
+
       expect(callback).to receive(:call)
 
       described_class.reload
 
       # Clean up
-      described_class.class_variable_set(:@@_after_reload, []) # rubocop:disable Style/ClassVars
+      described_class.instance_variable_set(:@after_reload_callbacks, [])
     end
   end
 end
