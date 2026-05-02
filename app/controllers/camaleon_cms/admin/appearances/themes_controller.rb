@@ -7,7 +7,6 @@ module CamaleonCms
         add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.appearance')
         def index
           add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.themes')
-          PluginRoutes.reload
           authorize! :manage, :themes
           return unless params[:set].present?
 
