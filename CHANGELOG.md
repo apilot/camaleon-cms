@@ -4,9 +4,14 @@
 
 - **Bug fix:** Fix thread-safety issues with `PluginRoutes.reload` causing persistent 500 errors, [#1163](https://github.com/owen2345/camaleon-cms/pull/1163)
   - Remove unnecessary `PluginRoutes.reload` from `plugins#index` action
+  - Remove unnecessary `PluginRoutes.reload` from `themes#index` action
   - Refactor class variables (`@@`) to class instance variables (`@`) to avoid inheritance-sharing issues
   - Add `Monitor` to serialize route reloading and cache access
   - Fix `return` in blocks by using `find` instead of `each`
+  - Add comprehensive tests for `PluginRoutes` thread-safety fixes
+  - Add request specs for `plugins` controller verifying reload behavior
+  - Add request specs for `themes` controller verifying reload behavior
+  - Fix Rubocop offenses in test files
 
 ## [2.9.2](https://github.com/owen2345/camaleon-cms/tree/2.9.2) (2026-05-01)
 
