@@ -7,6 +7,7 @@
   - Refactor class variables (`@@`) to class instance variables (`@`) with `Monitor` for thread-safe route reloading and cache access
   - Fix `return` in blocks by using `find` instead of `each`
   - Add 27 tests for `PluginRoutes`, `plugins`, and `themes` controllers
+- **Optimize PluginRoutes.draw_gems and apps_dir methods** Micro-optimizations for memory consumption and performance, [#1164](https://github.com/owen2345/camaleon-cms/pull/1164)
 
 ## [2.9.2](https://github.com/owen2345/camaleon-cms/tree/2.9.2) (2026-05-01)
 
