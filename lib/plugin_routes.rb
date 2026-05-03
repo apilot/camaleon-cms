@@ -313,7 +313,7 @@ class PluginRoutes
 
     # return app's directory path
     def apps_dir
-      Rails.root.join('app', 'apps').to_s
+      @apps_dir ||= Rails.root.join('app', 'apps').to_s
     end
 
     # return all plugins located in cms and in this project
