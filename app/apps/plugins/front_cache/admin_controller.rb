@@ -5,7 +5,7 @@ module Plugins
 
       def settings
         @caches = current_site.get_meta('front_cache_elements', { paths: [] })
-        @caches[:paths] << '' unless @caches[:paths].present?
+        @caches[:paths] << '' if @caches[:paths].blank?
       end
 
       def save_settings

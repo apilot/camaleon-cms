@@ -62,7 +62,7 @@ module CamaleonCms
         private
 
         def save_metas(site)
-          return unless params[:metas].present?
+          return if params[:metas].blank?
 
           params[:metas].each do |meta, val|
             site.set_meta(meta, val)

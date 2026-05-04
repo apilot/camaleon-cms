@@ -105,7 +105,7 @@ module Plugins
 
       <div class='panel-options hidden'>
 
-        <label style='display: block;'><input type='radio' name='post[visibility]' claass='radio' value='public' #{if !post.visibility.present? || post.visibility == 'public'
+        <label style='display: block;'><input type='radio' name='post[visibility]' claass='radio' value='public' #{if post.visibility.blank? || post.visibility == 'public'
                                                                                                                      "checked=''"
                                                                                                                    end}> #{t('camaleon_cms.admin.table.public')}</label>
         <div></div>

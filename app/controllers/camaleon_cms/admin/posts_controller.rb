@@ -42,7 +42,7 @@ module CamaleonCms
         posts_all = posts_all.where(user_id: cama_current_user) if cannot?(:edit_other, @post_type)
 
         @posts = posts_all
-        params[:s] = 'published' unless params[:s].present?
+        params[:s] = 'published' if params[:s].blank?
         @lists_tab = params[:s]
         case params[:s]
         when 'published', 'pending', 'trash'
@@ -196,7 +196,7 @@ module CamaleonCms
       # define post type parent
       def set_post_type
         @post_type = current_site.post_types.find_by_id(params[:post_type_id])
-        unless @post_type.present?
+        if @post_type.blank?
           flash[:error] = t('camaleon_cms.admin.request_error_message')
           redirect_to cama_admin_path
           return

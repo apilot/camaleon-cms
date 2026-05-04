@@ -125,7 +125,7 @@ module CamaleonCms
       args[:data_tags] = args.delete(:tags)
       _thumb = args.delete(:thumb)
       p = posts.new(args)
-      p.slug = site.get_valid_post_slug(p.title.parameterize) unless p.slug.present?
+      p.slug = site.get_valid_post_slug(p.title.parameterize) if p.slug.blank?
       if p.save!
         _settings.each { |k, v| p.set_setting(k, v) } if _settings.present?
         p.set_position(_order_position) if _order_position.present?
@@ -181,7 +181,7 @@ module CamaleonCms
 
     # destroy all custom field groups assigned to this post type
     def destroy_field_groups
-      if !destroyed_by_association.present? && %w[post page].include?(slug)
+      if destroyed_by_association.blank? && %w[post page].include?(slug)
         errors.add(:base, 'This post type can not be deleted.')
         return false
       end

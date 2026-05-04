@@ -40,10 +40,10 @@ module CamaleonCms
       @posts = @category.the_posts.paginate(page: params[:page],
                                             per_page: current_site.front_per_page).eager_load(:metas)
       r_file = lookup_context.template_exists?("category_#{@category.the_slug}") ? "category_#{@category.the_slug}" : nil # specific template category with specific slug within a posttype
-      unless r_file.present?
+      if r_file.blank?
         r_file = lookup_context.template_exists?("post_types/#{@post_type.the_slug}/category") ? "post_types/#{@post_type.the_slug}/category" : nil
       end
-      unless r_file.present?
+      if r_file.blank?
         r_file = lookup_context.template_exists?("categories/#{@category.the_slug}") ? "categories/#{@category.the_slug}" : 'category'
       end
 
@@ -194,8 +194,8 @@ module CamaleonCms
               end
 
       @post = @post.try(:decorate)
-      if !@post.present? || !(force_visit || @post.can_visit?)
-        if params[:format] == 'html' || !params[:format].present?
+      if @post.blank? || !(force_visit || @post.can_visit?)
+        if params[:format] == 'html' || params[:format].blank?
           page_not_found
         else
           head 404

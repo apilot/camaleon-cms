@@ -101,7 +101,7 @@ module CamaleonCms
     # check if current site exist, if not, this will be redirected to main domain
     # Also, check current site status
     def cama_site_check_existence
-      if !current_site.present?
+      if current_site.blank?
         if Cama::Site.main_site.present?
           url = Cama::Site.main_site.decorate.the_url
           # TODO: Remove this condition when Rails 6.x won't be supported
@@ -113,7 +113,7 @@ module CamaleonCms
         else
           redirect_to cama_admin_installers_path
         end
-      elsif (cama_current_user.present? && !cama_current_user.admin?) || !cama_current_user.present?
+      elsif (cama_current_user.present? && !cama_current_user.admin?) || cama_current_user.blank?
         # inactive page control
         if current_site.is_inactive?
           if request.original_url.to_s.match(%r{\A#{current_site.the_url}admin(/|\z)})

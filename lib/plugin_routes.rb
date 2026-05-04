@@ -401,7 +401,7 @@ class PluginRoutes
         p['version'] = gem.version.to_s
         p['path'] = path
         p['kind'] = 'plugin'
-        p['descr'] = gem.description unless p['descr'].present?
+        p['descr'] = gem.description if p['descr'].blank?
         p['gem_mode'] = true
         ary << p
       end

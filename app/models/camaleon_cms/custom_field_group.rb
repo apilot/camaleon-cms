@@ -155,7 +155,7 @@ module CamaleonCms
     private
 
     def before_validating
-      self.slug = "_group-#{name.to_s.parameterize}" unless slug.present?
+      self.slug = "_group-#{name.to_s.parameterize}" if slug.blank?
     end
 
     # auto save the default field values

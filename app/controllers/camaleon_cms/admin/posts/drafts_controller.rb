@@ -16,7 +16,7 @@ module CamaleonCms
               @post_draft.attributes = @post_data
             end
           end
-          @post_draft = @post_type.posts.new(@post_data) unless @post_draft.present?
+          @post_draft = @post_type.posts.new(@post_data) if @post_draft.blank?
           r = { post: @post_draft, post_type: @post_type }
           hooks_run('create_post_draft', r)
           if @post_draft.save(validate: false)
@@ -53,11 +53,11 @@ module CamaleonCms
 
         def set_post_data_params
           post_data = params.require(:post).permit(:title, :slug, :content, :excerpt, :status, :comment_status, :post_parent, :visibility, :visibility_value, :post_order, :published_at).to_h
-          post_data.delete(:created_at) unless params[:post][:created_at].present?
-          post_data.delete(:updated_at) unless params[:post][:updated_at].present?
+          post_data.delete(:created_at) if params[:post][:created_at].blank?
+          post_data.delete(:updated_at) if params[:post][:updated_at].blank?
           post_data[:status] = 'draft_child'
           post_data[:post_parent] = params[:post_id]
-          post_data[:user_id] = cama_current_user.id unless post_data[:user_id].present?
+          post_data[:user_id] = cama_current_user.id if post_data[:user_id].blank?
           post_data[:data_tags] = params[:tags].to_s
           post_data[:data_categories] = params[:categories] || []
           @post_data = post_data

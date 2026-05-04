@@ -118,7 +118,7 @@ class CamaleonCmsUploader
   # false: if format is not accepted
   # sample: validate_file_format('/var/www/myfile.xls', 'image,audio,docx,xls') => return true if the file extension is in formats
   def self.validate_file_format(key, valid_formats = '*')
-    return true if valid_formats == '*' || !valid_formats.present?
+    return true if valid_formats == '*' || valid_formats.blank?
 
     valid_formats = valid_formats.gsub(' ',
                                        '').downcase.split(',') + get_file_format_extensions(valid_formats).split(',')

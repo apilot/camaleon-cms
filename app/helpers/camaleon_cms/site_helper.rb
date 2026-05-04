@@ -43,7 +43,7 @@ module CamaleonCms
       rescue StandardError
         nil
       end
-      unless r[:site].present?
+      if r[:site].blank?
         Rails.logger.error 'Camaleon CMS - Please define your current site: $current_site = CamaleonCms::Site.first.decorate or map your domains: https://camaleon.website/documentation/category/139779-examples/how.html'.cama_log_style(:red)
       end
       @current_site = r[:site]

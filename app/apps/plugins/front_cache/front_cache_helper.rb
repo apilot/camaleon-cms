@@ -13,7 +13,7 @@ module Plugins
 
         cache_key = front_cache_plugin_cache_key
         @caches = current_site.get_meta('front_cache_elements')
-        if !flash.keys.present? && front_cache_exist?(cache_key) # recover cache item
+        if flash.keys.blank? && front_cache_exist?(cache_key) # recover cache item
           Rails.logger.info "Camaleon CMS - readed cache: #{front_cache_plugin_get_path(cache_key)}"
           response.headers['PLUGIN_FRONT_CACHE'] = 'TRUE'
           args = { data: front_cache_get(cache_key).gsub('{{form_authenticity_token}}', form_authenticity_token) }
@@ -25,7 +25,7 @@ module Plugins
         @_plugin_do_cache = false
         if @caches[:paths].include?(request.original_url) || @caches[:paths].include?(request.path_info) || front_cache_plugin_match_path_patterns?(request.original_url, request.path_info) || (params[:action] == 'index' && params[:controller] == 'camaleon_cms/frontend' && @caches[:home].present?) # cache paths and home page
           @_plugin_do_cache = true
-        elsif params[:action] == 'post' && params[:controller] == 'camaleon_cms/frontend' && !params[:draft_id].present?
+        elsif params[:action] == 'post' && params[:controller] == 'camaleon_cms/frontend' && params[:draft_id].blank?
           if (post = current_site.the_posts.find_by_slug(params[:slug]))
             post = post.decorate
             if post.can_visit? && post.visibility != 'private'
@@ -43,7 +43,7 @@ module Plugins
 
       def front_cache_front_after_load
         cache_key = front_cache_plugin_cache_key
-        return unless @_plugin_do_cache && !flash.keys.present?
+        return unless @_plugin_do_cache && flash.keys.blank?
 
         body =
           response

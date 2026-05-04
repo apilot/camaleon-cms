@@ -92,7 +92,7 @@ module CamaleonCms
 
         # TODO: Move this out of the controller
         # send email reset password
-        return unless params[:user].present?
+        return if params[:user].blank?
 
         data_user = user_permit_data
         @user = current_site.users.find_by_email(data_user[:email])

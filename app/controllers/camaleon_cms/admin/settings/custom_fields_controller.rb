@@ -103,7 +103,7 @@ module CamaleonCms
         end
 
         def permitted_fields
-          return {} unless params[:fields].present?
+          return {} if params[:fields].blank?
 
           params.require(:fields).permit(params[:fields].keys.index_with do
             %i[id name slug description field_order]
@@ -111,7 +111,7 @@ module CamaleonCms
         end
 
         def permitted_field_options
-          return {} unless params[:field_options].present?
+          return {} if params[:field_options].blank?
 
           params.require(:field_options).permit(params[:field_options].keys.index_with do
             [:field_key, :multiple, :required, :translate, :default_value, :dimension, :width, :height, :class, :placeholder,

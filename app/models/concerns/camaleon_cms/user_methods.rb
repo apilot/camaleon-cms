@@ -126,7 +126,7 @@ module CamaleonCms
       all_posts.each do |p|
         s = p.post_type.site
         u = s.users.admin_scope.where.not(id: id).first
-        next unless u.present?
+        next if u.blank?
 
         p.update_column(:user_id, u.id)
         p.comments.where(user_id: id).each do |c|

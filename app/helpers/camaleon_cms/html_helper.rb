@@ -12,7 +12,7 @@ module CamaleonCms
     def cama_assets_library_register(key, assets = {})
       key = key.to_sym
       cama_assets_libraries
-      @_cama_assets_libraries[key] = { css: [], js: [] } unless @_cama_assets_libraries[key].present?
+      @_cama_assets_libraries[key] = { css: [], js: [] } if @_cama_assets_libraries[key].blank?
       @_cama_assets_libraries[key][:css] += assets[:css] if assets[:css].present?
       @_cama_assets_libraries[key][:js] += assets[:js] if assets[:js].present?
     end
@@ -70,7 +70,7 @@ module CamaleonCms
     # return all js libraries added [aa.js, bb,js, ..]
     # def get_assets_js
     def cama_draw_custom_assets
-      cama_html_helpers_init unless @_assets_libraries.present?
+      cama_html_helpers_init if @_assets_libraries.blank?
       libs = []
       @_assets_libraries.each_value do |assets|
         libs += assets[:css] if assets[:css].present?

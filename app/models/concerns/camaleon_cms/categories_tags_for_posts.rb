@@ -139,7 +139,7 @@ module CamaleonCms
     def check_default_category
       return unless manage_categories?
 
-      assign_category([post_type.default_category.id]) unless categories.present?
+      assign_category([post_type.default_category.id]) if categories.blank?
     end
   end
 end

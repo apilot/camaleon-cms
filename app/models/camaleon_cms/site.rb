@@ -184,7 +184,7 @@ module CamaleonCms
         res = slug
         (1..9999).each do |i|
           p = posts.find_by_slug(res)
-          break if !p.present? || (p.present? && p.id == post_id)
+          break if p.blank? || (p.present? && p.id == post_id)
 
           res = "#{slug}-#{i}"
         end
@@ -211,7 +211,7 @@ module CamaleonCms
     # if the anonymous user not exist, will create one
     def get_anonymous_user
       user = users.where(username: 'anonymous').first
-      unless user.present?
+      if user.blank?
         pass = "anonymous#{rand(9999)}"
         user = users.create({ email: 'anonymous_user@local.com', username: 'anonymous', password: pass,
                               password_confirmation: pass, first_name: 'Anonymous' })

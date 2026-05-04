@@ -226,13 +226,13 @@ module CamaleonCms
     #   "1"=>{ "untitled-text-box"=>{"id"=>"262", "values"=>{"0"=>"33333"}}}
     # }
     def set_field_values(datas = {})
-      return unless datas.present?
+      return if datas.blank?
 
       ActiveRecord::Base.transaction do
         custom_field_values.delete_all
         datas.each_value do |fields_data|
           fields_data.each do |field_key, values|
-            next unless values[:values].present?
+            next if values[:values].blank?
 
             order_value = -1
             (values[:values].is_a?(Hash) || values[:values].is_a?(ActionController::Parameters) ? values[:values].values : values[:values]).each do |value|
@@ -275,14 +275,14 @@ module CamaleonCms
     # sample: my_post.set_field_value('subtitle', 'Sub Title', {group_number: 1, group_number: 1}) # add field values for fields in group 1
     def set_field_value(key, value, args = {})
       args = { order: 0, group_number: 0, field_id: nil, clear: true }.merge!(args)
-      unless args[:field_id].present?
+      if args[:field_id].blank?
         args[:field_id] = begin
           get_field_object(key).id
         rescue StandardError
           nil
         end
       end
-      raise ArgumentError, "There is no custom field configured for #{key}" unless args[:field_id].present?
+      raise ArgumentError, "There is no custom field configured for #{key}" if args[:field_id].blank?
 
       if args[:clear]
         custom_field_values.where({ custom_field_slug: key,

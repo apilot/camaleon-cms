@@ -146,7 +146,7 @@ module CamaleonCms
         # Only permit external menu options that match registered custom field slug
         def permitted_external_options(external_params = nil)
           opts = external_params ? external_params[:options] : params[:options]
-          return {} unless opts.present?
+          return {} if opts.blank?
 
           allowed_keys = cama_custom_field_allowed_slugs('NavMenuItem')
           return {} if allowed_keys.blank?

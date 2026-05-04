@@ -47,7 +47,7 @@ module CamaleonCms
     # sample: upload_file(params[:my_file], {formats: "jpg,png,gif,mp3,mp4", temporal_time: 10.minutes, maximum: 10.megabytes})
     def upload_file(uploaded_io, settings = {})
       cached_name = uploaded_io.is_a?(ActionDispatch::Http::UploadedFile) ? uploaded_io.original_filename : nil
-      return { error: 'File is empty', file: nil, size: nil } unless uploaded_io.present?
+      return { error: 'File is empty', file: nil, size: nil } if uploaded_io.blank?
 
       if uploaded_io.is_a?(String) && uploaded_io.match(%r{^https?://}).present? # download url file
         tmp = cama_tmp_upload(uploaded_io)
@@ -276,7 +276,7 @@ module CamaleonCms
       downloaded_tmp_file = nil
       if uploaded_io.is_a?(String) && uploaded_io.start_with?('data:') # create tmp file using base64 format
         _tmp_name = args[:name]
-        return { error: cama_t('camaleon_cms.admin.media.name_required').to_s } unless params[:name].present?
+        return { error: cama_t('camaleon_cms.admin.media.name_required').to_s } if params[:name].blank?
 
         err = validate_file_format_or_error(_tmp_name, args[:formats])
         return err if err

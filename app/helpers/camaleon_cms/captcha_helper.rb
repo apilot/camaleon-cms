@@ -6,7 +6,7 @@ module CamaleonCms
       img = MiniMagick::Image.open(File.join($camaleon_engine_dir.present? ? $camaleon_engine_dir : Rails.root.to_s,
                                              'lib', 'captcha', "captcha_#{rand(12)}.jpg").to_s)
       text = cama_rand_str(len)
-      session[:cama_captcha] = [] unless session[:cama_captcha].present?
+      session[:cama_captcha] = [] if session[:cama_captcha].blank?
       session[:cama_captcha] << text
       img.combine_options do |c|
         c.gravity 'Center'
@@ -23,7 +23,7 @@ module CamaleonCms
     # img_args: attributes for image_tag
     # input_args: attributes for input field
     def cama_captcha_tag(len = 5, img_args = { alt: '' }, input_args = {}, bootstrap_group_mode = false)
-      unless input_args[:placeholder].present?
+      if input_args[:placeholder].blank?
         input_args[:placeholder] =
           I18n.t('camaleon_cms.captcha_placeholder',
                  default: 'Please enter the text of the image')

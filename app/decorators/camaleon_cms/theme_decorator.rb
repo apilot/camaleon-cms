@@ -12,7 +12,7 @@ module CamaleonCms
     end
 
     def the_settings_link
-      return '' unless h.cama_current_user.present?
+      return '' if h.cama_current_user.blank?
 
       attrs = { target: '_blank', style: 'font-size:11px !important;cursor:pointer;' }.merge(attrs)
       h.link_to("&rarr; #{title || h.ct('edit', default: 'Edit')}".html_safe, the_settings_url, attrs)

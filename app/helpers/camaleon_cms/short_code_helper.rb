@@ -12,7 +12,7 @@ module CamaleonCms
 
       shortcode_add('load_libraries',
                     lambda { |attrs, args|
-                      return args[:shortcode] unless attrs.present?
+                      return args[:shortcode] if attrs.blank?
 
                       cama_load_libraries(*attrs['data'].to_s.split(','))
                       ''
@@ -21,7 +21,7 @@ module CamaleonCms
 
       shortcode_add('asset',
                     lambda { |attrs, args|
-                      return args[:shortcode] unless attrs.present?
+                      return args[:shortcode] if attrs.blank?
 
                       url = ActionController::Base.helpers.asset_url(attrs['file'])
                       if attrs['image'].present?
@@ -172,7 +172,7 @@ module CamaleonCms
     # parse the attributes of a shortcode
     def _shortcode_parse_attr(text)
       res = {}
-      return res unless text.present?
+      return res if text.blank?
 
       text.scan(/(\w+)\s*=\s*"([^"]*)"(?:\s|$)|(\w+)\s*=\s*'([^']*)'(?:\s|$)|(\w+)\s*=\s*([^\s'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/).each do |item|
         item.each_with_index do |c, index|
@@ -195,7 +195,7 @@ module CamaleonCms
               else
                 args[:owner]
               end
-      return res unless model.present?
+      return res if model.blank?
 
       if attrs['field'].present? # model custom fields
         field = model.get_field_object(attrs['field'])

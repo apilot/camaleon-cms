@@ -23,7 +23,7 @@ module CamaleonCms
         layout_name: 'camaleon_cms/mailer',
         format: 'html'
       }.merge(data)
-      data[:cc_to] = [data[:cc_to]] if data[:cc_to].is_a?(String) || !data[:cc_to].present?
+      data[:cc_to] = [data[:cc_to]] if data[:cc_to].is_a?(String) || data[:cc_to].blank?
 
       mail_data = { to: email, subject: subject }
       if @current_site.get_option('mailer_enabled') == 1
@@ -92,7 +92,7 @@ module CamaleonCms
         mail(mail_data) { |format| format.html { render inline: @html, layout: layout } } if data[:format] == 'html'
         mail(mail_data) { |format| format.text { render inline: @html, layout: layout } } if data[:format] == 'txt'
       end
-      mail(mail_data) unless data[:format].present?
+      mail(mail_data) if data[:format].blank?
     end
 
     private

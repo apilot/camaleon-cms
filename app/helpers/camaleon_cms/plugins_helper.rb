@@ -7,7 +7,7 @@ module CamaleonCms
     def plugins_initialize(klass = nil)
       mod = Module.new
       PluginRoutes.enabled_apps(current_site).each do |plugin|
-        next if !plugin.present? || !plugin['helpers'].present?
+        next if plugin.blank? || plugin['helpers'].blank?
 
         plugin['helpers'].each do |h|
           mod.send :include, h.constantize
@@ -140,7 +140,7 @@ module CamaleonCms
 
     # auto load all helpers of this plugin
     def plugin_load_helpers(plugin)
-      return if !plugin.present? || !plugin['helpers'].present?
+      return if plugin.blank? || plugin['helpers'].blank?
 
       plugin['helpers'].each do |h|
         next if self.class.include?(h.constantize)
