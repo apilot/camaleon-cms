@@ -11,6 +11,7 @@ AllCops:
     - /**/vendor/**/* # Exclude downloaded gem code in CI
   NewCops: disable
   SuggestExtensions: false
+  TargetRailsVersion: 6.1
   TargetRubyVersion: 3.2
 
 Layout/MultilineMethodCallIndentation:
