@@ -31,7 +31,7 @@ module CamaleonCms
     # caused by requests for non-existent files.
     protect_from_forgery with: :exception, unless: -> { request.fullpath.match(%r{\A/assets/.*\.js\z}) }
     layout proc { |controller| controller.request.xhr? ? false : 'default' }
-    helper_method :current_user
+    helper_method :current_user, :cama_get_i18n_frontend
 
     # show page error
     def render_error(status = 404, exception = nil, message = '')
@@ -150,6 +150,13 @@ module CamaleonCms
       def current_user
         cama_current_user
       end
+    end
+
+    # return the locale for frontend translations initialized in admin controller
+    # used by models like posts, categories, ..., sample: my_post.the_url
+    # fix for https://github.com/owen2345/camaleon-cms/issues/233#issuecomment-215385432
+    def cama_get_i18n_frontend
+      @cama_i18n_frontend
     end
   end
 end
