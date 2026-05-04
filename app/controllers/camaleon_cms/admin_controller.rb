@@ -76,7 +76,6 @@ module CamaleonCms
       @_admin_menus = {}
       @_admin_breadcrumb = []
       @_extra_models_for_fields = []
-      @cama_i18n_frontend = current_site.get_languages.first
     end
 
     # trigger hooks for admin panel before admin load
