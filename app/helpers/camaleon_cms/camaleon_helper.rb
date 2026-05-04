@@ -44,11 +44,6 @@ module CamaleonCms
       I18n.translate("camaleon_cms.common.#{key}", **args)
     end
 
-    # check if current request was for admin panel
-    def cama_is_admin_request?
-      @cama_i18n_frontend.present?
-    end
-
     # generate loop categories html sitemap links
     # this is a helper for sitemap generator to print categories, sub categories and post contents in html list format
     def cama_sitemap_cats_generator(cats)

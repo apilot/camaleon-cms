@@ -16,6 +16,7 @@ module CamaleonCms
              params[:cama_ajax_request].present? ? 'camaleon_cms/admin/_ajax' : 'camaleon_cms/admin'
            }
     add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.dashboard', default: 'Dashboard'), :cama_admin_path
+    helper_method :cama_get_i18n_frontend
 
     # render admin dashboard
     def index
@@ -98,6 +99,13 @@ module CamaleonCms
 
     def admin_logged_actions
       admin_menus_add_commons if !request.xhr? || !params[:cama_ajax_request].present? # initialize admin sidebar menus
+    end
+
+    # return the locale for frontend translations initialized in admin controller
+    # used by models like posts, categories, ..., sample: my_post.the_url
+    # fix for https://github.com/owen2345/camaleon-cms/issues/233#issuecomment-215385432
+    def cama_get_i18n_frontend
+      @cama_i18n_frontend
     end
   end
 end
