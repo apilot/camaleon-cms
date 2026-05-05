@@ -29,7 +29,7 @@ RSpec.describe 'Decorator i18n locale resolution', type: :feature do
         # Admin context should have @cama_i18n_frontend initialized
         admin_sign_in
         visit cama_admin_path
-        
+
         # Admin context should not raise any errors
         expect(page).to have_current_path(cama_admin_path)
       end
@@ -41,16 +41,16 @@ RSpec.describe 'Decorator i18n locale resolution', type: :feature do
         site.set_meta('languages_site', ['es'])
         # Refresh cache to pick up new language
         site.instance_variable_set(:@_languages, nil)
-        
+
         # Set I18n.locale to different value 'en'
         original_locale = I18n.locale
         begin
           I18n.locale = :en
-          
+
           # Visit frontend
-          visit "/"
+          visit '/'
           expect(page.status_code).to eq(200)
-          
+
           # NOTE: This test currently passes but doesn't verify correct locale was used!
           # After fix: decorator.get_locale should return :es (site language), not :en (I18n.locale)
           # Currently: @cama_i18n_frontend is nil in frontend, so it falls back to I18n.locale (:en)
@@ -65,18 +65,18 @@ RSpec.describe 'Decorator i18n locale resolution', type: :feature do
     it 'generates a valid URL without raising an error' do
       decorated_post = post.decorate
       url = decorated_post.the_url
-      
+
       expect(url).to be_a(String)
       expect(url).not_to be_empty
     end
 
     context 'with site having specific frontend language' do
-      it 'should generate URL using available site languages' do
-        frontend_langs = site.get_languages
-        
+      it 'generates URL using available site languages' do
+        site.get_languages
+
         decorated = post.decorate
         url = decorated.the_url
-        
+
         # URL should be generated successfully
         expect(url).to be_a(String)
         # URL should exist
@@ -89,34 +89,34 @@ RSpec.describe 'Decorator i18n locale resolution', type: :feature do
     it 'uses site frontend language in frontend context (not I18n.locale)' do
       # Set the existing site to have Spanish as frontend language
       site.set_meta('languages_site', [I18n.default_locale, :es])
-      
+
       original_locale = I18n.locale
       begin
         # Set I18n.locale to English to create conflict
         I18n.locale = :en
-        
+
         # Visit the frontend home page - this triggers the controller's cama_before_actions
         # which now initializes @cama_i18n_frontend to the site's frontend language (:es)
-        visit "/"
-        
+        visit '/'
+
         # After the visit, the page renders with decorators
         # The decorator's get_locale() should have returned :es (site's frontend language)
         # NOT :en (I18n.locale)
-        
+
         # We can't directly check the decorator's locale from the browser,
         # but we can verify the page loaded (no exception means @cama_i18n_frontend was available)
-        expect(page.status_code).to eq(200), "Page should load with correct locale"
-        
+        expect(page.status_code).to eq(200), 'Page should load with correct locale'
+
         # Additional verification: direct decorator test in controller context
         # This simulates what happens during the page render
         current_site = site
         frontend_language = current_site.get_languages.first
-        
+
         decorated = site.post_types.first&.posts&.first&.decorate
         if decorated.present?
           actual_locale = decorated.get_locale
           expect(actual_locale).to eq(frontend_language),
-            "Expected decorator to use site's frontend language (#{frontend_language}), but got #{actual_locale}"
+                                   "Expected decorator to use site's frontend language (#{frontend_language}), but got #{actual_locale}"
         end
       ensure
         I18n.locale = original_locale
