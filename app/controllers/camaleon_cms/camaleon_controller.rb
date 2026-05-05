@@ -79,9 +79,6 @@ module CamaleonCms
       prepend_view_path(File.join($camaleon_engine_dir, views_dir).to_s)
       prepend_view_path(Rails.root.join(views_dir).to_s)
 
-      # Initialize frontend language for decorators (used in both admin and frontend contexts)
-      @cama_i18n_frontend = current_site.get_languages.first
-
       CamaleonCms::PostDefault.current_user = cama_current_user
       CamaleonCms::PostDefault.current_site = current_site
     end
