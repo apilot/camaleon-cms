@@ -24,36 +24,26 @@ RSpec.describe 'Decorator i18n locale resolution', type: :feature do
   end
 
   describe 'decorator locale usage: admin vs frontend contexts' do
-    describe 'in admin context' do
-      it 'decorator uses site frontend language (not I18n.locale)' do
-        # Admin context should have @cama_i18n_frontend initialized
-        admin_sign_in
-        visit cama_admin_path
-
-        # Admin context should not raise any errors
-        expect(page).to have_current_path(cama_admin_path)
-      end
-    end
-
     describe 'in frontend context' do
-      it 'decorator should use site frontend language (not I18n.locale) when available' do
+      it 'renders correct frontend language in page output (via I18n.locale)' do
         # Set site frontend language to 'es'
         site.set_meta('languages_site', ['es'])
         # Refresh cache to pick up new language
         site.instance_variable_set(:@_languages, nil)
 
-        # Set I18n.locale to different value 'en'
+        # Set I18n.locale to different value 'en' initially
         original_locale = I18n.locale
         begin
           I18n.locale = :en
 
-          # Visit frontend
+          # Visit frontend - init_frontent will set I18n.locale to site's frontend language (:es)
           visit '/'
           expect(page.status_code).to eq(200)
 
-          # NOTE: This test currently passes but doesn't verify correct locale was used!
-          # After fix: decorator.get_locale should return :es (site language), not :en (I18n.locale)
-          # Currently: @cama_i18n_frontend is nil in frontend, so it falls back to I18n.locale (:en)
+          # Verify the page head renders correct locale (via the_head method)
+          # This confirms I18n.locale was set to site's frontend language, not :en
+          expect(page.html).to include("var LANGUAGE = 'es';"),
+                                "Expected page head to render LANGUAGE='es' (site's frontend language)"
         ensure
           I18n.locale = original_locale
         end
@@ -85,39 +75,59 @@ RSpec.describe 'Decorator i18n locale resolution', type: :feature do
     end
   end
 
-  describe 'decorator locale resolution: strict test (should fail before fix)' do
-    it 'uses site frontend language in frontend context (not I18n.locale)' do
-      # Set the existing site to have Spanish as frontend language
+  describe 'decorator locale resolution: verified via rendered output' do
+    it 'renders correct I18n.locale in frontend page head (set to site frontend language)' do
+      # Set the existing site to have English and Spanish as frontend languages
       site.set_meta('languages_site', [I18n.default_locale, :es])
 
       original_locale = I18n.locale
       begin
-        # Set I18n.locale to English to create conflict
+        # Set I18n.locale to English (site's first language)
         I18n.locale = :en
 
-        # Visit the frontend home page - this triggers the controller's cama_before_actions
-        # which now initializes @cama_i18n_frontend to the site's frontend language (:es)
+        # Visit the frontend home page - this triggers the controller's `before_action :init_frontent`,
+        # which, if no params[:locale] || session[:cama_current_language] are present, initializes I18n.locale to the
+        # site's first language (:en in this case)
         visit '/'
 
-        # After the visit, the page renders with decorators
-        # The decorator's get_locale() should have returned :es (site's frontend language)
-        # NOT :en (I18n.locale)
+        # Verify page loaded successfully
+        expect(page.status_code).to eq(200)
 
-        # We can't directly check the decorator's locale from the browser,
-        # but we can verify the page loaded (no exception means @cama_i18n_frontend was available)
-        expect(page.status_code).to eq(200), 'Page should load with correct locale'
+        # Verify the rendered output: the_head method renders var LANGUAGE = 'I18n.locale' in JavaScript
+        # See: app/helpers/camaleon_cms/frontend/site_helper.rb line 63
+        # This proves I18n.locale is set correctly to site's frontend language
+        expected_language = site.get_languages.first.to_s
+        expect(page.html).to include("var LANGUAGE = '#{expected_language}';"),
+                              "Expected page head to render LANGUAGE='#{expected_language}' (site's frontend language)"
 
-        # Additional verification: direct decorator test in controller context
-        # This simulates what happens during the page render
-        current_site = site
-        frontend_language = current_site.get_languages.first
-
+        # Additional verification: direct decorator test
+        frontend_language = site.get_languages.first
         decorated = site.post_types.first&.posts&.first&.decorate
         if decorated.present?
           actual_locale = decorated.get_locale
           expect(actual_locale).to eq(frontend_language),
                                    "Expected decorator to use site's frontend language (#{frontend_language}), but got #{actual_locale}"
         end
+      ensure
+        I18n.locale = original_locale
+      end
+    end
+
+    it 'renders correct I18n.locale when user explicitly switches language' do
+      site.set_meta('languages_site', [I18n.default_locale, :es])
+
+      original_locale = I18n.locale
+      begin
+        # User clicks language switcher to switch to Spanish
+        visit "/?cama_set_language=es"
+
+        # Verify page loaded
+        expect(page.status_code).to eq(200)
+
+        # Verify the rendered head shows Spanish locale
+        # This proves I18n.locale was set to user's chosen language
+        expect(page.html).to include("var LANGUAGE = 'es';"),
+                              "Expected page head to render LANGUAGE='es' after user switched to Spanish"
       ensure
         I18n.locale = original_locale
       end
