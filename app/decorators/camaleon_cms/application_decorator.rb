@@ -52,20 +52,12 @@ module CamaleonCms
 
     # get the locale for current decorator
     def get_locale(locale = nil)
-      locale || @_deco_locale || begin
-        h.cama_get_i18n_frontend
-      rescue StandardError
-        nil
-      end || I18n.locale
+      locale || @_deco_locale || I18n.locale
     end
 
     # return the current locale prefixed to add in frontend routes
     def _calc_locale(_l)
-      _l = (_l || @_deco_locale || begin
-        h.cama_get_i18n_frontend
-      rescue StandardError
-        nil
-      end || I18n.locale).to_s
+      _l = (_l || @_deco_locale || I18n.locale).to_s
       "_#{_l}"
     end
   end

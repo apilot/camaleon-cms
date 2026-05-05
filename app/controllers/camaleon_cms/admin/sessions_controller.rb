@@ -151,9 +151,9 @@ module CamaleonCms
       private
 
       def before_hook_session
-        session[:cama_current_language] = params[:cama_set_language].to_sym if params[:cama_set_language].present?
-        session[:cama_current_language] = nil if current_site.get_languages.exclude?(session[:cama_current_language])
-        I18n.locale = params[:locale] || session[:cama_current_language] || current_site.get_languages.first
+        # NOTE: session[:cama_current_language] is for FRONTEND only (user's site language choice)
+        # Admin should use admin language setting, not frontend language
+        # This prevents language mixing when switching between frontend and admin contexts
         hooks_run('session_before_load')
       end
 
