@@ -2,10 +2,13 @@
 
 ## Unreleased
 
-- **Fix:** Decorator locale resolution in frontend context, [#1166](https://github.com/owen2345/camaleon-cms/pull/1166)
-  - Move `@cama_i18n_frontend` initialization from AdminController to parent CamaleonController
-  - Ensures decorators use site's frontend language in both admin and frontend contexts
-  - Add comprehensive locale resolution tests
+- **Fix:** Decorator locale resolution and language context mixing, [#1166](https://github.com/owen2345/camaleon-cms/pull/1166)
+  - Move `cama_get_i18n_frontend` helper method to parent CamaleonController for accessibility
+  - Move `@cama_i18n_frontend` initialization to FrontendController.init_frontent (after language switching)
+  - Remove redundant initialization from parent controller
+  - Fix AdminSessionsController to NOT read frontend's session[:cama_current_language] (prevents breadcrumb language mixing when switching from frontend to admin)
+  - Ensures decorators use correct locale: site's frontend language in frontend, admin language in admin
+  - Add 8 comprehensive locale resolution tests
 - **Bug fix:** Fix thread-safety issues with `PluginRoutes.reload` causing persistent 500 errors, [#1163](https://github.com/owen2345/camaleon-cms/pull/1163)
   - Remove unnecessary `PluginRoutes.reload` from `plugins#index` and `themes#index` actions
   - Refactor class variables (`@@`) to class instance variables (`@`) with `Monitor` for thread-safe route reloading and cache access
