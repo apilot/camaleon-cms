@@ -466,12 +466,6 @@ module CamaleonCms
       [horizontal_offset, vertical_offset]
     end
 
-    # convert file path into thumb path format
-    # return the image name into thumb format: owewen.png into thumb/owen-png.png
-    def cama_parse_for_thumb_name(file_path)
-      "#{@fog_connection_hook_res[:thumb_folder_name]}/#{File.basename(file_path).parameterize}#{File.extname(file_path)}"
-    end
-
     def clamp_to_image_dimension(value, img_size)
       return value unless value.present? && value.to_s.include?('?')
 
