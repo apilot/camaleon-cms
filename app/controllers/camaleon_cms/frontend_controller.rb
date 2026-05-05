@@ -271,6 +271,9 @@ module CamaleonCms
       I18n.locale = params[:locale] || session[:cama_current_language] || current_site.get_languages.first
       return page_not_found unless current_site.get_languages.include?(I18n.locale.to_sym)
 
+      # Update frontend language instance variable to reflect current switched locale (for decorators)
+      @cama_i18n_frontend = I18n.locale
+
       # define render paths
       lookup_context.prefixes.delete('frontend')
       lookup_context.prefixes.delete('application')
