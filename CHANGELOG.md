@@ -7,7 +7,8 @@
   - Move `@cama_i18n_frontend` initialization to FrontendController.init_frontent (after language switching)
   - Remove redundant initialization from parent controller
   - Fix AdminSessionsController to NOT read frontend's session[:cama_current_language] (prevents breadcrumb language mixing when switching from frontend to admin)
-  - Ensures decorators use correct locale: site's frontend language in frontend, admin language in admin
+  - Simplify decorator locale resolution by removing now-redundant `@cama_i18n_frontend` variable (just mirrors `I18n.locale`)
+  - Ensures decorators use correct locale via `I18n.locale`: site's frontend language in frontend, admin language in admin
   - Add 8 comprehensive locale resolution tests
 - **Bug fix:** Fix thread-safety issues with `PluginRoutes.reload` causing persistent 500 errors, [#1163](https://github.com/owen2345/camaleon-cms/pull/1163)
   - Remove unnecessary `PluginRoutes.reload` from `plugins#index` and `themes#index` actions
