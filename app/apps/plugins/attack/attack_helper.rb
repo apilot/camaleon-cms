@@ -1,14 +1,14 @@
 module Plugins
   module Attack
     module AttackHelper
-      # here all actions on plugin destroying
+      # Here all actions on the plugin are destroyed
       # plugin: plugin model
       def attack_on_destroy(_plugin)
         current_site.attack.destroy_all
       end
 
-      # here all actions on going to active
-      # you can run sql commands like this:
+      # Here all actions on going to active
+      # you can run SQL commands like this:
       # results = ActiveRecord::Base.connection.execute(query);
       # plugin: plugin model
       def attack_on_active(_plugin)
@@ -16,15 +16,13 @@ module Plugins
                                                  post: { sec: 20, max: 5 },
                                                  msg: I18n.t('plugin.attack.form.request_limit_exceeded').to_s,
                                                  ban: 5,
-                                                 cleared: Time.now })
+                                                 cleared: Time.zone.now.iso8601 })
 
-        unless ActiveRecord::Base.connection.table_exists? 'plugins_attacks'
-          ActiveRecord::Base.connection.create_table :plugins_attacks do |t|
-            t.string :path, index: true
-            t.string :browser_key, index: true
-            t.belongs_to :site, index: true
-            t.datetime 'created_at'
-          end
+        ActiveRecord::Base.connection.create_table :plugins_attacks, if_not_exists: true do |t|
+          t.string :path, index: true
+          t.string :browser_key, index: true
+          t.belongs_to :site, index: true
+          t.datetime 'created_at'
         end
         CamaleonCms::Site.class_eval do
           has_many :attack, class_name: 'Plugins::Attack::Models::Attack'
@@ -54,40 +52,40 @@ module Plugins
         return unless current_site
 
         config = current_site.get_meta('attack_config')
-        q = current_site.attack.where(browser_key: cama_get_session_id, path: attack_request_key)
+        query = current_site.attack.where(browser_key: cama_get_session_id, path: attack_request_key)
         return if config.blank?
 
         # clear past requests
         if begin
-          Time.parse(config[:cleared])
+          Time.zone.parse(config[:cleared])
         rescue StandardError
           2.hours.ago
         end < 1.hour.ago
           current_site.attack.where('plugins_attacks.created_at < ?', 1.hour.ago).delete_all
-          config[:cleared] = Time.now.to_s
+          config[:cleared] = Time.zone.now.iso8601 # Use ISO8601 for reliable parsing
           current_site.set_meta('attack_config', config)
         end
 
         # post request
         if request.post? || request.patch?
-          r = q.where(created_at: config[:post][:sec].to_i.seconds.ago..Time.now)
+          r = query.where(created_at: config[:post][:sec].to_i.seconds.ago..Time.zone.now)
           if r.count > config[:post][:max].to_i
             Rails.cache.write(cama_get_session_id, config[:msg], expires_in: config[:ban].to_i.minutes)
-            # send an email to administrator with request info (ip, browser, if logged then send user info
+            # Email administrator with request info (ip, browser, if logged, then send user info
             render html: config[:msg].html_safe
             return
           end
 
         # get request
         else
-          r = q.where(created_at: config[:get][:sec].to_i.seconds.ago..Time.now)
+          r = query.where(created_at: config[:get][:sec].to_i.seconds.ago..Time.zone.now)
           if r.count > config[:get][:max].to_i
             Rails.cache.write(cama_get_session_id, config[:msg], expires_in: config[:ban].to_i.minutes)
             render html: config[:msg].html_safe
             return
           end
         end
-        q.create
+        query.create
       end
 
       def attack_request_key(method = nil)
