@@ -34,7 +34,7 @@ RSpec.describe 'CustomFields create/update permissions', type: :request do
         field_options: { '0' => { field_key: 'select_eval' } }
       }
 
-      expect(response).to have_http_status(302)
+      expect(response).to have_http_status(:found)
       expect(group.reload.fields.where(slug: 'eval_update')).to be_present
     end
 
@@ -51,7 +51,7 @@ RSpec.describe 'CustomFields create/update permissions', type: :request do
         field_options: { '0' => { field_key: 'select_eval' } }
       }
 
-      expect(response).to have_http_status(302)
+      expect(response).to have_http_status(:found)
       expect(group.reload.fields.where(slug: 'eval_blocked')).to be_empty
       expected_custom = I18n.t('camaleon_cms.admin.custom_field.message.select_eval_admin_only', default: 'The "Select Eval" field type is restricted to administrators.')
       expect(flash[:error]).to satisfy do |msg|
@@ -98,7 +98,7 @@ RSpec.describe 'CustomFields create/update permissions', type: :request do
       end.not_to(change { current_site.custom_field_groups.count })
 
       # should redirect (either by authorization or permission check)
-      expect(response).to have_http_status(302)
+      expect(response).to have_http_status(:found)
 
       # and set an error message about select_eval restriction (either the custom message or the standard CanCan denial)
       expected_custom = I18n.t('camaleon_cms.admin.custom_field.message.select_eval_admin_only', default: 'The "Select Eval" field type is restricted to administrators.')
@@ -119,7 +119,7 @@ RSpec.describe 'CustomFields create/update permissions', type: :request do
       sign_in_as(user, site: current_site)
 
       get '/admin/settings/custom_fields/list', params: { post_type: post_type.id, post_id: my_post.id }
-      expect(response).to have_http_status(200)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'respects categories parameter for field groups and updates post categories' do

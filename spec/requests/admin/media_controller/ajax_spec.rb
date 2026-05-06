@@ -20,7 +20,7 @@ RSpec.describe CamaleonCms::Admin::MediaController, '#ajax', type: :request do
     it 'allows access to ajax endpoint' do
       get '/admin/media/ajax'
 
-      expect(response).to have_http_status(200)
+      expect(response).to have_http_status(:ok)
     end
   end
 

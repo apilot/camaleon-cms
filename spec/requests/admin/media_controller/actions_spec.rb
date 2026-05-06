@@ -21,7 +21,7 @@ RSpec.describe CamaleonCms::Admin::MediaController, '#actions', type: :request d
       it 'allows creating a new folder' do
         post '/admin/media/actions', params: { folder: '/test_folder', media_action: 'new_folder' }
 
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
       end
     end
 
@@ -30,7 +30,7 @@ RSpec.describe CamaleonCms::Admin::MediaController, '#actions', type: :request d
         allow_any_instance_of(CamaleonCmsLocalUploader).to receive(:delete_folder).and_return(error: '')
         post '/admin/media/actions', params: { folder: '/test_folder', media_action: 'del_folder' }
 
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
       end
     end
 
@@ -39,7 +39,7 @@ RSpec.describe CamaleonCms::Admin::MediaController, '#actions', type: :request d
         allow_any_instance_of(CamaleonCmsLocalUploader).to receive(:delete_file).and_return(error: '')
         post '/admin/media/actions', params: { folder: '/test_file.jpg', media_action: 'del_file' }
 
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
       end
     end
   end
