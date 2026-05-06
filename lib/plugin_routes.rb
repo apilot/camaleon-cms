@@ -295,18 +295,6 @@ class PluginRoutes
       all_locales.split('|').map { |_l| I18n.t(key, **args.merge({ locale: _l })) }.uniq
     end
 
-    # return all locales for translated routes
-    def all_locales_for_routes
-      r = cache_variable('all_locales_for_routes')
-      return r if r
-
-      res = all_locales.split('|').each_with_object({}) do |locale, hsh|
-        hsh[locale] = "_#{locale}"
-      end
-      res[false] = ''
-      cache_variable('all_locales_for_routes', res)
-    end
-
     # return app's directory path
     def apps_dir
       @apps_dir ||= Rails.root.join('app/apps').to_s
