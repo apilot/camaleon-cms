@@ -29,7 +29,9 @@ module CamaleonCms
     # render category list
     def category
       begin
-        @category ||= current_site.the_full_categories.find_by(slug: params[:category_slug]).decorate if params[:category_slug].present?
+        if params[:category_slug].present?
+          @category ||= current_site.the_full_categories.find_by(slug: params[:category_slug]).decorate
+        end
         @category ||= current_site.the_full_categories.find(params[:category_id]).decorate
         @post_type = @category.the_post_type
       rescue StandardError

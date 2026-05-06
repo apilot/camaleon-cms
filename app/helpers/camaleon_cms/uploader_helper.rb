@@ -407,7 +407,9 @@ module CamaleonCms
 
       return { error: 'Redirects are not allowed for remote uploads.' } if response.is_a?(Net::HTTPRedirection)
 
-      return { error: "Unable to download remote file (HTTP #{response.code})." } unless response.is_a?(Net::HTTPSuccess)
+      unless response.is_a?(Net::HTTPSuccess)
+        return { error: "Unable to download remote file (HTTP #{response.code})." }
+      end
 
       # Enforce the site's maximum upload size to prevent memory exhaustion from oversized responses.
       max_bytes = current_site.get_option('filesystem_max_size', 100).to_f.megabytes
