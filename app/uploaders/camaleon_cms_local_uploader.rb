@@ -115,7 +115,7 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
 
     folder = File.join(@root_folder, key)
     FileUtils.rm_rf(folder) if Dir.exist? folder
-    get_media_collection.find_by_key(key).take.destroy
+    get_media_collection.by_key(key).take.destroy
   end
 
   # remove an existent file
@@ -125,7 +125,7 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
     file = File.join(@root_folder, key)
     FileUtils.rm(file) if File.exist? file
     @instance.hooks_run('after_delete', key)
-    get_media_collection.find_by_key(key).take.destroy
+    get_media_collection.by_key(key).take.destroy
   end
 
   # convert a real file path into file key

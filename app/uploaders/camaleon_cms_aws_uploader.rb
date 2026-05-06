@@ -125,7 +125,7 @@ class CamaleonCmsAwsUploader < CamaleonCmsUploader
     key = "#{@aws_settings['inner_folder']}/#{key}" if @aws_settings['inner_folder'].present?
     key = key.cama_fix_media_key
     bucket.objects(prefix: key.slice(1..-1) << '/').delete
-    get_media_collection.find_by_key(key).take.destroy
+    get_media_collection.by_key(key).take.destroy
   end
 
   # delete a file in AWS with :key
@@ -140,7 +140,7 @@ class CamaleonCmsAwsUploader < CamaleonCmsUploader
       ''
     end
     @instance.hooks_run('after_delete', key)
-    get_media_collection.find_by_key(key).take.destroy
+    get_media_collection.by_key(key).take.destroy
   end
 
   # initialize a bucket with AWS configurations

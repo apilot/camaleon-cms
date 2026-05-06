@@ -67,7 +67,7 @@ module CamaleonCms
           nil
         end
       end
-      post = the_posts.find_by_slug(slug_or_id) if slug_or_id.is_a?(String) # id
+      post = the_posts.find_by(slug: slug_or_id) if slug_or_id.is_a?(String) # id
       post.present? ? post.decorate : nil
     end
 
@@ -96,7 +96,7 @@ module CamaleonCms
       return unless slug_or_id.is_a?(String)
 
       begin
-        the_full_categories.find_by_slug(slug_or_id).decorate
+        the_full_categories.find_by(slug: slug_or_id).decorate
       rescue StandardError
         nil
       end
@@ -126,7 +126,7 @@ module CamaleonCms
       return unless slug_or_id.is_a?(String)
 
       begin
-        object.post_tags.find_by_slug(slug_or_id).decorate
+        object.post_tags.find_by(slug: slug_or_id).decorate
       rescue StandardError
         nil
       end
@@ -144,7 +144,7 @@ module CamaleonCms
       return unless id_or_username.is_a?(String)
 
       begin
-        object.users.find_by_username(id_or_username).decorate
+        object.users.find_by(username: id_or_username).decorate
       rescue StandardError
         nil
       end
@@ -165,14 +165,14 @@ module CamaleonCms
     def the_post_type(slug_or_id)
       if slug_or_id.is_a?(String)
         begin
-          return object.post_types.find_by_slug(slug_or_id).decorate
+          return object.post_types.find_by(slug: slug_or_id).decorate
         rescue StandardError
           nil
         end
       end
       if slug_or_id.is_a?(Array)
         begin
-          return object.post_types.find_by_slug(slug_or_id).decorate
+          return object.post_types.find_by(slug: slug_or_id).decorate
         rescue StandardError
           nil
         end

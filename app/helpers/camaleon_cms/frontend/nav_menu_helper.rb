@@ -49,7 +49,7 @@ module CamaleonCms
         }
 
         args = args_def.merge!(args)
-        nav_menu = current_site.nav_menus.find_by_slug(args[:menu_slug])
+        nav_menu = current_site.nav_menus.find_by(slug: args[:menu_slug])
         nav_menu ||= current_site.nav_menus.first
         html = "<#{args[:container]} class='#{args[:container_class]}' "\
           "id='#{args[:container_id]}'>#{args[:container_prepend]}{__}#{args[:container_append]}</#{args[:container]}>"

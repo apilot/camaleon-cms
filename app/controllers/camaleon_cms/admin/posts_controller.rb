@@ -197,7 +197,7 @@ module CamaleonCms
 
       # define post type parent
       def set_post_type
-        @post_type = current_site.post_types.find_by_id(params[:post_type_id])
+        @post_type = current_site.post_types.find_by(id: params[:post_type_id])
         if @post_type.blank?
           flash[:error] = t('camaleon_cms.admin.request_error_message')
           redirect_to cama_admin_path

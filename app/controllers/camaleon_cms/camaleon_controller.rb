@@ -122,7 +122,7 @@ module CamaleonCms
               flash[:error] = 'Site is Inactive'
             end
           else
-            p = current_site.posts.find_by_id(current_site.get_option('page_inactive')).try(:decorate)
+            p = current_site.posts.find_by(id: current_site.get_option('page_inactive')).try(:decorate)
             if p
               redirect_to(p.the_url) unless params == { 'controller' => 'camaleon_cms/frontend', 'action' => 'post',
                                                         'slug' => p.the_slug }
@@ -135,7 +135,7 @@ module CamaleonCms
         # maintenance page and IP's control
         if current_site.is_maintenance? && !current_site.get_option('maintenance_ips',
                                                                     '').split(',').include?(request.remote_ip)
-          p = current_site.posts.find_by_id(current_site.get_option('page_maintenance')).try(:decorate)
+          p = current_site.posts.find_by(id: current_site.get_option('page_maintenance')).try(:decorate)
           if p
             redirect_to(p.the_url) if params != { 'controller' => 'camaleon_cms/frontend', 'action' => 'post',
                                                   'slug' => p.the_slug }

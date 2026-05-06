@@ -35,7 +35,7 @@ module CamaleonCms
     # login a user using username and password
     # return boolean: true => authenticated, false => authentication failed
     def login_user_with_password(username, password)
-      @user = current_site.users.find_by_username(username)
+      @user = current_site.users.find_by(username: username)
       r = { user: @user, params: params, password: password, captcha_validate: true }
       hooks_run('user_before_login', r)
       @user&.authenticate(password)
@@ -127,7 +127,7 @@ module CamaleonCms
 
       return nil unless cookie_auth_token_complete?
 
-      @cama_current_user = current_site.users_include_admins.find_by_auth_token(user_auth_token_from_cookie).try(:decorate)
+      @cama_current_user = current_site.users_include_admins.find_by(auth_token: user_auth_token_from_cookie).try(:decorate)
     end
 
     def cookie_auth_token_complete?
@@ -190,7 +190,7 @@ module CamaleonCms
       end
       return unless doorkeeper_token
 
-      current_site.users_include_admins.find_by_id(doorkeeper_token.resource_owner_id).try(:decorate)
+      current_site.users_include_admins.find_by(id: doorkeeper_token.resource_owner_id).try(:decorate)
     end
   end
 end

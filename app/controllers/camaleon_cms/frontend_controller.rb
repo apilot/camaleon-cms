@@ -29,7 +29,7 @@ module CamaleonCms
     # render category list
     def category
       begin
-        @category ||= current_site.the_full_categories.find_by_slug(params[:category_slug]).decorate if params[:category_slug].present?
+        @category ||= current_site.the_full_categories.find_by(slug: params[:category_slug]).decorate if params[:category_slug].present?
         @category ||= current_site.the_full_categories.find(params[:category_id]).decorate
         @post_type = @category.the_post_type
       rescue StandardError
@@ -60,7 +60,7 @@ module CamaleonCms
     # render contents from post type
     def post_type
       begin
-        @post_type = current_site.post_types.find_by_slug(params[:post_type_slug]).decorate
+        @post_type = current_site.post_types.find_by(slug: params[:post_type_slug]).decorate
       rescue StandardError
         return page_not_found
       end
@@ -81,7 +81,7 @@ module CamaleonCms
     def post_tag
       begin
         @post_tag = if params[:post_tag_slug].present?
-                      current_site.post_tags.find_by_slug(params[:post_tag_slug]).decorate
+                      current_site.post_tags.find_by(slug: params[:post_tag_slug]).decorate
                     else
                       current_site.post_tags.find(params[:post_tag_id]).decorate
                     end
@@ -186,7 +186,7 @@ module CamaleonCms
     def render_post(post_or_slug_or_id, from_url = false, status = nil, force_visit = false)
       @post = case post_or_slug_or_id
               when String # slug
-                current_site.the_posts.find_by_slug(post_or_slug_or_id)
+                current_site.the_posts.find_by(slug: post_or_slug_or_id)
               when Integer # id
                 current_site.the_posts.where(id: post_or_slug_or_id).first
               else # model

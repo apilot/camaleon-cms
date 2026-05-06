@@ -11,9 +11,9 @@ module CamaleonCms
 
         def index
           @nav_menu = if params[:id].present?
-                        current_site.nav_menus.find_by_id(params[:id])
+                        current_site.nav_menus.find_by(id: params[:id])
                       elsif params[:slug].present?
-                        current_site.nav_menus.find_by_slug(params[:slug])
+                        current_site.nav_menus.find_by(slug: params[:slug])
                       else
                         current_site.nav_menus.first
                       end

@@ -25,7 +25,7 @@ class CamaleonCmsUploader
               ''].include?(prefix)
             get_media_collection.where(folder_path: '/')
           else
-            get_media_collection.find_by_key(prefix).take.try(:items)
+            get_media_collection.by_key(prefix).take.try(:items)
           end
     # Private hook to recover custom files to include in current list where data can be modified to add custom{files, folders}
     # Note: this hooks doesn't have access to public vars like params. requests, ...
@@ -136,10 +136,10 @@ class CamaleonCmsUploader
   # sample: search_new_key("my_file/file.txt")
   def search_new_key(key)
     _key = key
-    if get_media_collection.find_by_key(key).any?
+    if get_media_collection.by_key(key).any?
       (1..999).each do |i|
         _key = key.cama_add_postfix_file_name("_#{i}")
-        break unless get_media_collection.find_by_key(_key).any?
+        break unless get_media_collection.by_key(_key).any?
       end
     end
     _key
