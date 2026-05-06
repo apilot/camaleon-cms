@@ -245,7 +245,7 @@ module CamaleonCms
       postfix = 'url'
       postfix = 'path' if args.delete(:as_path)
       skip_relative_url_root = args.delete(:skip_relative_url_root)
-      h.cama_current_site_host_port(args) unless args.keys.include?(:host)
+      h.cama_current_site_host_port(args) unless args.key?(:host)
       res = h.cama_url_to_fixed("cama_root_#{postfix}", args)
       if skip_relative_url_root && PluginRoutes.static_system_info['relative_url_root'].present?
         res = res.sub("/#{PluginRoutes.static_system_info['relative_url_root']}",
