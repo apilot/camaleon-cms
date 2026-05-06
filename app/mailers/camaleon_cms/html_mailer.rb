@@ -72,7 +72,7 @@ module CamaleonCms
         end
       end
 
-      layout = data[:layout_name].present? ? data[:layout_name] : false
+      layout = data[:layout_name].presence || false
       if data[:template_name].present? # render email with template
         if data[:format] == 'html'
           mail(mail_data) do |format|

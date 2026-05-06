@@ -113,7 +113,7 @@ module CamaleonCms
 
           if params[:custom_items].present? # custom menu items
             params[:custom_items].each_value do |custom_item|
-              type = custom_item['kind'].present? ? custom_item['kind'] : 'external'
+              type = custom_item['kind'].presence || 'external'
               items << @nav_menu.append_menu_item({ label: custom_item['label'], link: custom_item['url'], type: type })
             end
           end

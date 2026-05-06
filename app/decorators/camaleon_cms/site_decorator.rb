@@ -68,7 +68,7 @@ module CamaleonCms
         end
       end
       post = the_posts.find_by(slug: slug_or_id) if slug_or_id.is_a?(String) # id
-      post.present? ? post.decorate : nil
+      post&.decorate
     end
 
     # return a collection of categories

@@ -30,7 +30,7 @@ def admin_sign_in(user = 'admin', pass = 'admin123')
 end
 
 def cama_root_relative_path
-  PluginRoutes.system_info['relative_url_root'].to_s if PluginRoutes.system_info['relative_url_root'].present?
+  PluginRoutes.system_info['relative_url_root'].presence&.to_s
 end
 
 def file_select

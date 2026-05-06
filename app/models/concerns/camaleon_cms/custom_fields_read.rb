@@ -82,7 +82,7 @@ module CamaleonCms
       rescue StandardError
         _default
       end
-      v.present? ? v : _default
+      v.presence || _default
     end
     alias get_field get_field_value
     alias get_field! get_field_value

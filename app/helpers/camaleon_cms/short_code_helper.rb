@@ -161,7 +161,7 @@ module CamaleonCms
     # determine the content to replace instead the shortcode
     # return string
     def _eval_shortcode(code, attrs, args = {}, template = nil)
-      template ||= (@_shortcodes_template[code].present? ? @_shortcodes_template[code] : "camaleon_cms/shortcode_templates/#{code}")
+      template ||= @_shortcodes_template[code].presence || "camaleon_cms/shortcode_templates/#{code}"
       if @_shortcodes_template[code].instance_of?(::Proc)
         @_shortcodes_template[code].call(_shortcode_parse_attr(attrs), args)
       else

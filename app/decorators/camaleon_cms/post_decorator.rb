@@ -14,13 +14,10 @@ module CamaleonCms
       excerpt = object.get_meta('summary').to_s.translate(get_locale)
       # r = {content: (excerpt.present? ? excerpt : object.content_filtered.to_s.translate(get_locale).strip_tags.gsub(/&#13;|\n/, " ").truncate(qty_chars)), post: object}
       r = {
-        content: (if excerpt.present?
-                    excerpt
-                  else
-                    h.cama_strip_shortcodes(object.content_filtered.to_s.translate(get_locale).strip_tags.gsub(
-                      /&#13;|\n/, ' '
-                    ).truncate(qty_chars))
-                  end), post: object
+        content:
+          excerpt.presence || h.cama_strip_shortcodes(object.content_filtered.to_s.translate(get_locale)
+                                                            .strip_tags.gsub(/&#13;|\n/, ' ').truncate(qty_chars)),
+        post: object
       }
       h.hooks_run('post_the_excerpt', r)
       r[:content]
@@ -33,17 +30,13 @@ module CamaleonCms
       h.do_shortcode(r[:content], self)
     end
 
-    # return thumbnail image for this post
+    # Return the thumbnail image for this post
     # default: default image if thumbails not exist
     # if default is empty, post_type default thumb will be returned
     def the_thumb_url(default = nil)
       th = object.get_meta('thumb')
-      if th.present?
-        th
-      else
-        default || object.post_type.get_option('default_thumb',
-                                               nil) || h.asset_url('camaleon_cms/image-not-found.png')
-      end
+      th.presence || default || object.post_type.get_option('default_thumb', nil) ||
+        h.asset_url('camaleon_cms/image-not-found.png')
     end
     alias the_image_url the_thumb_url
 

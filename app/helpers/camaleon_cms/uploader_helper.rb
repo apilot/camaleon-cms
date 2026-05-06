@@ -191,8 +191,8 @@ module CamaleonCms
       data = { img: img, w: w, h: h, w_offset: w_offset, h_offset: h_offset, resize: resize, replace: replace }
       hooks_run('before_crop_image', data)
       data[:img].combine_options do |i|
-        i.resize("#{w if w.present?}x#{h if h.present?}#{force}") if data[:resize]
-        i.crop "#{w if w.present?}x#{h if h.present?}+#{w_offset}+#{h_offset}#{force}" unless data[:resize]
+        i.resize("#{w.presence}x#{h.presence}#{force}") if data[:resize]
+        i.crop "#{w.presence}x#{h.presence}+#{w_offset}+#{h_offset}#{force}" unless data[:resize]
       end
 
       ext = File.extname(file_path)

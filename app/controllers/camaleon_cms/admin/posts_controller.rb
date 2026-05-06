@@ -117,7 +117,7 @@ module CamaleonCms
         if @post.draft_child? && @post.parent.present?
           # This is a draft (as a child of the original post)
           original_parent = @post.parent.parent
-          post_data[:post_parent] = original_parent.present? ? original_parent.id : nil
+          post_data[:post_parent] = original_parent&.id
           @post = @post.parent
           delete_drafts = true
         elsif @post.draft?
