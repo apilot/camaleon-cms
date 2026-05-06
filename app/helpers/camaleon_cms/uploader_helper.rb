@@ -44,7 +44,8 @@ module CamaleonCms
     #     To manage jobs, please check https://edgeguides.rubyonrails.org/active_job_basics.html
     #     Note: if you are using temporal_time, you will need to copy the file to another directory later
     # sample: upload_file(params[:my_file], {formats: "images", folder: "temporal"})
-    # sample: upload_file(params[:my_file], {formats: "jpg,png,gif,mp3,mp4", temporal_time: 10.minutes, maximum: 10.megabytes})
+    # sample: upload_file(params[:my_file], {formats: "jpg,png,gif,mp3,mp4",
+    #           temporal_time: 10.minutes, maximum: 10.megabytes})
     def upload_file(uploaded_io, settings = {})
       cached_name = uploaded_io.is_a?(ActionDispatch::Http::UploadedFile) ? uploaded_io.original_filename : nil
       return { error: 'File is empty', file: nil, size: nil } if uploaded_io.blank?
@@ -208,9 +209,12 @@ module CamaleonCms
     #   w: (Integer) width
     #   h: (Integer) height
     #   settings:
-    #     gravity: (Sym, default :north_east) Crop position: :north_west, :north, :north_east, :east, :south_east, :south, :south_west, :west, :center
-    #     overwrite: (Boolean, default true) true for overwrite current image with resized resolutions, false: create other file called with prefix "crop_"
-    #     output_name: (String, default prefixd name with crop_), permit to define the output name of the thumbnail if overwrite = true
+    #     gravity: (Sym, default :north_east)
+    #       Crop position: :north_west, :north, :north_east, :east, :south_east, :south, :south_west, :west, :center
+    #     overwrite: (Boolean, default true) true for overwrite current image with resized resolutions,
+    #       false: create other file called with prefix "crop_"
+    #     output_name: (String, default prefixd name with crop_), permit to define the output name of the
+    #       thumbnail if overwrite = true
     # Return: (String) file path where saved this cropped
     # sample: cama_resize_and_crop(my_file, 200, 200, {gravity: :north_east, overwrite: false})
     def cama_resize_and_crop(file, w, h, settings = {})
@@ -265,7 +269,8 @@ module CamaleonCms
     # cama_tmp_upload('https://camaleon.website/media/132/logo2.png')  ==> /var/rails/my_project/public/tmp/1/logo2.png
     # cama_tmp_upload('/var/www/media/132/logo 2.png')  ==> /var/rails/my_project/public/tmp/1/logo-2.png
     # accept args:
-    #   name: to indicate the name to use, sample: cama_tmp_upload('/var/www/media/132/logo 2.png', {name: 'owen.png', formats: 'images'})
+    #   name: to indicate the name to use,
+    #     sample: cama_tmp_upload('/var/www/media/132/logo 2.png', {name: 'owen.png', formats: 'images'})
     #   formats: extensions permitted, sample: jpg,png,... or generic: images | videos | audios | documents (default *)
     #   dimension: 20x30
     # return: {file_path, error}
@@ -360,8 +365,11 @@ module CamaleonCms
             secret_key: current_site.get_option('filesystem_s3_secret_key'),
             bucket: current_site.get_option('filesystem_s3_bucket_name'),
             cloud_front: current_site.get_option('filesystem_s3_cloudfront'),
-            aws_file_upload_settings: ->(settings) { settings }, # permit to add your custom attributes for file_upload https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Object.html#upload_file-instance_method
-            aws_file_read_settings: ->(data, _s3_file) { data } # permit to read custom attributes from aws file and add to file parsed object
+            # permit to add your custom attributes for
+            # file_upload https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Object.html#upload_file-instance_method
+            aws_file_upload_settings: ->(settings) { settings },
+            # permit to read custom attributes from aws file and add to file parsed object
+            aws_file_read_settings: ->(data, _s3_file) { data }
           },
           custom_uploader: nil # possibility to use custom file uploader
         }

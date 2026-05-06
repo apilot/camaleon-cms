@@ -84,10 +84,10 @@ module CamaleonCms
         end
 
         # others
-        %i[media comments themes widgets nav_menu plugins users settings custom_fields select_eval].each do |manager_key|
-          safe_can :manage, manager_key if @roles_manager[manager_key]
+        %i[media comments themes widgets nav_menu plugins users settings custom_fields select_eval].each do |resource|
+          safe_can :manage, resource if @roles_manager[resource]
         end
-        @roles_manager.try(:each) do |rol_manage_key, val_role|
+        @roles_manager.each do |rol_manage_key, val_role|
           safe_can :manage, rol_manage_key.to_sym if val_role.to_s.cama_true?
         end
       end

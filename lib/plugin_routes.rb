@@ -174,7 +174,9 @@ class PluginRoutes
 
     # Add a callable (Proc/Lambda) to run after routes reload; strings are not supported.
     def add_after_reload_routes(command)
-      after_reload_callbacks << (command.is_a?(String) ? raise(ArgumentError, 'Expected a callable (Proc/Lambda), not a String') : command)
+      raise(ArgumentError, 'Expected a callable (Proc/Lambda), not a String') if command.is_a?(String)
+
+      after_reload_callbacks << command
     end
 
     # return all enabled plugins []

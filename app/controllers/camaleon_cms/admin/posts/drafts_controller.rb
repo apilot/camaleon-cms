@@ -52,7 +52,11 @@ module CamaleonCms
         private
 
         def set_post_data_params
-          post_data = params.require(:post).permit(:title, :slug, :content, :excerpt, :status, :comment_status, :post_parent, :visibility, :visibility_value, :post_order, :published_at).to_h
+          post_data = params
+            .require(:post).permit(
+            :title, :slug, :content, :excerpt, :status, :comment_status, :post_parent, :visibility, :visibility_value,
+            :post_order, :published_at
+          ).to_h
           post_data.delete(:created_at) if params[:post][:created_at].blank?
           post_data.delete(:updated_at) if params[:post][:updated_at].blank?
           post_data[:status] = 'draft_child'

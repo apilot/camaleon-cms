@@ -171,7 +171,8 @@ module CamaleonCms
       end
 
       def user_permit_data
-        params.require(:user).permit(:first_name, :last_name, :email, :username, :password, :password_confirmation, :is_valid_email)
+        params.require(:user)
+              .permit(:first_name, :last_name, :email, :username, :password, :password_confirmation, :is_valid_email)
       end
     end
   end
