@@ -147,7 +147,7 @@ module CamaleonCms
         authorize! :destroy, @post
         @post.set_option('status_default', @post.status)
         # @post.children.destroy_all unless @post.draft? TODO: why delete children?
-        @post.update_column('status', 'trash')
+        @post.update_column(:status, 'trash') # rubocop:disable Rails/SkipsModelValidations
         @post.update_extra_data
         hooks_run('trashed_post', { post: @post, post_type: @post_type })
         flash[:notice] = t('camaleon_cms.admin.post.message.trash', post_type: @post_type.decorate.the_title)
@@ -157,7 +157,9 @@ module CamaleonCms
       def restore
         @post = @post_type.posts.find(params[:post_id])
         authorize! :update, @post
-        @post.update_column('status', @post.options[:status_default] || 'pending')
+        # rubocop:disable Rails/SkipsModelValidations
+        @post.update_column(:status, @post.options[:status_default] || 'pending')
+        # rubocop:enable Rails/SkipsModelValidations
         @post.update_extra_data
         hooks_run('restored_post', { post: @post, post_type: @post_type })
         flash[:notice] = t('camaleon_cms.admin.post.message.restore', post_type: @post_type.decorate.the_title)

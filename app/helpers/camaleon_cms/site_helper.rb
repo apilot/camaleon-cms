@@ -105,7 +105,7 @@ module CamaleonCms
       # new theme
       current_site.set_option('_theme', key)
       theme = PluginRoutes.theme_info(key)
-      current_site.themes.update_all(status: 'inactive')
+      current_site.themes.update_all(status: 'inactive') # rubocop:disable Rails/SkipsModelValidations
       theme_model = current_site.themes.where(slug: key).first_or_create! { |t| t.name = theme[:name] }
       theme_model.update(status: nil)
       hook_run(theme, 'on_active', theme_model)

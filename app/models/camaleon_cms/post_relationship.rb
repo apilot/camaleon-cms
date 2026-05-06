@@ -18,7 +18,9 @@ module CamaleonCms
     private
 
     def update_count
-      post_type.update_column('count', post_type.posts.size) if post_type.present?
+      return if post_type.blank?
+
+      post_type.update_column(:count, post_type.posts.size) # rubocop:disable Rails/SkipsModelValidations
     end
   end
 end

@@ -244,10 +244,11 @@ module CamaleonCms
       end
     end
 
-    # update new value for field with slug _key
+    # Update the value for the field with slug _key
     # Sample: my_posy.update_field_value('sub_title', 'Test Sub Title')
-    def update_field_value(_key, value = nil, group_number = 0)
-      custom_field_values.find_by(custom_field_slug: _key, group_number: group_number)&.update_column('value', value)
+    def update_field_value(key, value = nil, group_number = 0)
+      custom_field_values.find_by(custom_field_slug: key, group_number: group_number)
+                         &.update_column(:value, value) # rubocop:disable Rails/SkipsModelValidations
     rescue StandardError
       nil
     end

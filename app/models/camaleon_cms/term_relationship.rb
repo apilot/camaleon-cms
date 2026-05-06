@@ -17,7 +17,10 @@ module CamaleonCms
     # update counter of post published items
     # TODO verify counter
     def update_count
-      term_taxonomy.update_column('count', term_taxonomy.posts.published.size) if term_taxonomy&.try(:posts)
+      return unless term_taxonomy&.try(:posts)
+
+      term_taxonomy
+        .update_column(:count, term_taxonomy.posts.published.size) # rubocop:disable Rails/SkipsModelValidations
     end
   end
 end

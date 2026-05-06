@@ -61,7 +61,8 @@ module CamaleonCms
         # reorder custom fields group
         def reorder
           params[:values].to_a.each_with_index do |value, index|
-            current_site.custom_field_groups.find(value).update_column('field_order', index)
+            current_site.custom_field_groups.find(value)
+                        .update_column(:field_order, index) # rubocop:disable Rails/SkipsModelValidations
           end
           json = { size: params[:values].size }
           render json: json

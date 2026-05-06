@@ -171,7 +171,7 @@ module CamaleonCms
     # new_order_position: (Integer) position number
     # return nil
     def set_position(new_order_position)
-      update_column('post_order', new_order_position)
+      update_column(:post_order, new_order_position) # rubocop:disable Rails/SkipsModelValidations
     end
 
     # save the summary for current post
