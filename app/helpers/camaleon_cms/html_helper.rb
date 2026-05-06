@@ -90,19 +90,6 @@ module CamaleonCms
       "#{args[:css_html]}\n#{args[:js_html]}\n#{@_assets_content.join('').html_safe}"
     end
 
-    # return category tree for category dropdown
-    # each level is prefixed with -
-    # level: internal recursive control
-    def cama_get_options_html_from_items(terms, level = 0)
-      options = []
-      terms.all.each do |term|
-        options << [('—' * level) + term.name, term.id] unless @term.id == term.id
-        children = term.children
-        options += cama_get_options_html_from_items(children, level + 1) unless children.empty?
-      end
-      options
-    end
-
     # create a html tooltip to include anywhere
     # text: text of the tooltip
     # location: location of the tooltip (left | right | top |bottom)
