@@ -443,7 +443,7 @@ class PluginRoutes
       rescue StandardError
         ''
       end }
-      options.merge!({ protocol: 'https' }) if Rails.application.config.force_ssl
+      options[:protocol] = 'https' if Rails.application.config.force_ssl
       options
     end
 
