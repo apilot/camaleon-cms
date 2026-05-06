@@ -102,7 +102,7 @@ module CamaleonCms
 
       # generate image versions
       if res['file_type'] == 'image'
-        settings[:versions].to_s.gsub(' ', '').split(',').each do |v|
+        settings[:versions].to_s.delete(' ').split(',').each do |v|
           version_path = cama_resize_upload(settings[:uploaded_io].path, v, { replace: false })
           cama_uploader.add_file(version_path, cama_uploader.version_path(res['key'], v), is_thumb: true,
                                                                                           same_name: true)
@@ -379,7 +379,7 @@ module CamaleonCms
     end
 
     def slugify(val)
-      val.to_s.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
+      val.to_s.downcase.strip.tr(' ', '-').gsub(/[^\w-]/, '')
     end
 
     def slugify_folder(val)

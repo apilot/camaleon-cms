@@ -94,7 +94,7 @@ class CamaleonCmsUploader
   # support for multiples formats, sample: image,audio
   def self.get_file_format_extensions(format)
     res = []
-    format.downcase.gsub(' ', '').split(',').each do |f|
+    format.downcase.delete(' ').split(',').each do |f|
       res << case f
              when 'image', 'images'
                'jpg,jpeg,png,gif,bmp,ico,svg'
@@ -120,8 +120,7 @@ class CamaleonCmsUploader
   def self.validate_file_format(key, valid_formats = '*')
     return true if valid_formats == '*' || valid_formats.blank?
 
-    valid_formats = valid_formats.gsub(' ',
-                                       '').downcase.split(',') + get_file_format_extensions(valid_formats).split(',')
+    valid_formats = valid_formats.delete(' ').downcase.split(',') + get_file_format_extensions(valid_formats).split(',')
     valid_formats.include?(File.extname(key).sub('.', '').split('?').first.try(:downcase))
   end
 
