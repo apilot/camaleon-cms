@@ -74,13 +74,6 @@ module CamaleonCms
       cache
     end
 
-    # =Deprecated
-    def cama_draw_timer
-      @_cama_timer ||= Time.current
-      puts "***************************************** timer: #{((Time.current - @_cama_timer) * 24 * 60 * 60).to_i}  (#{caller.first})"
-      @_cama_timer = Time.current
-    end
-
     # return normal translation with default value with translation of english
     def cama_t(key, args = {})
       args[:default] = I18n.t(key, **args.dup.merge(locale: :en)) if args[:default].blank?
