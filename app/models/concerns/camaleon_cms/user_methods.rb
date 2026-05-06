@@ -134,7 +134,7 @@ module CamaleonCms
     end
 
     def reassign_comments
-      all_comments.includes(post: { post_type: :site }).each do |comment|
+      all_comments.includes(post: { post_type: :site }).find_each do |comment|
         site = comment.post.post_type.site
         user = site.get_anonymous_user
         comment.update_column(:user_id, user.id) # rubocop:disable Rails/SkipsModelValidations

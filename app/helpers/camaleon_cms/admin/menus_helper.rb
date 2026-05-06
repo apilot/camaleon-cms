@@ -9,7 +9,7 @@ module CamaleonCms
                               url: cama_admin_dashboard_path })
         items = []
 
-        current_site.post_types.eager_load(:metas).visible_menu.all.each do |pt|
+        current_site.post_types.eager_load(:metas).visible_menu.find_each do |pt|
           pt = pt.decorate
           items_i = []
           if can? :posts,

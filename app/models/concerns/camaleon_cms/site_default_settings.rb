@@ -17,7 +17,7 @@ module CamaleonCms
       # nav menus
       @nav_menu = nav_menus.new({ name: 'Main Menu', slug: 'main_menu' })
       if @nav_menu.save
-        post_types.all.each do |pt|
+        post_types.find_each do |pt|
           if pt.slug == 'post'
             title = 'Sample Post'
             slug = 'sample-post'

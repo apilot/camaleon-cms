@@ -88,13 +88,13 @@ module CamaleonCms
     # kind: (string) tags | categories
     def update_counts(kind = '')
       if ['', 'categories'].include?(kind) && manage_categories?
-        post_type.full_categories.where(id: (@cats_before + categories.pluck(:id)).uniq).each do |c|
+        post_type.full_categories.where(id: (@cats_before + categories.pluck(:id)).uniq).find_each do |c|
           c.update_column(:count, c.posts.published.size) # rubocop:disable Rails/SkipsModelValidations
         end
       end
       return unless ['', 'tags'].include?(kind) && manage_tags?
 
-      post_type.post_tags.where(id: (@tags_before + post_tags.pluck(:id)).uniq).each do |tag|
+      post_type.post_tags.where(id: (@tags_before + post_tags.pluck(:id)).uniq).find_each do |tag|
         tag.update_column(:count, tag.posts.published.size) # rubocop:disable Rails/SkipsModelValidations
       end
     end

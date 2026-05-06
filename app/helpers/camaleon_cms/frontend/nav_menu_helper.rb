@@ -65,7 +65,7 @@ module CamaleonCms
         html = ''
         parent_current = false
         index = 0
-        nav_menu.eager_load(:metas).each do |nav_menu_item|
+        nav_menu.eager_load(:metas).find_each do |nav_menu_item|
           _args = args.dup
           data_nav_item = cama_parse_menu_item(nav_menu_item)
           next if data_nav_item == false
