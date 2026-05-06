@@ -24,7 +24,7 @@ class PluginRoutes
       settings = {}
 
       gem_settings = File.join($camaleon_engine_dir, 'config', 'system.json')
-      app_settings = Rails.root.join('config', 'system.json')
+      app_settings = Rails.root.join('config/system.json')
 
       settings.merge!(JSON.parse(File.read(gem_settings))) if File.exist?(gem_settings)
       settings.merge!(JSON.parse(File.read(app_settings))) if File.exist?(app_settings)
@@ -309,7 +309,7 @@ class PluginRoutes
 
     # return app's directory path
     def apps_dir
-      @apps_dir ||= Rails.root.join('app', 'apps').to_s
+      @apps_dir ||= Rails.root.join('app/apps').to_s
     end
 
     # return all plugins located in cms and in this project

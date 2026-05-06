@@ -1,21 +1,25 @@
 module CamaleonCms
   module CaptchaHelper
     # build a captcha image
-    # len: Number or characters to include in captcha (default 5)
+    # @param [Integer, nil] len Number of characters to include in captcha (default: 5)
+    # @return [MiniMagick::Image]
     def cama_captcha_build(len = 5)
-      img = MiniMagick::Image.open(File.join($camaleon_engine_dir.presence || Rails.root.to_s,
-                                             'lib', 'captcha', "captcha_#{rand(12)}.jpg").to_s)
+      img = MiniMagick::Image.open(resolve_captcha_file("captcha_#{rand(12)}.jpg"))
       text = cama_rand_str(len)
       session[:cama_captcha] = [] if session[:cama_captcha].blank?
       session[:cama_captcha] << text
       img.combine_options do |c|
-        c.gravity 'Center'
+        c.gravity('Center')
         c.fill('#FFFFFF')
-        c.draw "text 0,5 #{text}"
-        c.font File.join($camaleon_engine_dir.presence || Rails.root.to_s, 'lib', 'captcha', 'bumpyroad.ttf')
-        c.pointsize '30'
+        c.draw("text 0,5 #{text}")
+        c.font(resolve_captcha_file('bumpyroad.ttf'))
+        c.pointsize('30')
       end
-      img
+    end
+
+    def resolve_captcha_file(filename)
+      base_dir = $camaleon_engine_dir.presence || Rails.root.to_s
+      File.join(base_dir, 'lib', 'captcha', filename)
     end
 
     # build a captcha tag (image with captcha)

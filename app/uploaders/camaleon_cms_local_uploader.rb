@@ -2,13 +2,13 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
   def after_initialize
     @root_folder = @current_site.upload_directory
 
-    FileUtils.mkdir_p(@root_folder) unless Dir.exist?(@root_folder)
+    FileUtils.mkdir_p(@root_folder)
   end
 
   def setup_private_folder
     @root_folder = Rails.root.join(self.class::PRIVATE_DIRECTORY).to_s
 
-    FileUtils.mkdir_p(@root_folder) unless Dir.exist?(@root_folder)
+    FileUtils.mkdir_p(@root_folder)
   end
 
   def browser_files(prefix = '/', _objects = {})

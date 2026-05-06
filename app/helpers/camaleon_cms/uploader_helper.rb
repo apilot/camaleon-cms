@@ -271,7 +271,7 @@ module CamaleonCms
     # return: {file_path, error}
     def cama_tmp_upload(uploaded_io, args = {})
       tmp_path = args[:path] || File.join(Rails.public_path, 'tmp', current_site.id.to_s).to_s
-      FileUtils.mkdir_p(tmp_path) unless Dir.exist?(tmp_path)
+      FileUtils.mkdir_p(tmp_path)
       saved = false
       downloaded_tmp_file = nil
       if uploaded_io.is_a?(String) && uploaded_io.start_with?('data:') # create tmp file using base64 format
