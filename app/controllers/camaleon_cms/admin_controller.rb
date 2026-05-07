@@ -42,29 +42,29 @@ module CamaleonCms
     # render search results
     # receive params[:q]
     # receive params[:kind]: define de type of the results type (content|category|tag) => default content
-    # if this is receive a param[:ajax], then will render only results view
+    # if this is receiving a param[:ajax], then will render only results view
     def search
       add_breadcrumb I18n.t('camaleon_cms.admin.button.search')
       params[:kind] = 'content' if params[:kind].blank?
       params[:q] = (params[:q] || '').downcase
-      @items = case params[:kind]
-               when 'post_type'
-                 current_site.post_types.where(
-                   "LOWER(#{Cama::PostType.table_name}.name) LIKE ? OR LOWER(#{Cama::PostType.table_name}.slug) LIKE ? OR LOWER(#{Cama::PostType.table_name}.description) LIKE ?", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%"
-                 )
-               when 'category'
-                 current_site.full_categories.where(
-                   "LOWER(#{Cama::Category.table_name}.name) LIKE ? OR LOWER(#{Cama::Category.table_name}.slug) LIKE ? OR LOWER(#{Cama::Category.table_name}.description) LIKE ?", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%"
-                 )
-               when 'tag'
-                 current_site.post_tags.where(
-                   "LOWER(#{Cama::PostTag.table_name}.name) LIKE ? OR LOWER(#{Cama::PostTag.table_name}.slug) LIKE ? OR LOWER(#{Cama::PostTag.table_name}.description) LIKE ?", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%"
-                 )
-               else
-                 current_site.posts.where(
-                   "LOWER(#{Cama::Post.table_name}.title) LIKE ? OR LOWER(#{Cama::Post.table_name}.slug) LIKE ? OR LOWER(#{Cama::Post.table_name}.content_filtered) LIKE ?", "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%"
-                 )
-               end
+      table_name = case params[:kind]
+        when 'post_type'
+          base_query = current_site.post_types
+          Cama::PostType.table_name
+        when 'category'
+          base_query = current_site.full_categories
+          Cama::Category.table_name
+        when 'tag'
+          base_query = current_site.post_tags
+          Cama::PostTag.table_name
+        else
+          base_query = current_site.posts
+          Cama::Post.table_name
+      end
+      @items = base_query.where(
+        items_sql_by_name(table_name), "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%"
+      )
+
       @items = @items.paginate(page: params[:page], per_page: current_site.admin_per_page)
     end
 
@@ -97,6 +97,15 @@ module CamaleonCms
 
     def admin_logged_actions
       admin_menus_add_commons if !request.xhr? || params[:cama_ajax_request].blank? # initialize admin sidebar menus
+    end
+
+    def items_sql_by_name(table_name)
+      lower_name = "LOWER(#{table_name}"
+      if table_name == Cama::Post.table_name
+        return "#{lower_name}.title) LIKE ? OR #{lower_name}.slug) LIKE ? OR #{lower_name}.content_filtered) LIKE ?"
+      end
+
+      "#{lower_name}.name) LIKE ? OR #{lower_name}.slug) LIKE ? OR #{lower_name}.description) LIKE ?"
     end
   end
 end
