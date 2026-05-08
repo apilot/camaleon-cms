@@ -126,7 +126,7 @@ module CamaleonCms
       elsif (cama_current_user.present? && !cama_current_user.admin?) || cama_current_user.blank?
         # inactive page control
         if current_site.is_inactive?
-          if request.original_url.to_s.match(%r{\A#{current_site.the_url}admin(/|\z)})
+          if request.original_url.to_s.match?(%r{\A#{current_site.the_url}admin(/|\z)})
             if cama_current_user.present?
               cama_logout_user
               flash[:error] = 'Site is Inactive'

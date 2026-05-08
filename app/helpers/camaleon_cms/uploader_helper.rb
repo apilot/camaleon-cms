@@ -447,7 +447,7 @@ module CamaleonCms
       file_content = file.read
       file.rewind if file.respond_to?(:rewind)
       SUSPICIOUS_PATTERNS.each do |pattern|
-        if file_content =~ pattern
+        if file_content&.match?(pattern)
           Rails.logger.info { "Potentially malicious content found: #{pattern.inspect}" }
           break file_content_unsafe = pattern.inspect
         end
