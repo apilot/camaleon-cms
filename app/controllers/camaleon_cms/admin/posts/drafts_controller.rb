@@ -54,7 +54,7 @@ module CamaleonCms
         def set_post_data_params
           post_data = params
             .require(:post).permit(
-            :title, :slug, :content, :excerpt, :status, :comment_status, :post_parent, :visibility, :visibility_value,
+              :title, :slug, :content, :excerpt, :status, :comment_status, :post_parent, :visibility, :visibility_value,
             :post_order, :published_at
           ).to_h
           post_data.delete(:created_at) if params[:post][:created_at].blank?

@@ -22,8 +22,8 @@ RSpec.describe 'Security: XSS Vulnerabilities Fixes', type: :request do
     it 'escapes field names and field options' do
       group = current_site
         .custom_field_groups.create!(
-        name: malicious_payload, object_class: 'PostType_Post', objectid: post_type.id,
-        slug: "malicious-group-#{SecureRandom.hex(4)}"
+          name: malicious_payload, object_class: 'PostType_Post', objectid: post_type.id,
+          slug: "malicious-group-#{SecureRandom.hex(4)}"
       )
       group.add_field({ name: malicious_payload, slug: 'test-field' }, { field_key: 'text_box' })
 
@@ -49,8 +49,8 @@ RSpec.describe 'Security: XSS Vulnerabilities Fixes', type: :request do
     it 'includes auto-select JavaScript attributes in shortcodes' do
       group = current_site
         .custom_field_groups.create!(
-        name: 'Test Group', object_class: 'PostType_Post', objectid: post_type.id,
-        slug: "test-group-#{SecureRandom.hex(4)}"
+          name: 'Test Group', object_class: 'PostType_Post', objectid: post_type.id,
+          slug: "test-group-#{SecureRandom.hex(4)}"
       )
       group.add_field({ name: 'Test Field', slug: 'test-field' }, { field_key: 'text_box' })
 
