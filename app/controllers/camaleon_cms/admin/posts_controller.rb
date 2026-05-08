@@ -224,10 +224,10 @@ module CamaleonCms
       # is_create: indicate if this info is for create a new post
       def get_post_data(is_create = false)
         post_data = params
-          .require(:post).permit(
-            :title, :slug, :content, :excerpt, :status, :comment_status, :post_parent, :visibility, :visibility_value,
-          :post_order, :published_at
-        ).to_h
+                    .require(:post).permit(
+                      :title, :slug, :content, :excerpt, :status, :comment_status, :post_parent, :visibility,
+                      :visibility_value, :post_order, :published_at
+                    ).to_h
         post_data[:user_id] = cama_current_user.id if is_create
         post_data[:status] = 'pending' if post_data[:status] == 'published' && cannot?(:publish_post, @post_type)
         post_data[:data_tags] = params[:tags].to_s

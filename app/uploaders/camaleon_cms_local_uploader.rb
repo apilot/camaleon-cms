@@ -60,10 +60,10 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
     res['key'] = File.join(res['folder_path'], res['name'])
     if res['file_type'] == 'image' && File.extname(file_path).downcase != '.gif'
       res['thumb'] = if is_private_uploader?
-        "/admin/media/download_private_file?file=#{version_path(key).slice(1..-1)}"
-      else
-        version_path(res['url'])
-      end
+                       "/admin/media/download_private_file?file=#{version_path(key).slice(1..-1)}"
+                     else
+                       version_path(res['url'])
+                     end
     end
     if res['file_type'] == 'image'
       res['thumb'].sub! '.svg', '.jpg'

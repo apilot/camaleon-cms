@@ -36,15 +36,15 @@ module Themes
           { field_key: 'editor', translate: true,
             default_value: helper.capture do
               helper.safe_join([
-                helper.content_tag(:h4, 'My Links'),
-                helper.content_tag(:p) {
-                  helper.safe_join([
-                    helper.link_to('Dribbble', '#'), helper.tag(:br), ' ',
-                    helper.link_to('Twitter', '#'), helper.tag(:br), ' ',
-                    helper.link_to('Facebook', '#')
-                  ])
-                }
-              ])
+                                 helper.content_tag(:h4, 'My Links'),
+                                 helper.content_tag(:p) {
+                                   helper.safe_join([
+                                                      helper.link_to('Dribbble', '#'), helper.tag(:br), ' ',
+                                                      helper.link_to('Twitter', '#'), helper.tag(:br), ' ',
+                                                      helper.link_to('Facebook', '#')
+                                                    ])
+                                 }
+                               ])
             end }
         )
         group.add_field(
@@ -52,11 +52,12 @@ module Themes
           { field_key: 'editor', translate: true,
             default_value: helper.capture do
               helper.safe_join([
-                helper.content_tag(:h4, 'About Theme'),
-                helper.content_tag(
-                  :p, 'This cute theme was created to showcase your work in a simple way. Use it wisely.'
-                )
-              ])
+                                 helper.content_tag(:h4, 'About Theme'),
+                                 helper.content_tag(
+                                   :p,
+                                   'This cute theme was created to showcase your work in a simple way. Use it wisely.'
+                                 )
+                               ])
             end }
         )
       end

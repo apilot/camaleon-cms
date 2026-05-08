@@ -78,7 +78,7 @@ module CamaleonCms
             slug = 'welcome'
             welcome_parts = []
             logo_img = helpers
-              .image_tag('https://camaleon.website/media/132/logo2.png', width: 155, height: 155, alt: 'logo')
+                       .image_tag('https://camaleon.website/media/132/logo2.png', width: 155, height: 155, alt: 'logo')
             welcome_parts << helpers.content_tag(:p, logo_img, style: 'text-align: center;')
             cms_strong = helpers.content_tag(:strong, 'Camaleon CMS')
             rails_link = helpers.link_to('Ruby on Rails', 'https://rubyonrails.org')

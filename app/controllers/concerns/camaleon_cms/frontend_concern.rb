@@ -65,10 +65,10 @@ module CamaleonCms
           comment_data[:agent] = request.user_agent.force_encoding('ISO-8859-1').encode('UTF-8')
           comment_data[:content] = post_comment[:content]
           @comment = if post_comment[:parent_id].present?
-            @post.comments.find_by(id: post_comment[:parent_id]).children.new(comment_data)
-          else
-            @post.comments.main.new(comment_data)
-          end
+                       @post.comments.find_by(id: post_comment[:parent_id]).children.new(comment_data)
+                     else
+                       @post.comments.main.new(comment_data)
+                     end
           if @comment.save
             flash[:comment_submit][:notice] = t('camaleon_cms.admin.comments.message.created')
           else

@@ -23,7 +23,7 @@ module CamaleonCms
 
           def create
             @widget = current_site
-              .widgets.new(params.require(:widget_main).permit(:name, :slug, :description, :excerpt, :renderer))
+                      .widgets.new(params.require(:widget_main).permit(:name, :slug, :description, :excerpt, :renderer))
             @widget.status = 'simple'
             if @widget.save!
               flash[:notice] = t('camaleon_cms.admin.widgets.message.created')

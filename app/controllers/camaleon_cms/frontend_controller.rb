@@ -52,10 +52,10 @@ module CamaleonCms
       end
       if r_file.blank?
         r_file = if lookup_context.template_exists?("categories/#{category_slug}")
-          "categories/#{category_slug}"
-        else
-          'category'
-        end
+                   "categories/#{category_slug}"
+                 else
+                   'category'
+                 end
       end
 
       layout_ = if lookup_context.template_exists?("layouts/#{post_type_slug}/category")

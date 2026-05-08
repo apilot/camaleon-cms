@@ -47,10 +47,10 @@ module CamaleonCms
       end
 
       @message = if Rails.env.production?
-        ''
-      else
-        "#{message} #{error_msg || ("#{exception&.message}<br><br>#{caller.inspect}")}"
-      end
+                   ''
+                 else
+                   "#{message} #{error_msg || ("#{exception&.message}<br><br>#{caller.inspect}")}"
+                 end
 
       respond_to do |format|
         format.html { render "camaleon_cms/#{status}", status: status }

@@ -113,10 +113,10 @@ module CamaleonCms
             {
               icon: 'plug',
               title: safe_join([
-                t('camaleon_cms.admin.sidebar.plugins'),
-                ' ',
-                content_tag(:small, plugin_count, class: 'label label-primary')
-              ]),
+                                 t('camaleon_cms.admin.sidebar.plugins'),
+                                 ' ',
+                                 content_tag(:small, plugin_count, class: 'label label-primary')
+                               ]),
               url: cama_admin_plugins_path,
               datas: "data-intro='#{t('camaleon_cms.admin.intro.plugins')}' data-position='right'"
             }
@@ -317,6 +317,7 @@ module CamaleonCms
 
       def _admin_menu_draw(items)
         return ''.html_safe if items.blank?
+
         content_tag(:ul, class: 'treeview-menu') do
           safe_join(items.each_with_index.map do |item, index|
             css_class = +"item_#{index + 1} "
@@ -343,6 +344,7 @@ module CamaleonCms
 
       def parse_datas(datas_string)
         return {} if datas_string.blank?
+
         result = {}
         datas_string.scan(/data-(\w+)=['"]([^'"]*)['"]/).each do |key, value|
           result[key.to_sym] = value

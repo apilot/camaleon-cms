@@ -122,7 +122,7 @@ module CamaleonCms
                          .order(group_number: :asc).group_by(&:group_number).each_value do |group_fields|
         group = field_keys.each_with_object({}) do |field_key, hsh|
           _tmp = group_fields
-            .each_with_object([]) { |field, ary| ary << field.value if field_key == field.custom_field_slug }
+                 .each_with_object([]) { |field, ary| ary << field.value if field_key == field.custom_field_slug }
           hsh[field_key] = _tmp if _tmp.present?
         end
         res << group
