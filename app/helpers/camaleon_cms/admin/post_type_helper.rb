@@ -54,8 +54,8 @@ module CamaleonCms
       def post_type_taxonomy_html_(categories, taxonomy = 'categories', name = 'categories', type = 'checkbox',
                                    values = [], class_cat = '', required = false)
         if categories.count < 1
-          return t('camaleon_cms.admin.post_type.message.no_created_html',
-                   taxonomy: taxonomy == 'categories' ? t('camaleon_cms.admin.table.categories') : t('camaleon_cms.admin.table.tags'))
+          taxonomy == 'categories' ? t('camaleon_cms.admin.table.categories') : t('camaleon_cms.admin.table.tags')
+          return t('camaleon_cms.admin.post_type.message.no_created_html', taxonomy: taxonomy)
         end
 
         content_tag(:ul, class: class_cat) do

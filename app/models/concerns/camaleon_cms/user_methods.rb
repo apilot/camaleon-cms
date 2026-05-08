@@ -8,10 +8,18 @@ module CamaleonCms
 
       extend CamaleonCms::NormalizeAttrs
 
-      validates_uniqueness_of :username, scope: [:site_id], case_sensitive: false,
-                                         message: I18n.t('camaleon_cms.admin.users.message.requires_different_username', default: 'Requires different username')
-      validates_uniqueness_of :email, scope: [:site_id], case_sensitive: false,
-                                      message: I18n.t('camaleon_cms.admin.users.message.requires_different_email', default: 'Requires different email')
+      validates_uniqueness_of(
+        :username, scope: [:site_id], case_sensitive: false,
+        message: I18n.t(
+          'camaleon_cms.admin.users.message.requires_different_username', default: 'Requires different username'
+        )
+      )
+      validates_uniqueness_of(
+        :email, scope: [:site_id], case_sensitive: false,
+        message: I18n.t(
+          'camaleon_cms.admin.users.message.requires_different_email', default: 'Requires different email'
+        )
+      )
 
       normalize_attrs(:first_name, :last_name, :username)
 

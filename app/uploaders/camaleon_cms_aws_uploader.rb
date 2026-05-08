@@ -101,13 +101,14 @@ class CamaleonCmsAwsUploader < CamaleonCmsUploader
 
     s3_file = bucket.object(key.slice(1..-1))
     s3_file.upload_file(
-      uploaded_io_or_file_path.is_a?(String) ? uploaded_io_or_file_path : uploaded_io_or_file_path.path, @aws_settings[:aws_file_upload_settings].call({ acl: 'public-read' })
+      uploaded_io_or_file_path.is_a?(String) ? uploaded_io_or_file_path : uploaded_io_or_file_path.path,
+      @aws_settings[:aws_file_upload_settings].call({ acl: 'public-read' })
     )
     res = cache_item(file_parse(s3_file)) unless args[:is_thumb]
     res
   end
 
-  # add new folder to AWS with :key
+  # Add a new folder to AWS with :key
   def add_folder(key)
     return { error: 'Invalid folder path' } unless valid_folder_path?(key)
 
@@ -118,7 +119,7 @@ class CamaleonCmsAwsUploader < CamaleonCmsUploader
     cache_item(file_parse(s3_file))
   end
 
-  # delete a folder in AWS with :key
+  # Delete a folder in AWS with :key
   def delete_folder(key)
     return { error: 'Invalid folder path' } unless valid_folder_path?(key)
 
@@ -128,7 +129,7 @@ class CamaleonCmsAwsUploader < CamaleonCmsUploader
     get_media_collection.by_key(key).take.destroy
   end
 
-  # delete a file in AWS with :key
+  # Delete the `:key` file in AWS
   def delete_file(key)
     return { error: 'Invalid file path' } unless valid_folder_path?(key)
 
@@ -143,7 +144,7 @@ class CamaleonCmsAwsUploader < CamaleonCmsUploader
     get_media_collection.by_key(key).take.destroy
   end
 
-  # initialize a bucket with AWS configurations
+  # Initialize a bucket with AWS configurations
   # return: (AWS Bucket object)
   def bucket
     @bucket ||= lambda {

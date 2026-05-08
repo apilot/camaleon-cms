@@ -4,12 +4,13 @@ module CamaleonCms
     include CamaleonCms::FrontendConcern
     include CamaleonCms::Frontend::ApplicationHelper
     layout proc { |controller|
-             args = {
-               layout: (params[:cama_ajax_request].present? ? 'cama_ajax' : PluginRoutes.static_system_info['default_layout']), controller: controller
-             }
-             hooks_run('front_default_layout', args)
-             args[:layout]
-           }
+      args = {
+        layout: (params[:cama_ajax_request].present? ? 'cama_ajax' : PluginRoutes.static_system_info['default_layout']),
+        controller: controller
+      }
+      hooks_run('front_default_layout', args)
+      args[:layout]
+    }
     before_action :before_hooks
     after_action :after_hooks
     # rescue_from ActiveRecord::RecordNotFound, with: :page_not_found
@@ -41,18 +42,26 @@ module CamaleonCms
       @children = @category.children.no_empty.decorate
       @posts = @category.the_posts.paginate(page: params[:page],
                                             per_page: current_site.front_per_page).eager_load(:metas)
-      r_file = lookup_context.template_exists?("category_#{@category.the_slug}") ? "category_#{@category.the_slug}" : nil # specific template category with specific slug within a posttype
+      category_slug = @category.the_slug
+
+      # specific template category with specific slug within a post-type
+      r_file = lookup_context.template_exists?("category_#{category_slug}") ? "category_#{category_slug}" : nil
+      post_type_slug = "post_types/#{@post_type.the_slug}"
       if r_file.blank?
-        r_file = lookup_context.template_exists?("post_types/#{@post_type.the_slug}/category") ? "post_types/#{@post_type.the_slug}/category" : nil
+        r_file = lookup_context.template_exists?("#{post_type_slug}/category") ? "#{post_type_slug}/category" : nil
       end
       if r_file.blank?
-        r_file = lookup_context.template_exists?("categories/#{@category.the_slug}") ? "categories/#{@category.the_slug}" : 'category'
+        r_file = if lookup_context.template_exists?("categories/#{category_slug}")
+          "categories/#{category_slug}"
+        else
+          'category'
+        end
       end
 
-      layout_ = if lookup_context.template_exists?("layouts/post_types/#{@post_type.the_slug}/category")
-                  "post_types/#{@post_type.the_slug}/category"
-                elsif lookup_context.template_exists?("layouts/categories/#{@category.the_slug}")
-                  "categories/#{@category.the_slug}"
+      layout_ = if lookup_context.template_exists?("layouts/#{post_type_slug}/category")
+                  "#{post_type_slug}/category"
+                elsif lookup_context.template_exists?("layouts/categories/#{category_slug}")
+                  "categories/#{category_slug}"
                 end
       r = { category: @category, layout: layout_, render: r_file }
       hooks_run('on_render_category', r)
@@ -72,8 +81,9 @@ module CamaleonCms
                                              per_page: current_site.front_per_page).eager_load(:metas)
       @categories = @post_type.categories.no_empty.eager_load(:metas).decorate
       @post_tags = @post_type.post_tags.eager_load(:metas)
-      r_file = lookup_context.template_exists?("post_types/#{@post_type.the_slug}") ? "post_types/#{@post_type.the_slug}" : 'post_type'
-      layout_ = lookup_context.template_exists?("layouts/post_types/#{@post_type.the_slug}") ? "post_types/#{@post_type.the_slug}" : nil
+      post_type_slug = "post_types/#{@post_type.the_slug}"
+      r_file = lookup_context.template_exists?(post_type_slug) ? post_type_slug : 'post_type'
+      layout_ = lookup_context.template_exists?("layouts/#{post_type_slug}") ? post_type_slug : nil
       r = { post_type: @post_type, layout: layout_, render: r_file }
       hooks_run('on_render_post_type', r)
       render r[:render], (!r[:layout].nil? ? { layout: r[:layout] } : {})
@@ -95,7 +105,8 @@ module CamaleonCms
       @cama_visited_tag = @post_tag
       @posts = @post_tag.the_posts.paginate(page: params[:page],
                                             per_page: current_site.front_per_page).eager_load(:metas)
-      r_file = lookup_context.template_exists?("post_types/#{@post_type.the_slug}/post_tag") ? "post_types/#{@post_type.the_slug}/post_tag" : 'post_tag'
+      slug_post_tag = "post_types/#{@post_type.the_slug}/post_tag"
+      r_file = lookup_context.template_exists?(slug_post_tag) ? slug_post_tag : 'post_tag'
       layout_ = lookup_context.template_exists?('layouts/post_tag') ? 'post_tag' : nil
       r = { post_tag: @post_tag, layout: layout_, render: r_file }
       hooks_run('on_render_post_tag', r)
@@ -105,19 +116,17 @@ module CamaleonCms
     # search contents
     def search
       breadcrumb_add(ct('search'))
-      items = params[:post_type_slugs].present? ? current_site.the_posts(params[:post_type_slugs].split(',')) : current_site.the_posts
+      post_type_slugs = params[:post_type_slugs]
+      items = post_type_slugs.present? ? current_site.the_posts(post_type_slugs.split(',')) : current_site.the_posts
       @cama_visited_search = true
       @param_search = params[:q]
       layout_ = lookup_context.template_exists?('layouts/search') ? 'search' : nil
       r = { layout: layout_, render: 'search', posts: nil }
       hooks_run('on_render_search', r)
-      params[:q] = (params[:q] || '').downcase
-      @posts = if !r[:posts].nil?
-                 r[:posts]
-               else
-                 items.where('LOWER(title) LIKE ? OR LOWER(content_filtered) LIKE ?',
-                             "%#{params[:q]}%", "%#{params[:q]}%")
-               end
+      q_params = params[:q]
+      params[:q] = (q_params || '').downcase
+      @posts = r[:posts].presence ||
+               items.where('LOWER(title) LIKE ? OR LOWER(content_filtered) LIKE ?', "%#{q_params}%", "%#{q_params}%")
       @posts_size = @posts.size
       @posts = @posts.paginate(page: params[:page], per_page: current_site.front_per_page)
       render r[:render], (!r[:layout].nil? ? { layout: r[:layout] } : {})
@@ -215,10 +224,11 @@ module CamaleonCms
         rescue StandardError
           nil
         end
+        post_template = @post.get_template(@post_type)
         r_file = if lookup_context.template_exists?("page_#{@post.id}")
                    "page_#{@post.id}"
-                 elsif @post.get_template(@post_type).present? && lookup_context.template_exists?(@post.get_template(@post_type))
-                   @post.get_template(@post_type)
+                 elsif post_template.present? && lookup_context.template_exists?(post_template)
+                   post_template
                  elsif home_page.present? && @post.id.to_s == home_page
                    'index'
                  elsif lookup_context.template_exists?("post_types/#{@post_type.the_slug}/single")
@@ -263,9 +273,9 @@ module CamaleonCms
     # if url hasn't a locale, then it will use default locale set on application.rb
     def init_frontent
       # preview theme initializing
-      @_current_theme = current_site.themes.where(slug: params[:ccc_theme_preview]).first_or_create!.decorate if cama_sign_in? && params[:ccc_theme_preview].present? && can?(
-        :manage, :themes
-      )
+      if cama_sign_in? && params[:ccc_theme_preview].present? && can?(:manage, :themes)
+        @_current_theme = current_site.themes.where(slug: params[:ccc_theme_preview]).first_or_create!.decorate
+      end
 
       @_site_options = current_site.options
       session[:cama_current_language] = params[:cama_set_language].to_sym if params[:cama_set_language].present?
@@ -284,8 +294,10 @@ module CamaleonCms
         t =~ %r{themes/(.*)/views}i || t == 'camaleon_cms/default_theme' || t == "themes/#{current_site.id}/views"
       end
 
-      lookup_context.prefixes.append("themes/#{current_site.id}/views") if Dir.exist?(Rails.root.join('app', 'apps',
-                                                                                                      'themes', current_site.id.to_s).to_s)
+      if Dir.exist?(Rails.root.join('app', 'apps', 'themes', current_site.id.to_s).to_s)
+        lookup_context.prefixes.append("themes/#{current_site.id}/views")
+      end
+
       lookup_context.prefixes.append("themes/#{current_theme.slug}/views")
       lookup_context.prefixes.append('camaleon_cms/default_theme')
 
@@ -307,11 +319,9 @@ module CamaleonCms
     # define default options for url helpers
     # control for default locale
     def default_url_options(options = {})
-      if current_site.get_languages.first.to_s == I18n.locale.to_s
-        options
-      else
-        { locale: I18n.locale }.merge options
-      end
+      return options if current_site.get_languages.first.to_s == I18n.locale.to_s
+
+      { locale: I18n.locale }.merge!(options)
     rescue StandardError
       options
     end

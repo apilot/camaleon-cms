@@ -65,19 +65,22 @@ module CamaleonCms
                         link_to(
                           url_for({ action: :toggle_status, comment_id: comment.id, s: 'a' }),
                           title: t('camaleon_cms.admin.comments.tooltip.approved_comment'),
-                          class: "#{comment.approved == 'approved' ? 'hidden' : ''} btn btn-success approve btn-xs cama_ajax_request"
+                          class: "#{comment.approved == 'approved' ? 'hidden' : ''} " \
+                                 "btn btn-success approve btn-xs cama_ajax_request"
                         ) { content_tag(:span, '', class: 'fa fa-thumbs-o-up') },
                         ' ',
                         link_to(
                           url_for({ action: :toggle_status, comment_id: comment.id, s: 'p' }),
                           title: t('camaleon_cms.admin.comments.tooltip.comment_pending'),
-                          class: "#{comment.approved == 'pending' ? 'hidden' : ''} btn btn-primary pending btn-xs cama_ajax_request"
+                          class: "#{comment.approved == 'pending' ? 'hidden' : ''} " \
+                                 "btn btn-primary pending btn-xs cama_ajax_request"
                         ) { content_tag(:span, '', class: 'fa fa-warning') },
                         ' ',
                         link_to(
                           url_for({ action: :toggle_status, comment_id: comment.id, s: 's' }),
                           title: t('camaleon_cms.admin.comments.tooltip.comment_spam'),
-                          class: "#{comment.approved == 'spam' ? 'hidden' : ''} btn btn-danger spam btn-xs cama_ajax_request"
+                          class: "#{comment.approved == 'spam' ? 'hidden' : ''} " \
+                                 "btn btn-danger spam btn-xs cama_ajax_request"
                         ) { content_tag(:span, '', class: 'fa fa-bug') }
                       ].join.html_safe
                     end

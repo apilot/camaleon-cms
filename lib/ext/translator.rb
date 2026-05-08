@@ -6,7 +6,8 @@ class String
   # The default value if translation is not provided is all text
   #
   #  $ WpPost.post_title
-  #  $ => "<!--:en-->And this is how the Universe ended.<!--:--><!--:fr-->Et c'est ainsi que l'univers connu cessa d'exister.<!--:-->"
+  #  $ => "<!--:en-->And this is how the Universe ended.<!--:-->" \
+  #       "<!--:fr-->Et c'est ainsi que l'univers connu cessa d'exister.<!--:-->"
   #  $ I18n.locale = :en
   #  $ WpPost.post_title.translate
   #  $ => "And this is how the Universe ended."

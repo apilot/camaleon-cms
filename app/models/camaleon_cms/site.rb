@@ -79,7 +79,7 @@ module CamaleonCms
       options[:_admin_theme] || 'en'
     end
 
-    # set current admin language for this site
+    # Set the current admin language for this site
     def set_admin_language(language)
       set_option('_admin_theme', language)
     end
@@ -149,11 +149,9 @@ module CamaleonCms
 
     # list all users of current site
     def users
-      if PluginRoutes.system_info['users_share_sites']
-        CamaleonCms::User.all
-      else
-        CamaleonCms::User.where(site_id: id)
-      end
+      return CamaleonCms::User.all if PluginRoutes.system_info['users_share_sites']
+
+      CamaleonCms::User.where(site_id: id)
     end
     alias users_include_admins users
 
@@ -176,9 +174,7 @@ module CamaleonCms
     def get_valid_post_slug(slug, post_id = nil)
       slugs = slug.translations
       if slugs.present?
-        slugs.each do |k, v|
-          slugs[k] = get_valid_post_slug(v)
-        end
+        slugs.each { |k, v| slugs[k] = get_valid_post_slug(v) }
         slugs.to_translate
       else
         res = slug
@@ -221,7 +217,8 @@ module CamaleonCms
 
     # return the domain for current site
     # sample: mysite.com | sample.mysite.com
-    # also, you can define custom domain for this site by: my_site.site_domain = 'my_site.com' # used for sites with different domains to call from console or task
+    # also, you can define custom domain for this site by: my_site.site_domain = 'my_site.com'
+    # used for sites with different domains to call from console or task
     def get_domain
       @site_domain || (if main_site?
                          slug

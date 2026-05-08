@@ -105,8 +105,9 @@ RSpec.describe 'Decorator i18n locale resolution', type: :feature do
         decorated = site.post_types.first&.posts&.first&.decorate
         if decorated.present?
           actual_locale = decorated.get_locale
-          expect(actual_locale).to eq(frontend_language),
-                                   "Expected decorator to use site's frontend language (#{frontend_language}), but got #{actual_locale}"
+          expect(actual_locale)
+            .to eq(frontend_language),
+                "Expected decorator to use site's frontend language (#{frontend_language}), but got #{actual_locale}"
         end
       ensure
         I18n.locale = original_locale

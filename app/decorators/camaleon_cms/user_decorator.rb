@@ -20,7 +20,9 @@ module CamaleonCms
 
     # return the avatar for this user, default: assets/admin/img/no_image.jpg
     def the_avatar(default_avatar = nil)
-      avatar_exists? ? object.get_meta('avatar') : (default_avatar || h.asset_url('camaleon_cms/admin/img/no_image.jpg'))
+      return object.get_meta('avatar') if avatar_exists?
+
+      default_avatar || h.asset_url('camaleon_cms/admin/img/no_image.jpg')
     end
 
     # return the slogan for this user, default: Hello World
@@ -65,7 +67,8 @@ module CamaleonCms
     def avatar_exists?
       # TODO: change verification
       # if object.get_meta('avatar').present?
-      #   File.exist?(h.cama_url_to_file_path(object.get_meta('avatar'))) || Faraday.head(object.get_meta('avatar')).status == 200
+      #   File.exist?(h.cama_url_to_file_path(object.get_meta('avatar'))) ||
+      #     Faraday.head(object.get_meta('avatar')).status == 200
       # else
       #   false
       # end

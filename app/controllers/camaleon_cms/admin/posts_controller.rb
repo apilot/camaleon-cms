@@ -53,8 +53,13 @@ module CamaleonCms
           @posts = @posts.no_trash
         end
 
-        @btns = { published: "#{t('camaleon_cms.admin.post_type.published')} (#{posts_all.published.size})",
-                  all: "#{t('camaleon_cms.admin.post_type.all')} (#{posts_all.no_trash.size})", pending: "#{t('camaleon_cms.admin.post_type.pending')} (#{posts_all.pending.size})", draft: "#{t('camaleon_cms.admin.post_type.draft')} (#{posts_all.drafts.size})", trash: "#{t('camaleon_cms.admin.post_type.trash')} (#{posts_all.trash.size})" }
+        @btns = {
+          published: "#{t('camaleon_cms.admin.post_type.published')} (#{posts_all.published.size})",
+          all: "#{t('camaleon_cms.admin.post_type.all')} (#{posts_all.no_trash.size})",
+          pending: "#{t('camaleon_cms.admin.post_type.pending')} (#{posts_all.pending.size})",
+          draft: "#{t('camaleon_cms.admin.post_type.draft')} (#{posts_all.drafts.size})",
+          trash: "#{t('camaleon_cms.admin.post_type.trash')} (#{posts_all.trash.size})"
+        }
         per_page = 9_999_999 if @post_type.manage_hierarchy?
         r = { posts: @posts, post_type: @post_type, btns: @btns, all_posts: posts_all, render: 'index',
               per_page: per_page }

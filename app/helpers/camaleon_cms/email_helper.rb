@@ -1,7 +1,7 @@
 module CamaleonCms
   module EmailHelper
     include CamaleonCms::HooksHelper
-    # send and email
+    # send an email
     # email: email to
     # subject: Subject of the email
     # content: content of the email
@@ -20,7 +20,8 @@ module CamaleonCms
     end
 
     # short method of send_email
-    # args: content='', from=nil, attachs=[], url_base='', current_site, template_name, layout_name, extra_data, format, cc_to
+    # args: content='', from=nil, attachs=[], url_base='', current_site, template_name, layout_name, extra_data,
+    #         format, cc_to
     def cama_send_email(email_to, subject, args = {})
       args = { url_base: cama_root_url, current_site: current_site, subject: subject }.merge(args)
       args[:attachments] = args[:attachs] if args[:attachs].present?

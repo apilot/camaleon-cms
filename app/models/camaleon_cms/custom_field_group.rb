@@ -5,8 +5,7 @@ module CamaleonCms
     alias_attribute :site_id, :parent_id
 
     default_scope do
-      where("object_class != '_fields'")
-        .reorder("#{CamaleonCms::CustomField.table_name}.field_order ASC")
+      where("object_class != '_fields'").reorder("#{CamaleonCms::CustomField.table_name}.field_order ASC")
     end
 
     has_many :metas, -> { where(object_class: 'CustomFieldGroup') }, foreign_key: :objectid, dependent: :destroy
@@ -52,7 +51,7 @@ module CamaleonCms
     end
     alias add_field add_manual_field
 
-    # return a field with slug = slug from current group
+    # return a field with slug = slug from the current group
     def get_field(slug)
       fields.find_by(slug: slug)
     end
@@ -76,7 +75,7 @@ module CamaleonCms
           if id_val.present? && (field_item = fields.find_by(id: id_val)).present?
             # If this is an existing select_eval field (or the incoming data would
             # make it a select_eval) ensure the current actor has explicit
-            # permission. For updates we preserve the form-like behavior by
+            # permission. For updates, we preserve the form-like behaviour by
             # collecting an error-like non-persisted field in errors_saved and
             # skipping the update when unauthorized.
             existing_key = (field_item.options || {})[:field_key].to_s
@@ -94,7 +93,7 @@ module CamaleonCms
             # Check if the incoming options request creation of select_eval
             incoming_key = (options[:field_key] || item[:field_key]).to_s
             if incoming_key == 'select_eval' && !can?(:manage, :select_eval)
-              # Add an error-like non-persisted field to errors_saved to preserve behavior
+              # Add an error-like non-persisted field to errors_saved to preserve behaviour
               field_item = fields.new(item)
               field_item.errors.add(:base, 'Not authorized to create select_eval field')
               errors_saved << field_item
@@ -161,8 +160,9 @@ module CamaleonCms
     # auto save the default field values
     def auto_save_default_values(field, options)
       class_name = object_class.split('_').first
-      return unless %w[Post Category Plugin
-                       Theme].include?(class_name) && objectid && (options[:default_value].present? || options[:default_values].present?)
+      return unless %w[Post Category Plugin Theme].include?(class_name) &&
+                    objectid &&
+                    (options[:default_value].present? || options[:default_values].present?)
 
       owner = if class_name == 'Theme'
                 "CamaleonCms::#{class_name}".constantize.find(objectid) # owner model
@@ -175,8 +175,8 @@ module CamaleonCms
               end
       (options[:default_values] || [options[:default_value]] || []).each do |value|
         if owner.present?
-          owner.custom_field_values.create!(custom_field_id: field.id, custom_field_slug: field.slug,
-                                            value: fix_meta_value(value))
+          owner.custom_field_values
+               .create!(custom_field_id: field.id, custom_field_slug: field.slug, value: fix_meta_value(value))
         end
       end
     end

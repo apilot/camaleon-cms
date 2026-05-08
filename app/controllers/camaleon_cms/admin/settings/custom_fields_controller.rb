@@ -115,8 +115,8 @@ module CamaleonCms
           return {} if params[:field_options].blank?
 
           params.require(:field_options).permit(params[:field_options].keys.index_with do
-            [:field_key, :multiple, :required, :translate, :default_value, :dimension, :width, :height, :class, :placeholder,
-             { default_values: [], multiple_options: %i[title value default] }]
+            [:field_key, :multiple, :required, :translate, :default_value, :dimension, :width, :height, :class,
+             :placeholder, { default_values: [], multiple_options: %i[title value default] }]
           end).to_h
         end
 
@@ -125,15 +125,17 @@ module CamaleonCms
           errors_saved, _all_fields = group.add_fields(permitted_fields, permitted_field_options)
           group.set_option('caption', @caption)
           if errors_saved.present?
-            flash[:error] = "<b>#{t('camaleon_cms.errors_found_msg', default: 'Several errors were found, please check.')}</b><br>#{errors_saved.map do |field|
-                                                                                                                                      "#{field.name}: " + field.errors.messages.map do |k, v|
-                                                                                                                                                            "#{k.to_s.titleize}: #{v.join('|')}"
-                                                                                                                                                          end.join(', ').to_s
-                                                                                                                                    end.join('<br>')}"
+            errors_found_msg = t('camaleon_cms.errors_found_msg', default: 'Several errors were found, please check.')
+            errors_saved_all_text = errors_saved.map do |field|
+              "#{field.name}: " + field.errors.messages.map do |k, v|
+                "#{k.to_s.titleize}: #{v.join('|')}"
+              end.join(', ').to_s
+            end.join('<br>')
+            flash[:error] = "<b>#{errors_found_msg}</b><br>#{errors_saved_all_text}"
+            false
           else
             flash[:notice] = t('camaleon_cms.admin.custom_field.message.custom_updated')
           end
-          true
         end
       end
     end

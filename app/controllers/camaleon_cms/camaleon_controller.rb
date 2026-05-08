@@ -35,6 +35,7 @@ module CamaleonCms
 
     # show page error
     def render_error(status = 404, exception = nil, message = '')
+      error_msg = params[:error_msg]
       Rails.logger.debug do
         original_url = begin
           request.original_url
@@ -42,11 +43,15 @@ module CamaleonCms
           nil
         end
         "Camaleon CMS - 404 url: " \
-          "#{original_url} ==> message: #{exception&.message} ==> #{params[:error_msg]} ==> #{caller.inspect}"
+          "#{original_url} ==> message: #{exception&.message} ==> #{error_msg} ==> #{caller.inspect}"
       end
 
-      @message = "#{message} #{params[:error_msg] || (exception.present? ? "#{exception.message}<br><br>#{caller.inspect}" : '')}"
-      @message = '' if Rails.env == 'production'
+      @message = if Rails.env.production?
+        ''
+      else
+        "#{message} #{error_msg || ("#{exception&.message}<br><br>#{caller.inspect}")}"
+      end
+
       respond_to do |format|
         format.html { render "camaleon_cms/#{status}", status: status }
         format.any { head status }

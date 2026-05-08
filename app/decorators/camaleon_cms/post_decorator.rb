@@ -12,7 +12,13 @@ module CamaleonCms
     # return the excerpt of this post
     def the_excerpt(qty_chars = 200)
       excerpt = object.get_meta('summary').to_s.translate(get_locale)
-      # r = {content: (excerpt.present? ? excerpt : object.content_filtered.to_s.translate(get_locale).strip_tags.gsub(/&#13;|\n/, " ").truncate(qty_chars)), post: object}
+      # r = {
+      #   content: (
+      #     (excerpt if excerpt.present?) ||
+      #     object.content_filtered.to_s.translate(get_locale).strip_tags.gsub(/&#13;|\n/, " ").truncate(qty_chars)
+      #   ),
+      #   post: object
+      # }
       r = {
         content:
           excerpt.presence || h.cama_strip_shortcodes(object.content_filtered.to_s.translate(get_locale)
@@ -237,11 +243,10 @@ module CamaleonCms
     # looks for the next post item related to parent element based on post_order attribute
     # @param _parent: parent decorated model, like: (PostType *default), Category, PostTag, Site
     # @samples: my_post.the_next_post(), my_post.the_next_post(@category), my_post.the_next_post(current_site)
-    def the_next_post(_parent = nil)
-      (_parent.presence || the_post_type).the_posts.where(
-        "#{CamaleonCms::Post.table_name}.post_order > :position OR (#{CamaleonCms::Post.table_name}.post_order = :position and #{CamaleonCms::Post.table_name}.created_at > :created_at)", {
-          position: object.post_order, created_at: object.created_at
-        }
+    def the_next_post(parent = nil)
+      (parent.presence || the_post_type).the_posts.where(
+        "#{post_order_sql} > :position OR (#{post_order_sql} = :position and #{post_table}.created_at > :created_at)",
+        { position: object.post_order, created_at: object.created_at }
       ).where.not(id: object.id).take.try(:decorate)
     end
 
@@ -249,9 +254,13 @@ module CamaleonCms
     # @param _parent: parent decorated model, like: (PostType *default), Category, PostTag, Site
     # @samples: my_post.the_prev_post(), my_post.the_prev_post(@category), my_post.the_prev_post(current_site)
     def the_prev_post(_parent = nil)
-      (_parent.presence || the_post_type).the_posts.where("#{CamaleonCms::Post.table_name}.post_order < :position OR (#{CamaleonCms::Post.table_name}.post_order = :position and #{CamaleonCms::Post.table_name}.created_at < :created_at)", { position: object.post_order, created_at: object.created_at }).where.not(id: object.id).reorder(
-        post_order: :asc, created_at: :asc
-      ).last.try(:decorate)
+      (_parent.presence || the_post_type)
+        .the_posts
+        .where(
+          "#{post_order_sql} < :position OR (#{post_order_sql} = :position and #{post_table}.created_at < :created_at)",
+          { position: object.post_order, created_at: object.created_at }
+        )
+        .where.not(id: object.id).reorder(post_order: :asc, created_at: :asc).last.try(:decorate)
     end
 
     # return the title with hierarchy prefixed
@@ -266,15 +275,27 @@ module CamaleonCms
       res.html_safe
     end
 
-    # return all related posts of current post
+    # return all related posts of the current post
     def the_related_posts
       ptype = the_post_type
-      ptype.the_posts.joins(:categories).where(CamaleonCms::TermRelationship.table_name.to_s => { term_taxonomy_id: the_categories.pluck(:id) }).distinct
+      ptype.the_posts.joins(:categories).where(
+        CamaleonCms::TermRelationship.table_name.to_s => { term_taxonomy_id: the_categories.pluck(:id) }
+      ).distinct
     end
 
     # fix for "Using Draper::Decorator without inferred source class"
     def self.object_class_name
       'CamaleonCms::Post'
+    end
+
+    private
+
+    def post_table
+      @post_table ||= CamaleonCms::Post.table_name
+    end
+
+    def post_order_sql
+      @post_order_sql ||= "#{post_table}.post_order"
     end
   end
 end

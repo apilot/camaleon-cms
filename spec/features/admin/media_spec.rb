@@ -46,7 +46,9 @@ describe 'the Media', :js do
     wait_for_ajax
 
     # delete folder
-    page.execute_script('$(\'#cama_media_gallery .folder_item[data-key="test_folder_created_by_testing"] .del_folder\').click()')
+    page.execute_script(
+      '$(\'#cama_media_gallery .folder_item[data-key="test_folder_created_by_testing"] .del_folder\').click()'
+    )
     confirm_dialog
     wait_for_ajax
   end

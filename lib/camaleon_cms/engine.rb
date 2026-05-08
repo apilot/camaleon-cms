@@ -60,7 +60,8 @@ module CamaleonCms
       app.config.encoding = 'utf-8'
 
       # add prefix url, like: https://localhost.com/blog/
-      # config.action_controller.relative_url_root = PluginRoutes.system_info["relative_url_root"] if PluginRoutes.system_info["relative_url_root"].present?
+      # config.action_controller.relative_url_root =
+      # PluginRoutes.system_info["relative_url_root"] if PluginRoutes.system_info["relative_url_root"].present?
 
       # multiple route files
       app.routes_reloader.paths.push(File.join(engine_dir, 'config', 'routes', 'admin.rb'))
@@ -71,12 +72,13 @@ module CamaleonCms
       app.config.eager_load_paths += %W[#{app.config.root}/app/apps/]
       if PluginRoutes.static_system_info['auto_include_migrations']
         PluginRoutes.all_plugins.each do |plugin|
-          app.config.paths['db/migrate'] << File.join(plugin['path'], 'migrate') if Dir.exist?(File.join(
-                                                                                                 plugin['path'], 'migrate'
-                                                                                               ))
-          app.config.paths['db/migrate'] << File.join(plugin['path'], 'db', 'migrate') if Dir.exist?(File.join(
-                                                                                                       plugin['path'], 'db', 'migrate'
-                                                                                                     ))
+          if Dir.exist?(File.join(plugin['path'], 'migrate'))
+            app.config.paths['db/migrate'] << File.join(plugin['path'], 'migrate')
+          end
+
+          if Dir.exist?(File.join(plugin['path'], 'db', 'migrate'))
+            app.config.paths['db/migrate'] << File.join(plugin['path'], 'db', 'migrate')
+          end
         end
       end
 

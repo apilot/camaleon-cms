@@ -44,7 +44,11 @@ module CamaleonCms
         nil
       end
       if r[:site].blank?
-        Rails.logger.error 'Camaleon CMS - Please define your current site: $current_site = CamaleonCms::Site.first.decorate or map your domains: https://camaleon.website/documentation/category/139779-examples/how.html'.cama_log_style(:red)
+        Rails.logger.error(
+          "Camaleon CMS - Please define your current site: $current_site = CamaleonCms::Site.first.decorate or " \
+            "map your domains: https://camaleon.website/documentation/category/139779-examples/how.html"
+            .cama_log_style(:red)
+        )
       end
       @current_site = r[:site]
       CurrentRequest.site = @current_site
@@ -121,7 +125,8 @@ module CamaleonCms
       # theme_model.destroy
     end
 
-    # add host + port to args of the current site visited (only if the request is coming from console or tasks i.e. not web browser)
+    # add host and port to args of the current site visited
+    # (only if the request is coming from console or tasks i.e. not web browser)
     # args: Hash
     # sample: {} will return {host: 'localhost', port: 3000}
     def cama_current_site_host_port(args)

@@ -23,7 +23,10 @@ module Plugins
         end
 
         @_plugin_do_cache = false
-        if @caches[:paths].include?(request.original_url) || @caches[:paths].include?(request.path_info) || front_cache_plugin_match_path_patterns?(request.original_url, request.path_info) || (params[:action] == 'index' && params[:controller] == 'camaleon_cms/frontend' && @caches[:home].present?) # cache paths and home page
+        # cache paths and home page
+        if @caches[:paths].include?(request.original_url) || @caches[:paths].include?(request.path_info) ||
+           front_cache_plugin_match_path_patterns?(request.original_url, request.path_info) ||
+           (params[:action] == 'index' && params[:controller] == 'camaleon_cms/frontend' && @caches[:home].present?)
           @_plugin_do_cache = true
         elsif params[:action] == 'post' && params[:controller] == 'camaleon_cms/frontend' && params[:draft_id].blank?
           if (post = current_site.the_posts.find_by(slug: params[:slug]))
@@ -31,7 +34,8 @@ module Plugins
             if post.can_visit? && post.visibility != 'private'
               if (@caches[:skip_posts] || []).include?(post.id.to_s)
                 @_plugin_do_cache = false
-              elsif (@caches[:post_types] || []).include?(post.post_type_id.to_s) || (@caches[:posts] || []).include?(post.id.to_s)
+              elsif (@caches[:post_types] || []).include?(post.post_type_id.to_s) ||
+                    (@caches[:posts] || []).include?(post.id.to_s)
                 @_plugin_do_cache = true
               end
             end

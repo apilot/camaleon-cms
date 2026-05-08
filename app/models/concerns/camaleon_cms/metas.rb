@@ -116,8 +116,11 @@ module CamaleonCms
       save_metas_options # unless self.changed?
     end
 
-    # save all settings for this post type received in data_options and data_metas attribute (options and metas)
-    # sample: Site.first.post_types.create({name: "owen", slug: "my_post_type", data_options: { has_category: true, default_layout: "my_layout" }})
+    # Save all settings for this post type - received in data_options and data_metas attribute (options and metas)
+    # sample:
+    # Site.first.post_types.create(
+    #   {name: "owen", slug: "my_post_type", data_options: { has_category: true, default_layout: "my_layout" }}
+    # )
     def save_metas_options
       set_multiple_options(data_options)
       return if data_metas.blank?
