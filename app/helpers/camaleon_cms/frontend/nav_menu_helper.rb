@@ -2,7 +2,7 @@ module CamaleonCms
   module Frontend
     module NavMenuHelper
       # draw nav menu as html list
-      # key: slug for nav menu
+      # key: slug for a nav menu
       # to register this, go to admin -> appearance -> menus
       # (DEPRECATED)
       def get_nav_menu(key = 'main_menu', class_name = 'navigation')
@@ -24,18 +24,27 @@ module CamaleonCms
           sub_container: 'ul', # type of container for sub items
           sub_class: 'dropdown-menu', # class for sub container
           callback_item: ->(args) {},
-          # callback executed for each item (args = { menu_item, link, level, settings, has_children, link_attrs = "", index}).
+          # callback executed for each item:
+          #   (args = { menu_item, link, level, settings, has_children, link_attrs = "", index}).
           #     menu_item: (Object) Menu object
           #     link: (Hash) link data: {link: '', name: ''}
           #     level: (Integer) current level
           #     has_children: (boolean) if this item contain sub menus
           #     settings: (Hash) menu settings
           #     index: (Integer) Index Position of this menu
-          #     link_attrs: (String) Here you can add your custom attrs for current link, sample: id='my_id' data-title='#{args[:link][:name]}'
+          #     link_attrs: (String) Here you can add your custom attrs for current link,
+          #       sample: id='my_id' data-title='#{args[:link][:name]}'
           #     item_container_attrs: (String) Here you can add your custom attrs for link container.
-          # In settings, you can change the values for this item, like after, before, ..:
-          # sample: lambda{|args| args[:settings][:after] = "<span class='caret'></span>" if args[:has_children]; args[:link_attrs] = "id='#{menu_item.id}'";  }
-          # sample: lambda{|args| args[:settings][:before] = "<i class='fa fa-home'></i>" if args[:level] == 0 && args[:index] == 0;  }
+          # In settings, you can change the values for this item, like after, before,...:
+          # sample:
+          #   lambda do |args|
+          #     args[:settings][:after] = "<span class='caret'></span>" if args[:has_children]
+          #     args[:link_attrs] = "id='#{menu_item.id}'"
+          #   end
+          # sample:
+          #   lambda do |args|
+          #     args[:settings][:before] = "<i class='fa fa-home'></i>" if args[:level] == 0 && args[:index] == 0
+          #   end
           before: '', # content before link text
           after: '', # content after link text
           link_current: 'current-link', # class for current menu link
@@ -62,7 +71,7 @@ module CamaleonCms
 
       # draw menu items
       def cama_menu_draw_items(args, nav_menu, level = 0)
-        html = ''
+        items_html = []
         parent_current = false
         index = 0
         nav_menu.eager_load(:metas).find_each do |nav_menu_item|
@@ -70,10 +79,11 @@ module CamaleonCms
           data_nav_item = cama_parse_menu_item(nav_menu_item)
           next if data_nav_item == false
 
-          _is_current = data_nav_item[:current] || site_current_path == data_nav_item[:link] ||
+          _is_current = data_nav_item[:current] ||
+                        site_current_path == data_nav_item[:link] ||
                         site_current_path == data_nav_item[:link].sub('.html', '')
-          has_children = nav_menu_item.have_children? && (args[:levels] == -1 ||
-                         (args[:levels] != -1 && level <= args[:levels]))
+          has_children = nav_menu_item.have_children? &&
+                         (args[:levels] == -1 || (args[:levels] != -1 && level <= args[:levels]))
           r = {
             menu_item: nav_menu_item.decorate,
             link: data_nav_item,
@@ -88,42 +98,68 @@ module CamaleonCms
           _args = r[:settings]
 
           if has_children
-            html_children, current_children = cama_menu_draw_items(args, nav_menu_item.children.reorder(:term_order),
-                                                                   level + 1)
+            html_children, current_children = cama_menu_draw_items(
+              args, nav_menu_item.children.reorder(:term_order), level + 1
+            )
           else
             html_children = ''
             current_children = false
           end
-          parent_current = true if _is_current || current_children
+          parent_current ||= _is_current || current_children
 
-          html += "<#{_args[:item_container]} #{r[:item_container_attrs]} class='#{_args[:item_class]} #{if has_children
-                                                                                                           _args[:item_class_parent]
-                                                                                                         end} #{if _is_current
-                                                                                                                  _args[:item_current].to_s
-                                                                                                                end} #{if current_children
-                                                                                                                         'current-menu-ancestor'
-                                                                                                                       end}'>#{_args[:link_before]}
-                <a #{r[:link_attrs]} #{if nav_menu_item.target.present?
-                                         " target='#{nav_menu_item.target}'"
-                                       end} href='#{data_nav_item[:link]}' class='#{if _is_current
-                                                                                      args[:link_current]
-                                                                                    end} #{if has_children
-                                                                                             _args[:link_class_parent]
-                                                                                           end} #{_args[:link_class]}' #{if has_children
-                                                                                                                           "data-toggle='dropdown'"
-                                                                                                                         end} >#{_args[:before]}#{data_nav_item[:name]}#{_args[:after]}</a> #{_args[:link_after]}
-                #{html_children}
-              </#{_args[:item_container]}>"
+          item_classes = [_args[:item_class]]
+          item_classes << _args[:item_class_parent] if has_children
+          item_classes << _args[:item_current] if _is_current
+          item_classes << 'current-menu-ancestor' if current_children
+          item_class_str = item_classes.reject(&:blank?).join(' ')
+
+          item_attrs = []
+          item_attrs << r[:item_container_attrs] if r[:item_container_attrs].present?
+          item_attrs << "class='#{item_class_str}'" if item_class_str.present?
+          item_attrs_str = item_attrs.reject(&:blank?).join(' ')
+
+          item_open = "<#{_args[:item_container]}"
+          item_open << " #{item_attrs_str}" if item_attrs_str.present?
+          item_open << ">"
+
+          link_attr_parts = []
+          link_attr_parts << r[:link_attrs] if r[:link_attrs].present?
+          link_attr_parts << "target='#{nav_menu_item.target}'" if nav_menu_item.target.present?
+          link_attr_parts << "href='#{data_nav_item[:link]}'"
+          link_classes = []
+          link_classes << args[:link_current] if _is_current
+          link_classes << _args[:link_class_parent] if has_children
+          link_classes << _args[:link_class]
+          link_class_str = link_classes.reject(&:blank?).join(' ')
+          link_attr_parts << "class='#{link_class_str}'" if link_class_str.present?
+          link_attr_parts << "data-toggle='dropdown'" if has_children
+          link_attrs_str = link_attr_parts.reject(&:blank?).join(' ')
+
+          link_inner = [_args[:before], data_nav_item[:name], _args[:after]].reject(&:blank?).join('')
+          link_tag = "<a #{link_attrs_str}>#{link_inner}</a>"
+
+          item_inner = [
+            _args[:link_before],
+            link_tag,
+            _args[:link_after],
+            html_children
+          ].reject(&:blank?).join('')
+          item_html = "#{item_open}#{item_inner}</#{_args[:item_container]}>"
+          items_html << item_html
+
           index += 1
         end
 
         if level == 0
-          html
+          safe_join(items_html)
         else
-          html = "<#{args[:sub_container]} class='#{args[:sub_class]} #{if parent_current
-                                                                          "parent-#{args[:item_current]}"
-                                                                        end} level-#{level}'>#{html}</#{args[:sub_container]}>"
-          [html, parent_current]
+          sub_classes = [args[:sub_class]]
+          sub_classes << "parent-#{args[:item_current]}" if parent_current
+          sub_classes << "level-#{level}"
+          sub_container_class = sub_classes.reject(&:blank?).join(' ')
+          sub_html = "<#{args[:sub_container]} class='#{sub_container_class}'>" \
+                     "#{safe_join(items_html)}</#{args[:sub_container]}>"
+          [sub_html, parent_current]
         end
       end
 
@@ -139,9 +175,8 @@ module CamaleonCms
           data_nav_item = cama_parse_menu_item(nav_menu_item)
           next if data_nav_item == false
 
-          _is_current = data_nav_item[:current] || site_current_path == data_nav_item[:link] || site_current_path == data_nav_item[:link].sub(
-            '.html', ''
-          )
+          _is_current = data_nav_item[:current] || site_current_path == data_nav_item[:link] ||
+                        site_current_path == data_nav_item[:link].sub('.html', '')
           has_children = nav_menu_item.have_children?
           has_children = false if max_levels > 0 && max_levels == internal_level
           data_nav_item[:label] = data_nav_item[:name]
@@ -157,14 +192,15 @@ module CamaleonCms
           }.merge!(data_nav_item.except(:current, :name, :link))
 
           if has_children
-            r[:children], _is_current_parent, r[:levels] = cama_menu_parse_items(nav_menu_item.children, max_levels,
-                                                                                 internal_level + 1)
+            r[:children], _is_current_parent, r[:levels] =
+              cama_menu_parse_items(nav_menu_item.children, max_levels, internal_level + 1)
             if _is_current_parent
               is_current_parent = true
               r[:current_parent] = true
             end
             r[:levels] = r[:levels] + 1
           end
+
           is_current_parent = true if r[:current_item]
           levels << r[:levels]
           res << r
@@ -240,7 +276,11 @@ module CamaleonCms
             result = { link: nav_menu_item.url.to_s.translate, name: nav_menu_item.name.to_s.translate, current: false }
             # permit to customize or mark as current menu
             # _args: (HASH) {menu_item: Model Menu Item, parsed_menu: Parsed Menu }
-            #   Sample parsed_menu: {link: "url of the link", name: "Text of the menu", current: Boolean (true => is current menu, false => not current menu item)}
+            #   Sample parsed_menu:
+            # {
+            #   link: "url of the link", name: "Text of the menu",
+            #   current: Boolean (true => is current menu, false => not current menu item)
+            # }
             unless is_from_backend
               result[:link] = cama_root_path if result[:link] == 'root_url'
               result[:link] = site_current_path if site_current_path == "#{current_site.the_path}#{result[:link]}"
@@ -251,11 +291,15 @@ module CamaleonCms
             end
           else
             # permit to build custom menu items registered as Custom Menu by hook "nav_menu_custom"
-            # sample: def my_parse_custom_menu_item_listener(args);
+            # sample:
+            # def my_parse_custom_menu_item_listener(args)
             #   if args[:menu_item].kind == 'MyModelClass'
             #     my_model = MyModelClass.find(args[:menu_item].url)
-            #     res = {name: my_model.name, url_edit: my_model_edit_url(id: my_model.id), link: my_model_public_url(id: my_model.id)}
-            #     res[:current] = site_current_path == my_model_public_url(id: my_model.id) unless args[:is_from_backend]
+            #     res = {
+            #       name: my_model.name, url_edit: my_model_edit_url(id: my_model.id),
+            #       link: my_model_url(id: my_model.id)
+            #     }
+            #     res[:current] = site_current_path == my_model_url(id: my_model.id) unless args[:is_from_backend]
             #     args[:parsed_menu] = res
             #   end
             # end
@@ -264,17 +308,19 @@ module CamaleonCms
             result = hook_args[:parsed_menu]
           end
         rescue StandardError => e
-          Rails.logger.error "Camaleon CMS - Menu Item Not Found => Skipped menu for: #{e.message} (#{nav_menu_item.inspect})".cama_log_style(:red)
+          Rails.logger.error(
+            "Camaleon CMS - Menu Item Not Found => Skipped menu for: #{e.message} (#{nav_menu_item.inspect})"
+              .cama_log_style(:red)
+          )
         end
 
-        # permit to customize data, like: current, title, ... of parsed menu item or skip menu item by assigning false into :parsed_menu
-        if is_from_backend
-          result
-        else
-          _args = { menu_item: nav_menu_item, parsed_menu: result }
-          hooks_run('on_render_front_menu_item', _args)
-          _args[:parsed_menu]
-        end
+        # permit customizing data, like: current, title, ... of parsed menu item or
+        # skip menu item by assigning false into :parsed_menu
+        return result if is_from_backend
+
+        _args = { menu_item: nav_menu_item, parsed_menu: result }
+        hooks_run('on_render_front_menu_item', _args)
+        _args[:parsed_menu]
       end
     end
   end
