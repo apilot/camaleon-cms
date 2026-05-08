@@ -99,57 +99,85 @@ module Plugins
 
       def form_html(post)
         append_asset_libraries({ 'plugin_visibility' => { js: [plugin_asset_path('js/form.js')] } })
-        "
-    <div class='form-group'>
-                  <label class='control-label'>#{t('camaleon_cms.admin.post_type.published_date')}</label>
-                  <div id='published_from' data-locale='#{current_locale}' class='input-group date'>
-                      <input type='text' name='post[published_at]' data-format='yyyy-MM-dd hh:mm:ss' class='form-control ' value='#{@post[:published_at]}' />
-                      <span class='add-on input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>
-                  </div>
-    </div><!-- calendar for published at -->
 
-    <div id='panel-post-visibility' class='form-group'>
+        html = []
+        html << tag.div(class: 'form-group') do
+          tag.label(t('camaleon_cms.admin.post_type.published_date'), class: 'control-label') +
+            tag.div(id: 'published_from', data: { locale: current_locale }, class: 'input-group date') do
+              tag.input(
+                name: 'post[published_at]', data: { format: 'yyyy-MM-dd hh:mm:ss' },
+                class: 'form-control ', value: @post[:published_at]
+              ) +
+                tag.span(class: 'add-on input-group-addon') { tag.span(class: 'glyphicon glyphicon-calendar') }
+            end
+        end
 
-      <label class='control-label'>#{t('camaleon_cms.admin.table.visibility')}: <span class='visibility_label'></span></label> -
+        html << tag.div(id: 'panel-post-visibility', class: 'form-group') do
+          tag.label(class: 'control-label') do
+            "#{t('camaleon_cms.admin.table.visibility')}: ".html_safe + tag.span(class: 'visibility_label')
+          end << ' - ' <<
+            tag.a(href: '#') { tag.span(t('camaleon_cms.admin.button.edit'), 'aria-hidden': 'true') } <<
+              tag.div(class: 'panel-options hidden') do
+                public_checked = post.visibility.blank? || post.visibility == 'public'
+                private_checked = post.visibility == 'private'
+                password_checked = post.visibility == 'password'
 
-      <a class='edit-visibility' href='#'><span aria-hidden='true'>#{t('camaleon_cms.admin.button.edit')}</span></a>
+                result = []
+                result << tag.label(style: 'display: block;') do
+                  tag.input(
+                    name: 'post[visibility]', class: 'radio', type: 'radio', value: 'public', checked: public_checked
+                  ) + " #{t('camaleon_cms.admin.table.public')}"
+                end
+                result << tag.div
 
-      <div class='panel-options hidden'>
+                result << tag.label(style: 'display: block;') do
+                  tag.input(
+                    name: 'post[visibility]', class: 'radio', type: 'radio', value: 'private', checked: private_checked
+                  ) + " #{t('camaleon_cms.admin.table.private')}"
+                end
 
-        <label style='display: block;'><input type='radio' name='post[visibility]' claass='radio' value='public' #{if post.visibility.blank? || post.visibility == 'public'
-                                                                                                                     "checked=''"
-                                                                                                                   end}> #{t('camaleon_cms.admin.table.public')}</label>
-        <div></div>
+                result << tag.div(style: 'padding-left: 20px;') { groups_list(post) }
 
-        <label style='display: block;'><input type='radio' name='post[visibility]' claass='radio' value='private' #{if post.visibility == 'private'
-                                                                                                                      "checked=''"
-                                                                                                                    end}> #{t('camaleon_cms.admin.table.private')}</label>
-        <div style='padding-left: 20px;'>#{groups_list(post)}</div>
+                result << tag.label(style: 'display: block;') do
+                  tag.input(
+                    name: 'post[visibility]', class: 'radio', type: 'radio',
+                    value: 'password', checked: password_checked
+                  ) + " #{t('camaleon_cms.admin.table.password_protection')}"
+                end
 
-        <label style='display: block;'><input type='radio' name='post[visibility]' claass='radio' value='password' #{if post.visibility == 'password'
-                                                                                                                       "checked=''"
-                                                                                                                     end}> #{t('camaleon_cms.admin.table.password_protection')}</label>
-        <div><input type='text' class='form-control password_field_value' name='post[visibility_value]' value='#{if post.visibility == 'password'
-                                                                                                                   post.visibility_value
-                                                                                                                 end}'></div>
+                result << tag.div do
+                  tag.input(
+                    name: 'post[visibility_value]', class: 'form-control password_field_value', type: 'text',
+                    value: post.visibility == 'password' ? post.visibility_value : nil
+                  )
+                end
 
-        <p>
-          <a class='lnk_hide' href='#'>#{t('camaleon_cms.admin.table.hide')}</a>
-        </p>
-      </div>
-    </div>"
+                result << tag.p { tag.a(t('camaleon_cms.admin.table.hide'), class: 'lnk_hide', href: '#') }
+
+                safe_join(result)
+              end
+        end
+
+        safe_join(html)
       end
 
       def groups_list(post)
-        res = []
-        current_groups = []
-        current_groups = post.visibility_value.split(',') if post.visibility == 'private'
+        current_groups = (post.visibility == 'private' && post.visibility_value) ? post.visibility_value.split(',') : []
+        elements = []
         current_site.user_roles.each do |role|
-          res << "<label><input type='checkbox' name='post_private_groups[]' class='visibility_private_group_item' value='#{role.slug}' #{if current_groups.include?(role.slug.to_s)
-                                                                                                                                            "checked=''"
-                                                                                                                                          end}> #{role.name}</label><br>"
+          checked = current_groups.include?(role.slug.to_s)
+          input = tag.input(
+            type: 'checkbox',
+            name: 'post_private_groups[]',
+            class: 'visibility_private_group_item',
+            value: role.slug,
+            checked: checked
+          )
+          label = tag.label { safe_join([input, " #{role.name}"]) }
+          elements << label
+          elements << tag.br
         end
-        res.join('')
+        safe_join(elements)
       end
     end
   end
