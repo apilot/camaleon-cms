@@ -47,8 +47,8 @@ module CamaleonCms
         if params[:partial].present?
           render json: { next_page: @next_page,
                          html: render_to_string(partial: 'render_file_item', locals: { files: @files }) }
-        else
-          render 'index', layout: false if params[:partial].blank?
+        elsif params[:partial].blank?
+          render 'index', layout: false
         end
       end
 

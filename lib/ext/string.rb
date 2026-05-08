@@ -102,7 +102,6 @@ class String
     res
   end
 
-  # rubocop:disable Layout/LineLength
   def cama_fix_filename
     # Sanitize the filename, to prevent hacking
     # https://github.com/carrierwaveuploader/carrierwave/blob/6a1445e0daef29a5d4f799a016359b62d82dbc24/lib/carrierwave/sanitized_file.rb#L322
@@ -114,7 +113,6 @@ class String
     name = 'unnamed' if name.empty?
     name
   end
-  # rubocop:enable Layout/LineLength
 
   # return cleaned model class name
   # remove decorate

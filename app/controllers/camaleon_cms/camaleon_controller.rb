@@ -42,14 +42,14 @@ module CamaleonCms
         rescue StandardError
           nil
         end
-        "Camaleon CMS - 404 url: " \
+        'Camaleon CMS - 404 url: ' \
           "#{original_url} ==> message: #{exception&.message} ==> #{error_msg} ==> #{caller.inspect}"
       end
 
       @message = if Rails.env.production?
                    ''
                  else
-                   "#{message} #{error_msg || ("#{exception&.message}<br><br>#{caller.inspect}")}"
+                   "#{message} #{error_msg || "#{exception&.message}<br><br>#{caller.inspect}"}"
                  end
 
       respond_to do |format|

@@ -33,44 +33,44 @@ module CamaleonCms
             slug = 'sample-post'
             content_parts = []
             content_parts << helpers.content_tag(
-              :p, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer pharetra ut augue in posuere. " \
-                  "Nulla non malesuada dui. Sed egestas tortor ut purus tempor sodales. " \
-                  "Duis non sollicitudin nulla, quis mollis neque. Integer sit amet augue ac neque varius auctor. " \
-                  "Vestibulum malesuada leo leo, at semper libero efficitur nec. " \
-                  "Etiam semper nisi ac nisi ullamcorper, sed tincidunt purus elementum. " \
-                  "Mauris ac congue nibh. Quisque pretium eget leo nec suscipit."
+              :p, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer pharetra ut augue in posuere. ' \
+                  'Nulla non malesuada dui. Sed egestas tortor ut purus tempor sodales. ' \
+                  'Duis non sollicitudin nulla, quis mollis neque. Integer sit amet augue ac neque varius auctor. ' \
+                  'Vestibulum malesuada leo leo, at semper libero efficitur nec. ' \
+                  'Etiam semper nisi ac nisi ullamcorper, sed tincidunt purus elementum. ' \
+                  'Mauris ac congue nibh. Quisque pretium eget leo nec suscipit.'
             )
             content_parts << helpers.content_tag(
-              :p, "Vestibulum ultrices orci ut congue interdum. " \
-                   "Morbi dolor nunc, imperdiet vel risus semper, tempor dapibus urna. " \
-                   "Phasellus luctus pharetra enim quis volutpat. Integer tristique urna nec malesuada ullamcorper. " \
-                   "Curabitur dictum, lectus id ultrices rhoncus, ante neque auctor erat, " \
-                   "ut sodales nisi odio sit amet lorem. In hac habitasse platea dictumst. " \
-                   "Quisque orci orci, hendrerit at luctus tristique, lobortis in diam. " \
-                   "Curabitur ligula enim, rhoncus ut vestibulum a, consequat sit amet nisi. " \
-                   "Aliquam bibendum fringilla ultrices. Aliquam erat volutpat. " \
-                   "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; " \
-                   "In justo mi, congue in rhoncus lobortis, facilisis in est. Nam et rhoncus purus."
+              :p, 'Vestibulum ultrices orci ut congue interdum. ' \
+                   'Morbi dolor nunc, imperdiet vel risus semper, tempor dapibus urna. ' \
+                   'Phasellus luctus pharetra enim quis volutpat. Integer tristique urna nec malesuada ullamcorper. ' \
+                   'Curabitur dictum, lectus id ultrices rhoncus, ante neque auctor erat, ' \
+                   'ut sodales nisi odio sit amet lorem. In hac habitasse platea dictumst. ' \
+                   'Quisque orci orci, hendrerit at luctus tristique, lobortis in diam. ' \
+                   'Curabitur ligula enim, rhoncus ut vestibulum a, consequat sit amet nisi. ' \
+                   'Aliquam bibendum fringilla ultrices. Aliquam erat volutpat. ' \
+                   'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; ' \
+                   'In justo mi, congue in rhoncus lobortis, facilisis in est. Nam et rhoncus purus.'
             )
             content_parts << helpers.content_tag(
-              :p, "Sed sagittis auctor lectus at rutrum. " \
-                  "Morbi ultricies felis mi, ut scelerisque augue facilisis eu. In molestie quam ex. " \
-                  "Quisque ut sapien sed odio tempus imperdiet. In id accumsan massa. " \
-                  "Morbi quis nunc ullamcorper, interdum enim eu, finibus purus. " \
-                  "Vestibulum ac fermentum augue, at tempus ante. " \
-                  "Aliquam ultrices, purus ut porttitor gravida, dui augue dignissim massa, " \
-                  "ac tempor ante dolor at arcu. " \
-                  "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. " \
-                  "Suspendisse placerat risus est, eget varius mi ultricies in. " \
-                  "Duis non odio ut felis dapibus eleifend. In fringilla enim lobortis placerat efficitur."
+              :p, 'Sed sagittis auctor lectus at rutrum. ' \
+                  'Morbi ultricies felis mi, ut scelerisque augue facilisis eu. In molestie quam ex. ' \
+                  'Quisque ut sapien sed odio tempus imperdiet. In id accumsan massa. ' \
+                  'Morbi quis nunc ullamcorper, interdum enim eu, finibus purus. ' \
+                  'Vestibulum ac fermentum augue, at tempus ante. ' \
+                  'Aliquam ultrices, purus ut porttitor gravida, dui augue dignissim massa, ' \
+                  'ac tempor ante dolor at arcu. ' \
+                  'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. ' \
+                  'Suspendisse placerat risus est, eget varius mi ultricies in. ' \
+                  'Duis non odio ut felis dapibus eleifend. In fringilla enim lobortis placerat efficitur.'
             )
             content_parts << helpers.content_tag(
-              :p, "Nulla sodales faucibus urna, quis viverra dolor facilisis sollicitudin. Aenean ac egestas nibh. " \
-                  "Nam non tortor eget nibh scelerisque fermentum. " \
-                  "Etiam ornare, nunc ut luctus mollis, ante dolor consectetur augue, " \
-                  "non scelerisque odio est a nulla. Nullam cursus egestas nulla, nec commodo nibh suscipit ut. " \
-                  "Mauris ut felis sem. Aenean at mi at nisi dictum blandit sit amet at erat. " \
-                  "Etiam eget lobortis tellus. Curabitur in commodo arcu, at vehicula tortor."
+              :p, 'Nulla sodales faucibus urna, quis viverra dolor facilisis sollicitudin. Aenean ac egestas nibh. ' \
+                  'Nam non tortor eget nibh scelerisque fermentum. ' \
+                  'Etiam ornare, nunc ut luctus mollis, ante dolor consectetur augue, ' \
+                  'non scelerisque odio est a nulla. Nullam cursus egestas nulla, nec commodo nibh suscipit ut. ' \
+                  'Mauris ut felis sem. Aenean at mi at nisi dictum blandit sit amet at erat. ' \
+                  'Etiam eget lobortis tellus. Curabitur in commodo arcu, at vehicula tortor.'
             )
             content = helpers.safe_join(content_parts)
           else

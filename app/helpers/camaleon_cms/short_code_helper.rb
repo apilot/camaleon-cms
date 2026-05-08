@@ -44,7 +44,7 @@ module CamaleonCms
 
       shortcode_add(
         'data',
-        lambda { |attrs, args| attrs.present? ? cama_shortcode_data(attrs, args) : args[:shortcode] },
+        ->(attrs, args) { attrs.present? ? cama_shortcode_data(attrs, args) : args[:shortcode] },
         "Permit to generate specific data of a post.
         Attributes:
           object: (String, defaut post) Model name: post | posttype | category | posttag | site | user |theme | navmenu

@@ -23,7 +23,7 @@ module CamaleonCms
     cattr_accessor :current_site
 
     has_many :term_relationships, foreign_key: :objectid, dependent: :destroy, primary_key: :id
-    has_many :children, lambda { where(post_class: 'PostDefault') },
+    has_many :children, -> { where(post_class: 'PostDefault') },
              class_name: 'CamaleonCms::PostDefault', foreign_key: :post_parent, dependent: :destroy, primary_key: :id
 
     scope :featured, -> { where(is_feature: true) }

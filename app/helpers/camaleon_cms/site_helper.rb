@@ -45,8 +45,8 @@ module CamaleonCms
       end
       if r[:site].blank?
         Rails.logger.error(
-          "Camaleon CMS - Please define your current site: $current_site = CamaleonCms::Site.first.decorate or " \
-            "map your domains: https://camaleon.website/documentation/category/139779-examples/how.html"
+          'Camaleon CMS - Please define your current site: $current_site = CamaleonCms::Site.first.decorate or ' \
+            'map your domains: https://camaleon.website/documentation/category/139779-examples/how.html'
             .cama_log_style(:red)
         )
       end

@@ -37,13 +37,13 @@ module Themes
             default_value: helper.capture do
               helper.safe_join([
                                  helper.content_tag(:h4, 'My Links'),
-                                 helper.content_tag(:p) {
+                                 helper.content_tag(:p) do
                                    helper.safe_join([
                                                       helper.link_to('Dribbble', '#'), helper.tag(:br), ' ',
                                                       helper.link_to('Twitter', '#'), helper.tag(:br), ' ',
                                                       helper.link_to('Facebook', '#')
                                                     ])
-                                 }
+                                 end
                                ])
             end }
         )

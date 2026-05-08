@@ -38,7 +38,7 @@ module CamaleonCms
         append_to_file 'Gemfile' do
           "\n\n#################### Camaleon CMS include all gems for plugins and themes #################### \n" \
             "require_relative './lib/plugin_routes' \n" \
-            "instance_eval(PluginRoutes.draw_gems)"
+            'instance_eval(PluginRoutes.draw_gems)'
         end
       end
     end

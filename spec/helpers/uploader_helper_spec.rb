@@ -127,7 +127,7 @@ describe CamaleonCms::UploaderHelper do
   end
 
   it 'add auto orient for cropping images' do
-    callback = lambda { |params| params[:img] = params[:img].auto_orient }
+    callback = ->(params) { params[:img] = params[:img].auto_orient }
     PluginRoutes.add_anonymous_hook('before_crop_image', callback, 'my_custom_hook')
 
     expect(upload_file(File.open(@path), { versions: '300x300,505x350,20x' }).key?(:error)).not_to eql(true)
@@ -135,7 +135,7 @@ describe CamaleonCms::UploaderHelper do
   end
 
   it 'add auto orient for resizing' do
-    callback = lambda { |params| params[:img] = params[:img].auto_orient }
+    callback = ->(params) { params[:img] = params[:img].auto_orient }
     PluginRoutes.add_anonymous_hook('before_resize_crop', callback, 'my_custom_hook')
     expect(upload_file(File.open(@path), { versions: '300x300,505x350,20x' }).key?(:error)).not_to eql(true)
 

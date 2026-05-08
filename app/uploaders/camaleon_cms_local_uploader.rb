@@ -41,15 +41,13 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
       'folder_path' => File.dirname(key),
       'url' => if is_dir
                  ''
+               elsif is_private_uploader?
+                 url_path.sub("#{@root_folder}/", '')
                else
-                 if is_private_uploader?
-                   url_path.sub("#{@root_folder}/", '')
-                 else
-                   File.join(
-                     @current_site.decorate.the_url(as_path: true, locale: false,
-                                                    skip_relative_url_root: true), url_path
-                   )
-                 end
+                 File.join(
+                   @current_site.decorate.the_url(as_path: true, locale: false,
+                                                  skip_relative_url_root: true), url_path
+                 )
                end,
       'is_folder' => is_dir,
       'file_size' => is_dir ? 0 : File.size(file_path).round(2),
