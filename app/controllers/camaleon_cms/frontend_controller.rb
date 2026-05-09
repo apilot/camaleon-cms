@@ -209,7 +209,7 @@ module CamaleonCms
         if params[:format] == 'html' || params[:format].blank?
           page_not_found
         else
-          head 404
+          head :not_found
         end
       else
         @object = @post
