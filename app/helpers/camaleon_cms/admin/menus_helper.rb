@@ -105,9 +105,9 @@ module CamaleonCms
         end
 
         if can? :manage, :plugins
-          plugin_count = PluginRoutes.all_plugins.reject do |plugin|
-            plugin[:domain].present? && !plugin[:domain].split(',').include?(current_site.the_slug)
-          end.size
+          plugin_count = PluginRoutes.all_plugins.count do |plugin|
+            !(plugin[:domain].present? && !plugin[:domain].split(',').include?(current_site.the_slug))
+          end
           admin_menu_add_menu(
             'plugins',
             {
