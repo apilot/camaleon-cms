@@ -290,7 +290,7 @@ module CamaleonCms
         File.open(path, 'wb') { |f| f.write(Base64.decode64(uploaded_io.split(';base64,').last)) }
         uploaded_io = File.open(path)
         saved = true
-      elsif uploaded_io.is_a?(String) && (uploaded_io.start_with?('http://', 'https://'))
+      elsif uploaded_io.is_a?(String) && uploaded_io.start_with?('http://', 'https://')
         err = validate_file_format_or_error(uploaded_io, args[:formats])
         return err if err
 
