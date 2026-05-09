@@ -119,7 +119,7 @@ module CamaleonCms
     def safe_can(action, subject, &block)
       if block_given?
         can(action, subject) do |resource|
-          safely_false { block.call(resource) }
+          safely_false { yield(resource) }
         end
       else
         # No block: can(action, subject) does not evaluate user logic; safe to call directly.
