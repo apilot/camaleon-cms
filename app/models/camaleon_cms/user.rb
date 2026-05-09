@@ -14,11 +14,11 @@ if PluginRoutes.static_system_info['user_model'].blank?
       has_secure_password
 
       def self.find_by_email(email)
-        where(['lower(email) = ?', email.to_s.downcase]).take
+        find_by(['lower(email) = ?', email.to_s.downcase])
       end
 
       def self.find_by_username(username)
-        where(['lower(username) = ?', username.to_s.downcase]).take
+        find_by(['lower(username) = ?', username.to_s.downcase])
       end
     end
   end
