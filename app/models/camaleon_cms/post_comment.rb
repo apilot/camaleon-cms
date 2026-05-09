@@ -27,7 +27,7 @@ module CamaleonCms
     normalize_attrs(:content)
 
     validates :content, presence: true
-    validates_presence_of :author, :author_email, if: proc { |c| c.is_anonymous.present? }
+    validates :author, :author_email, presence: { if: proc { |c| c.is_anonymous.present? } }
     after_create :update_counter
     after_destroy :update_counter
 

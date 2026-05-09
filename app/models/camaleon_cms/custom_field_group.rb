@@ -13,7 +13,7 @@ module CamaleonCms
                                                              foreign_key: :parent_id, dependent: :destroy
     belongs_to :site, foreign_key: :parent_id, required: false
 
-    validates_uniqueness_of :slug, scope: %i[object_class objectid parent_id]
+    validates :slug, uniqueness: { scope: %i[object_class objectid parent_id] }
 
     before_validation :before_validating
 

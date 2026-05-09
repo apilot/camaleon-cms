@@ -21,8 +21,8 @@ module CamaleonCms
     belongs_to :parent, class_name: 'CamaleonCms::CustomField', foreign_key: :parent_id, required: false
 
     validates :name, :object_class, presence: true
-    validates_uniqueness_of :slug, scope: %i[parent_id object_class],
-                                   unless: ->(o) { o.is_a?(CamaleonCms::CustomFieldGroup) }
+    validates :slug, uniqueness: { scope: %i[parent_id object_class],
+                                   unless: ->(o) { o.is_a?(CamaleonCms::CustomFieldGroup) } }
 
     before_validation :before_validating
     before_update :check_select_eval_authorization

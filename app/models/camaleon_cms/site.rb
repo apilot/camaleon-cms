@@ -35,7 +35,7 @@ module CamaleonCms
     before_destroy :destroy_site
     after_destroy :refresh_routes
 
-    validates_uniqueness_of :slug, scope: :taxonomy
+    validates :slug, uniqueness: { scope: :taxonomy }
 
     # all user roles for this site
     def user_roles
