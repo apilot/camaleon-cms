@@ -28,10 +28,10 @@ module CamaleonCms
     validates_with CamaleonCms::UniqValidator
 
     # relations
-    has_many :term_relationships, class_name: 'CamaleonCms::TermRelationship', foreign_key: :term_taxonomy_id,
+    has_many :term_relationships, class_name: 'CamaleonCms::TermRelationship',
                                   dependent: :destroy
     # has_many :posts, foreign_key: :objectid, through: :term_relationships, :source => :objects
-    belongs_to :parent, class_name: 'CamaleonCms::TermTaxonomy', foreign_key: :parent_id, optional: true
+    belongs_to :parent, class_name: 'CamaleonCms::TermTaxonomy', optional: true
     belongs_to :owner, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, optional: true
 
     # return all children taxonomy
