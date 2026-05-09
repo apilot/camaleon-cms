@@ -227,7 +227,7 @@ module CamaleonCms
         p_type.decorate.generate_breadcrumb(add_post_type, true)
       end
       if object.post_parent.present? && p_type.manage_hierarchy?
-        object.parents.reverse.each do |p|
+        object.parents.reverse_each do |p|
           p = p.decorate
           h.breadcrumb_add(p.the_title, p.published? ? p.the_url : nil)
         end
