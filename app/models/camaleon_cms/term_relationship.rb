@@ -4,9 +4,9 @@ module CamaleonCms
 
     default_scope -> { order(term_order: :asc) }
 
-    belongs_to :term_taxonomy, inverse_of: :term_relationships, required: false
+    belongs_to :term_taxonomy, inverse_of: :term_relationships, optional: true
     belongs_to :object, -> { order("#{CamaleonCms::Post.table_name}.id DESC") },
-               class_name: 'CamaleonCms::Post', foreign_key: :objectid, inverse_of: :term_relationships, required: false
+               class_name: 'CamaleonCms::Post', foreign_key: :objectid, inverse_of: :term_relationships, optional: true
 
     after_create :update_count
     before_destroy :update_count

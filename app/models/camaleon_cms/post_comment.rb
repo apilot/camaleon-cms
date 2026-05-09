@@ -14,9 +14,9 @@ module CamaleonCms
     # approved: approved | pending | spam
 
     has_many :children, class_name: 'CamaleonCms::PostComment', foreign_key: :comment_parent, dependent: :destroy
-    belongs_to :post, required: false
-    belongs_to :parent, class_name: 'CamaleonCms::PostComment', foreign_key: :comment_parent, required: false
-    belongs_to :user, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, required: false
+    belongs_to :post, optional: true
+    belongs_to :parent, class_name: 'CamaleonCms::PostComment', foreign_key: :comment_parent, optional: true
+    belongs_to :user, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, optional: true
 
     default_scope { order("#{CamaleonCms::PostComment.table_name}.created_at DESC") }
 

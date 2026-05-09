@@ -21,9 +21,9 @@ module CamaleonCms
     has_many :children, class_name: 'CamaleonCms::Post', foreign_key: :post_parent, dependent: :destroy,
                         primary_key: :id
 
-    belongs_to :owner, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, required: false
-    belongs_to :parent, class_name: 'CamaleonCms::Post', foreign_key: :post_parent, required: false
-    belongs_to :post_type, foreign_key: :taxonomy_id, inverse_of: :posts, required: false
+    belongs_to :owner, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, optional: true
+    belongs_to :parent, class_name: 'CamaleonCms::Post', foreign_key: :post_parent, optional: true
+    belongs_to :post_type, foreign_key: :taxonomy_id, inverse_of: :posts, optional: true
 
     scope :visible_frontend, -> { where(status: 'published') }
     scope :public_posts, lambda {

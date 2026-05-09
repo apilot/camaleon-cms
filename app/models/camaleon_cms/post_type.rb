@@ -15,8 +15,8 @@ module CamaleonCms
     has_many :field_group_taxonomy, -> { where('object_class LIKE ?', 'PostType_%') },
              class_name: 'CamaleonCms::CustomField', foreign_key: :objectid, dependent: :destroy
 
-    belongs_to :owner, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, required: false
-    belongs_to :site, foreign_key: :parent_id, required: false
+    belongs_to :owner, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, optional: true
+    belongs_to :site, foreign_key: :parent_id, optional: true
 
     scope :visible_menu, -> { where(term_group: nil) }
     scope :hidden_menu, -> { where(term_group: -1) }

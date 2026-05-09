@@ -17,8 +17,8 @@ module CamaleonCms
     has_many :metas, -> { where(object_class: 'CustomField') }, foreign_key: :objectid, dependent: :destroy
     has_many :values, class_name: 'CamaleonCms::CustomFieldsRelationship',
                       foreign_key: :custom_field_id, dependent: :destroy
-    belongs_to :custom_field_group, required: false
-    belongs_to :parent, class_name: 'CamaleonCms::CustomField', foreign_key: :parent_id, required: false
+    belongs_to :custom_field_group, optional: true
+    belongs_to :parent, class_name: 'CamaleonCms::CustomField', foreign_key: :parent_id, optional: true
 
     validates :name, :object_class, presence: true
     validates :slug, uniqueness: { scope: %i[parent_id object_class],

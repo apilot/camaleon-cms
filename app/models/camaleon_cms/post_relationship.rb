@@ -6,10 +6,10 @@ module CamaleonCms
     default_scope -> { order(term_order: :asc) }
 
     belongs_to :post_type, class_name: 'CamaleonCms::PostType', foreign_key: :term_taxonomy_id,
-                           inverse_of: :post_relationships, required: false
+                           inverse_of: :post_relationships, optional: true
     belongs_to :post, lambda {
                         order("#{CamaleonCms::Post.table_name}.id DESC")
-                      }, foreign_key: :objectid, inverse_of: :post_relationships, dependent: :destroy, required: false
+                      }, foreign_key: :objectid, inverse_of: :post_relationships, dependent: :destroy, optional: true
 
     # callbacks
     after_create :update_count
