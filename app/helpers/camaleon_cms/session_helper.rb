@@ -100,7 +100,7 @@ module CamaleonCms
       c_data = { value: nil, expires: 24.hours.ago }
       c_data[:domain] = :all if PluginRoutes.system_info['users_share_sites'].present? && CamaleonCms::Site.count > 1
       cookies[:auth_token] = c_data
-      redirect_to params[:return_to].presence || cama_admin_login_path,
+      redirect_to safe_redirect_url(params[:return_to]) || cama_admin_login_path,
                   notice: t('camaleon_cms.admin.logout.message.closed')
     end
 
