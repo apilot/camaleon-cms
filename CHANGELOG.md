@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- **Security fix:** Fix two unprotected redirects via `params[:return_to]` in `sessions_controller.rb` and `session_helper.rb` [#1168](https://github.com/owen2345/camaleon-cms/pull/1168)
+  - Both used `params[:return_to]` directly in `redirect_to`, allowing open redirect attacks
+  - Fixed by routing through the existing `safe_redirect_url` helper
+  - Added tests in `spec/requests/security/open_redirect_session_spec.rb`
+- **Security, style, and cleanup:** Rubocop fixes part 1 [#1168](https://github.com/owen2345/camaleon-cms/pull/1168)
+  - Fixed `Style/IfUnlessModifier`, `Rails/Output`, `Rails/FilePath`, `Performance/InefficientHashSearch`, `Performance/RedundantMerge`, `Performance/StringReplacement`, `Rails/Presence`, `RSpecRails/HttpStatus`, `Rails/DynamicFindBy`, `Rails/FindEach`, `Rails/SkipsModelValidations`, `Rails/Time`, `Rails/Date`, `Rails/ApplicationRecord`, `Rails/Blank`
+  - Removed dead code: `cama_draw_timer`, `all_locales_for_routes`, `cama_get_options_html_from_items`, `cama_parse_for_thumb_name`
+  - Set `TargetRailsVersion` to `6.1` in `.rubocop.yml`
+- **Security fix:** Bump gems — Nokogiri to 1.19.3, action_text-trix, aws-sdk, puma, rubyzip, selenium-webdriver, sqlite3, Bundler 2.7.2 [#1170](https://github.com/owen2345/camaleon-cms/pull/1170)
+  - Nokogiri fixes: CSS selector tokenizer regexp backtracking, XSLT memory leak
+  - puma fix: `prune_bundler` was stripping user-configured `BUNDLE_*` env vars on re-exec
+  - DOMPurify upgraded to 3.4.2 in action_text-trix
+
 - **Fix:** Decorator locale resolution and language context mixing (fixes issue #233), [#1166](https://github.com/owen2345/camaleon-cms/pull/1166)
   - **Phase 1:** Fix locale accessibility and language context mixing
     - Move `cama_get_i18n_frontend` helper to parent CamaleonController so both frontend and admin decorators can access correct locale
