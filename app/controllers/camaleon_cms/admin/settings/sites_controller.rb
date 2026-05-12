@@ -62,7 +62,7 @@ module CamaleonCms
         private
 
         def save_metas(site)
-          return unless params[:metas].present?
+          return if params[:metas].blank?
 
           params[:metas].each do |meta, val|
             site.set_meta(meta, val)
@@ -70,7 +70,7 @@ module CamaleonCms
         end
 
         def set_site
-          @site = CamaleonCms::Site.find_by_id(params[:id]).decorate
+          @site = CamaleonCms::Site.find_by(id: params[:id]).decorate
         rescue StandardError
           flash[:error] = t('camaleon_cms.admin.sites.message.error')
           redirect_to cama_admin_path

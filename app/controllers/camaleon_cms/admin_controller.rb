@@ -45,7 +45,7 @@ module CamaleonCms
     # if this is receive a param[:ajax], then will render only results view
     def search
       add_breadcrumb I18n.t('camaleon_cms.admin.button.search')
-      params[:kind] = 'content' unless params[:kind].present?
+      params[:kind] = 'content' if params[:kind].blank?
       params[:q] = (params[:q] || '').downcase
       @items = case params[:kind]
                when 'post_type'
@@ -96,7 +96,7 @@ module CamaleonCms
     end
 
     def admin_logged_actions
-      admin_menus_add_commons if !request.xhr? || !params[:cama_ajax_request].present? # initialize admin sidebar menus
+      admin_menus_add_commons if !request.xhr? || params[:cama_ajax_request].blank? # initialize admin sidebar menus
     end
   end
 end

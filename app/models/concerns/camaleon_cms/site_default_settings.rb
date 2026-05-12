@@ -17,7 +17,7 @@ module CamaleonCms
       # nav menus
       @nav_menu = nav_menus.new({ name: 'Main Menu', slug: 'main_menu' })
       if @nav_menu.save
-        post_types.all.each do |pt|
+        post_types.find_each do |pt|
           if pt.slug == 'post'
             title = 'Sample Post'
             slug = 'sample-post'
@@ -28,7 +28,7 @@ module CamaleonCms
             content = "<p style='text-align: center;'><img width='155' height='155' src='https://camaleon.website/media/132/logo2.png' alt='logo' /></p><p><strong>Camaleon CMS</strong>&nbsp;is a free and open-source tool and a fexible content management system (CMS) based on <a href='https://rubyonrails.org'>Ruby on Rails</a>.</p> <p>With Camaleon you can do the following:</p> <ul> <li>Create instantly a lot of sites&nbsp;in the same installation</li> <li>Manage your content information in several languages</li> <li>Extend current functionality by&nbsp;plugins (MVC structure and no more echo or prints anywhere)</li> <li>Create or install different themes for each site</li> <li>Create your own structure without coding anything (adapt Camaleon as you want&nbsp;and not you for Camaleon)</li> <li>Create your store and start to sell your products using our plugins</li> <li>Avoid web attacks</li> <li>Compare the speed and enjoy the speed of your new Camaleon site</li> <li>Customize or create your themes for mobile support</li> <li>Support&nbsp;more visitors at the same time</li> <li>Manage your information with a panel like wordpress&nbsp;</li> <li>All urls are oriented for SEO</li> <li>Multiples roles of users</li> </ul>"
           end
           user = users.admin_scope.first
-          unless user.present?
+          if user.blank?
             user = users.admin_scope.create({ email: 'admin@local.com', username: 'admin', password: 'admin123',
                                               password_confirmation: 'admin123', first_name: 'Administrator' })
           end

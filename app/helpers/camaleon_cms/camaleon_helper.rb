@@ -4,7 +4,7 @@ module CamaleonCms
     # verify if current user is logged in, if not, then return nil
     # return html link
     def cama_edit_link(url, title = nil, attrs = {})
-      return '' unless cama_current_user.present?
+      return '' if cama_current_user.blank?
       return '' unless cama_current_user.admin?
 
       attrs = { target: '_blank', style: 'font-size:11px !important;cursor:pointer;' }.merge(attrs)
@@ -74,16 +74,9 @@ module CamaleonCms
       cache
     end
 
-    # =Deprecated
-    def cama_draw_timer
-      @_cama_timer ||= Time.current
-      puts "***************************************** timer: #{((Time.current - @_cama_timer) * 24 * 60 * 60).to_i}  (#{caller.first})"
-      @_cama_timer = Time.current
-    end
-
     # return normal translation with default value with translation of english
     def cama_t(key, args = {})
-      args[:default] = I18n.t(key, **args.dup.merge(locale: :en)) unless args[:default].present?
+      args[:default] = I18n.t(key, **args.dup.merge(locale: :en)) if args[:default].blank?
       I18n.t(key, **args)
     end
 

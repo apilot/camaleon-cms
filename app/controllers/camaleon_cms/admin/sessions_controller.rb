@@ -9,7 +9,7 @@ module CamaleonCms
 
       # you can pass return_to as a param (mysite.com/admin/login?return_to=my-url) and this will be used after user logged in
       def login
-        return redirect_to(params[:return_to].present? ? params[:return_to] : cama_admin_dashboard_path) if signin?
+        return redirect_to(safe_redirect_url(params[:return_to]) || cama_admin_dashboard_path) if signin?
 
         cookies[:return_to] = params[:return_to] if params[:return_to].present?
         @user ||= current_site.users.new
@@ -19,7 +19,7 @@ module CamaleonCms
 
       def login_post
         data_user = user_permit_data
-        @user = current_site.users.find_by_username(data_user[:username])
+        @user = current_site.users.find_by(username: data_user[:username])
         captcha_validate = captcha_verify_if_under_attack('login')
         r = { user: @user, params: params, password: data_user[:password], captcha_validate: captcha_validate,
               stop_process: false }
@@ -92,10 +92,10 @@ module CamaleonCms
 
         # TODO: Move this out of the controller
         # send email reset password
-        return unless params[:user].present?
+        return if params[:user].blank?
 
         data_user = user_permit_data
-        @user = current_site.users.find_by_email(data_user[:email])
+        @user = current_site.users.find_by(email: data_user[:email])
         if @user.present?
           send_password_reset_email(@user)
           flash[:notice] = t('camaleon_cms.admin.login.message.send_mail_succes')

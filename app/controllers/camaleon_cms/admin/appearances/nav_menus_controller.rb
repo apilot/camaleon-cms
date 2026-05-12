@@ -11,9 +11,9 @@ module CamaleonCms
 
         def index
           @nav_menu = if params[:id].present?
-                        current_site.nav_menus.find_by_id(params[:id])
+                        current_site.nav_menus.find_by(id: params[:id])
                       elsif params[:slug].present?
-                        current_site.nav_menus.find_by_slug(params[:slug])
+                        current_site.nav_menus.find_by(slug: params[:slug])
                       else
                         current_site.nav_menus.first
                       end
@@ -113,7 +113,7 @@ module CamaleonCms
 
           if params[:custom_items].present? # custom menu items
             params[:custom_items].each_value do |custom_item|
-              type = custom_item['kind'].present? ? custom_item['kind'] : 'external'
+              type = custom_item['kind'].presence || 'external'
               items << @nav_menu.append_menu_item({ label: custom_item['label'], link: custom_item['url'], type: type })
             end
           end
@@ -146,7 +146,7 @@ module CamaleonCms
         # Only permit external menu options that match registered custom field slug
         def permitted_external_options(external_params = nil)
           opts = external_params ? external_params[:options] : params[:options]
-          return {} unless opts.present?
+          return {} if opts.blank?
 
           allowed_keys = cama_custom_field_allowed_slugs('NavMenuItem')
           return {} if allowed_keys.blank?

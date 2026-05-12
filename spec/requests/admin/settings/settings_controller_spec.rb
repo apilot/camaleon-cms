@@ -39,7 +39,7 @@ RSpec.describe CamaleonCms::Admin::SettingsController, type: :request do
 
         get '/admin/settings/test_email', params: { email: 'test@example.com' }
 
-        expect(response).to have_http_status(502)
+        expect(response).to have_http_status(:bad_gateway)
         expect(response.body).to eq(error_message)
         expect(response.content_type).to include('text/plain')
       end

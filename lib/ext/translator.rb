@@ -40,7 +40,7 @@ class String
   # sample: ["hola mundo", "Hello World"]
   def translations_array
     r = translations.map { |_key, value| value }
-    r.present? ? r : [self]
+    r.presence || [self]
   end
 
   protected

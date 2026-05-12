@@ -32,8 +32,8 @@ RSpec.describe 'Download private file requests', type: :request do
 
         get '/admin/media/download_private_file', params: { file: 'some_file' }
 
-        expect(response).not_to have_http_status(403)
-        expect(response).to have_http_status(200)
+        expect(response).not_to have_http_status(:forbidden)
+        expect(response).to have_http_status(:ok)
       end
     end
 

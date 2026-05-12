@@ -88,7 +88,7 @@ module CamaleonCms
     # set multiple configurations
     # h: {ket1: "sdsds", ff: "fdfdfdfd"}
     def set_options(h = {}, meta_key = '_default')
-      return unless h.present?
+      return if h.blank?
 
       data = cama_options(meta_key)
       PluginRoutes.fixActionParameter(h).to_sym.each do |key, value|
@@ -120,7 +120,7 @@ module CamaleonCms
     # sample: Site.first.post_types.create({name: "owen", slug: "my_post_type", data_options: { has_category: true, default_layout: "my_layout" }})
     def save_metas_options
       set_multiple_options(data_options)
-      return unless data_metas.present?
+      return if data_metas.blank?
 
       data_metas.each do |key, val|
         set_meta(key, val)

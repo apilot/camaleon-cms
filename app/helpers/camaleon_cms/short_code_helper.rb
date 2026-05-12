@@ -12,7 +12,7 @@ module CamaleonCms
 
       shortcode_add('load_libraries',
                     lambda { |attrs, args|
-                      return args[:shortcode] unless attrs.present?
+                      return args[:shortcode] if attrs.blank?
 
                       cama_load_libraries(*attrs['data'].to_s.split(','))
                       ''
@@ -21,7 +21,7 @@ module CamaleonCms
 
       shortcode_add('asset',
                     lambda { |attrs, args|
-                      return args[:shortcode] unless attrs.present?
+                      return args[:shortcode] if attrs.blank?
 
                       url = ActionController::Base.helpers.asset_url(attrs['file'])
                       if attrs['image'].present?
@@ -161,7 +161,7 @@ module CamaleonCms
     # determine the content to replace instead the shortcode
     # return string
     def _eval_shortcode(code, attrs, args = {}, template = nil)
-      template ||= (@_shortcodes_template[code].present? ? @_shortcodes_template[code] : "camaleon_cms/shortcode_templates/#{code}")
+      template ||= @_shortcodes_template[code].presence || "camaleon_cms/shortcode_templates/#{code}"
       if @_shortcodes_template[code].instance_of?(::Proc)
         @_shortcodes_template[code].call(_shortcode_parse_attr(attrs), args)
       else
@@ -172,7 +172,7 @@ module CamaleonCms
     # parse the attributes of a shortcode
     def _shortcode_parse_attr(text)
       res = {}
-      return res unless text.present?
+      return res if text.blank?
 
       text.scan(/(\w+)\s*=\s*"([^"]*)"(?:\s|$)|(\w+)\s*=\s*'([^']*)'(?:\s|$)|(\w+)\s*=\s*([^\s'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|(\S+)(?:\s|$)/).each do |item|
         item.each_with_index do |c, index|
@@ -195,7 +195,7 @@ module CamaleonCms
               else
                 args[:owner]
               end
-      return res unless model.present?
+      return res if model.blank?
 
       if attrs['field'].present? # model custom fields
         field = model.get_field_object(attrs['field'])
@@ -295,7 +295,7 @@ module CamaleonCms
 
       when 'navmenu'
         model = current_site.nav_menu_items.find(attrs['id']) if attrs['id'].present?
-        model = current_site.nav_menu_items.find_by_slug(attrs['key']) if attrs['key'].present?
+        model = current_site.nav_menu_items.find_by(slug: attrs['key']) if attrs['key'].present?
 
       when 'user'
         model = current_site.the_user(attrs['id'].to_i) if attrs['id'].present?

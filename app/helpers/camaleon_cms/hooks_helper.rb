@@ -34,7 +34,7 @@ module CamaleonCms
     private
 
     def _do_hook(plugin, hook_key, params = nil)
-      return if !plugin.present? || !plugin['hooks'].present? || !plugin['hooks'][hook_key].present?
+      return if plugin.blank? || plugin['hooks'].blank? || plugin['hooks'][hook_key].blank?
 
       plugin['hooks'][hook_key].each do |hook|
         next if @_hooks_skip.present? && @_hooks_skip.include?(hook)

@@ -14,13 +14,10 @@ module CamaleonCms
       excerpt = object.get_meta('summary').to_s.translate(get_locale)
       # r = {content: (excerpt.present? ? excerpt : object.content_filtered.to_s.translate(get_locale).strip_tags.gsub(/&#13;|\n/, " ").truncate(qty_chars)), post: object}
       r = {
-        content: (if excerpt.present?
-                    excerpt
-                  else
-                    h.cama_strip_shortcodes(object.content_filtered.to_s.translate(get_locale).strip_tags.gsub(
-                      /&#13;|\n/, ' '
-                    ).truncate(qty_chars))
-                  end), post: object
+        content:
+          excerpt.presence || h.cama_strip_shortcodes(object.content_filtered.to_s.translate(get_locale)
+                                                            .strip_tags.gsub(/&#13;|\n/, ' ').truncate(qty_chars)),
+        post: object
       }
       h.hooks_run('post_the_excerpt', r)
       r[:content]
@@ -33,17 +30,13 @@ module CamaleonCms
       h.do_shortcode(r[:content], self)
     end
 
-    # return thumbnail image for this post
+    # Return the thumbnail image for this post
     # default: default image if thumbails not exist
     # if default is empty, post_type default thumb will be returned
     def the_thumb_url(default = nil)
       th = object.get_meta('thumb')
-      if th.present?
-        th
-      else
-        default || object.post_type.get_option('default_thumb',
-                                               nil) || h.asset_url('camaleon_cms/image-not-found.png')
-      end
+      th.presence || default || object.post_type.get_option('default_thumb', nil) ||
+        h.asset_url('camaleon_cms/image-not-found.png')
     end
     alias the_image_url the_thumb_url
 
@@ -93,7 +86,7 @@ module CamaleonCms
           args[:label_cat] = I18n.t('routes.category', default: 'category')
           args[:category_id] = cat.id
           args[:title] = cat.the_title(args[:locale]).parameterize
-          args[:title] = cat.the_slug unless args[:title].present?
+          args[:title] = cat.the_slug if args[:title].blank?
         else
           p_url_format = 'post'
         end
@@ -110,7 +103,7 @@ module CamaleonCms
           args[:post_type_title] = ptype.the_title(args[:locale]).parameterize.presence || ptype.the_slug
           args[:category_id] = cat.id
           args[:title] = cat.the_title(args[:locale]).parameterize
-          args[:title] = cat.the_slug unless args[:title].present?
+          args[:title] = cat.the_slug if args[:title].blank?
         else
           p_url_format = 'post'
         end
@@ -148,7 +141,7 @@ module CamaleonCms
     # return html link
     # attrs: Hash of link tag attributes, sample: {id: "myid", class: "sss" }
     def the_edit_link(title = nil, attrs = {})
-      return '' unless h.cama_current_user.present?
+      return '' if h.cama_current_user.blank?
 
       attrs = { target: '_blank', style: 'font-size:11px !important;cursor:pointer;' }.merge(attrs)
       h.link_to("&rarr; #{title || h.ct('edit', default: 'Edit')}".html_safe, the_edit_url, attrs)
@@ -265,7 +258,7 @@ module CamaleonCms
     # sample: title paren 1 - title parent 2 -.. -...
     # if add_parent_title: true will add parent title like: —— item 1.1.1 | item 1.1
     def the_hierarchy_title
-      return the_title unless object.post_parent.present?
+      return the_title if object.post_parent.blank?
 
       res = '&#8212;' * object.parents.count
       res << " #{the_title}"

@@ -23,7 +23,7 @@ module CamaleonCms
 
     # touch owner model
     def update_model_owner
-      "CamaleonCms::#{object_class}".constantize.find(objectid).touch
+      "CamaleonCms::#{object_class}".constantize.find(objectid).touch # rubocop:disable Rails/SkipsModelValidations
     rescue StandardError
       nil
     end

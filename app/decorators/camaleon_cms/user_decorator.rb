@@ -34,7 +34,7 @@ module CamaleonCms
       args[:label] = I18n.t('routes.profile', default: 'profile')
       args[:user_id] = the_id
       args[:user_name] = the_name.parameterize
-      args[:user_name] = the_username unless args[:user_name].present?
+      args[:user_name] = the_username if args[:user_name].blank?
       args[:locale] = get_locale unless args.include?(:locale)
       args[:format] = args[:format] || 'html'
       as_path = args.delete(:as_path)

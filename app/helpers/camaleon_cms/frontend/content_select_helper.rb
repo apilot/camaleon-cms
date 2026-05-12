@@ -60,7 +60,7 @@ module CamaleonCms
       #   the_title
       # end
       def the_title
-        @object.the_title if @object.present?
+        @object&.the_title
       end
 
       # select content of post
@@ -76,7 +76,7 @@ module CamaleonCms
       #   the_url
       # end
       def the_url
-        @object.the_url if @object.present?
+        @object&.the_url
       end
 
       # select thumbnail of post
@@ -84,7 +84,7 @@ module CamaleonCms
       #   the_thumbnail
       # end
       def the_thumbnail
-        @object.the_thumb_url if @object.present?
+        @object&.the_thumb_url
       end
 
       # select slug of post, post type ... (@object)
@@ -92,7 +92,7 @@ module CamaleonCms
       #   the_slug
       # end
       def the_slug
-        @object.the_slug if @object.present?
+        @object&.the_slug
       end
 
       # select excerpt of post
@@ -100,7 +100,7 @@ module CamaleonCms
       #   the_excerpt
       # end
       def the_excerpt(chars = 200)
-        @object.the_excerpt(chars) if @object.present?
+        @object&.the_excerpt(chars)
       end
 
       # select custome field from object
@@ -108,7 +108,7 @@ module CamaleonCms
       #   the_field('extra-content')
       # end
       def the_field(slug)
-        @object.the_field(slug) if @object.present?
+        @object&.the_field(slug)
       end
 
       # loop through each post of post type

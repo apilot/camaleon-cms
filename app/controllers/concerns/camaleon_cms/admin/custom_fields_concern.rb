@@ -7,7 +7,7 @@ module CamaleonCms
 
       # Only permit field_options that match registered custom field slugs
       def cama_permitted_field_options(object_class)
-        return {} unless params[:field_options].present?
+        return {} if params[:field_options].blank?
 
         allowed_keys = cama_custom_field_allowed_slugs(object_class)
         return {} if allowed_keys.blank?

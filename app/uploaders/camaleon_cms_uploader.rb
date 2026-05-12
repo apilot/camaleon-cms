@@ -25,7 +25,7 @@ class CamaleonCmsUploader
               ''].include?(prefix)
             get_media_collection.where(folder_path: '/')
           else
-            get_media_collection.find_by_key(prefix).take.try(:items)
+            get_media_collection.by_key(prefix).take.try(:items)
           end
     # Private hook to recover custom files to include in current list where data can be modified to add custom{files, folders}
     # Note: this hooks doesn't have access to public vars like params. requests, ...
@@ -94,7 +94,7 @@ class CamaleonCmsUploader
   # support for multiples formats, sample: image,audio
   def self.get_file_format_extensions(format)
     res = []
-    format.downcase.gsub(' ', '').split(',').each do |f|
+    format.downcase.delete(' ').split(',').each do |f|
       res << case f
              when 'image', 'images'
                'jpg,jpeg,png,gif,bmp,ico,svg'
@@ -118,10 +118,9 @@ class CamaleonCmsUploader
   # false: if format is not accepted
   # sample: validate_file_format('/var/www/myfile.xls', 'image,audio,docx,xls') => return true if the file extension is in formats
   def self.validate_file_format(key, valid_formats = '*')
-    return true if valid_formats == '*' || !valid_formats.present?
+    return true if valid_formats == '*' || valid_formats.blank?
 
-    valid_formats = valid_formats.gsub(' ',
-                                       '').downcase.split(',') + get_file_format_extensions(valid_formats).split(',')
+    valid_formats = valid_formats.delete(' ').downcase.split(',') + get_file_format_extensions(valid_formats).split(',')
     valid_formats.include?(File.extname(key).sub('.', '').split('?').first.try(:downcase))
   end
 
@@ -136,10 +135,10 @@ class CamaleonCmsUploader
   # sample: search_new_key("my_file/file.txt")
   def search_new_key(key)
     _key = key
-    if get_media_collection.find_by_key(key).any?
+    if get_media_collection.by_key(key).any?
       (1..999).each do |i|
         _key = key.cama_add_postfix_file_name("_#{i}")
-        break unless get_media_collection.find_by_key(_key).any?
+        break unless get_media_collection.by_key(_key).any?
       end
     end
     _key

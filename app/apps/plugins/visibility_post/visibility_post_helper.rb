@@ -9,9 +9,9 @@ module Plugins
         args[:content] = _password_form
       end
 
-      def plugin_visibility_on_active(plugin); end
+      def plugin_visibility_on_active(_plugin); end
 
-      def plugin_visibility_on_inactive(plugin); end
+      def plugin_visibility_on_inactive(_plugin); end
 
       def plugin_visibility_post_list(args)
         args[:posts] = args[:posts].where(visibility: 'private') if params[:s] == 'private'
@@ -29,7 +29,7 @@ module Plugins
 
       def plugin_visibility_can_visit(args)
         post = args[:post]
-        return args[:flag] = false if post.published_at.present? && post.published_at > Time.now
+        return args[:flag] = false if post.published_at.present? && post.published_at > Time.zone.now
         return if post.visibility != 'private'
 
         args[:flag] = false unless signin? && post.visibility_value.split(',').include?(current_site.visitor_role)
@@ -37,31 +37,42 @@ module Plugins
 
       def plugin_visibility_extra_columns(args)
         if args[:from_body]
+          is_published = args[:post].published_at
+          post_visibility = args[:post].visibility
           args[:content] =
             "<td><i class='fa fa-#{{ 'private' => 'lock', '' => 'lock', 'public' => 'eye',
-                                     'password' => 'eye-slash' }[args[:post].visibility]}'></i> #{args[:post].visibility}</td>"
-          args[:content] =
-            "<td>#{args[:post].published_at.present? ? args[:post].published_at.strftime('%B %e, %Y %H:%M') : args[:post].the_created_at}</td>"
+                                     'password' => 'eye-slash' }[post_visibility]}'></i> #{post_visibility}</td>"
+          args[:content] +=
+            "<td>#{is_published.present? ? is_published.strftime('%B %e, %Y %H:%M') : args[:post].the_created_at}</td>"
         else
           args[:content] = "<th>#{t('camaleon_cms.admin.table.visibility')}</th>"
-          args[:content] = "<th>#{t('camaleon_cms.admin.table.date_published')}</th>"
+          args[:content] += "<th>#{t('camaleon_cms.admin.table.date_published')}</th>"
         end
       end
 
       def plugin_visibility_filter_post(args)
+        db_table = CamaleonCms::Post.table_name
         args[:active_record] =
           args[:active_record].where(
-            "(#{CamaleonCms::Post.table_name}.published_at is null or #{CamaleonCms::Post.table_name}.published_at <= ?)", Time.now
+            "(#{db_table}.published_at is null or #{db_table}.published_at <= ?)", Time.zone.now
           )
-        args[:active_record] = if signin?
-                                 if ActiveRecord::Base.connection.adapter_name.downcase.include?('mysql')
-                                   args[:active_record].where("visibility != 'private' or (visibility = 'private' and FIND_IN_SET(?, #{CamaleonCms::Post.table_name}.visibility_value))", current_site.visitor_role)
-                                 else
-                                   args[:active_record].where("visibility != 'private' or (visibility = 'private' and (',' || #{CamaleonCms::Post.table_name}.visibility_value || ',') LIKE ?)", "%,#{current_site.visitor_role},%")
-                                 end
-                               else
-                                 args[:active_record].where("visibility != 'private'")
-                               end
+        not_private = "visibility != 'private'"
+        args[:active_record] =
+          if signin?
+            if ActiveRecord::Base.connection.adapter_name.downcase.include?('mysql')
+              args[:active_record].where(
+                "#{not_private} or (visibility = 'private' and FIND_IN_SET(?, #{db_table}.visibility_value))",
+                current_site.visitor_role
+              )
+            else
+              args[:active_record].where(
+                "#{not_private} or (visibility = 'private' and (',' || #{db_table}.visibility_value || ',') LIKE ?)",
+                "%,#{current_site.visitor_role},%"
+              )
+            end
+          else
+            args[:active_record].where(not_private)
+          end
       end
 
       private
@@ -105,7 +116,7 @@ module Plugins
 
       <div class='panel-options hidden'>
 
-        <label style='display: block;'><input type='radio' name='post[visibility]' claass='radio' value='public' #{if !post.visibility.present? || post.visibility == 'public'
+        <label style='display: block;'><input type='radio' name='post[visibility]' claass='radio' value='public' #{if post.visibility.blank? || post.visibility == 'public'
                                                                                                                      "checked=''"
                                                                                                                    end}> #{t('camaleon_cms.admin.table.public')}</label>
         <div></div>

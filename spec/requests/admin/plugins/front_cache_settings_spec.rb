@@ -26,7 +26,7 @@ RSpec.describe 'Plugin Front Cache Settings', type: :request do
 
       get '/admin/plugins/front_cache/settings'
 
-      expect(response).to have_http_status(200)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'allows saving front_cache settings' do

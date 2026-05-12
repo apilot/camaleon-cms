@@ -47,7 +47,7 @@ module CamaleonCms
     # sample: upload_file(params[:my_file], {formats: "jpg,png,gif,mp3,mp4", temporal_time: 10.minutes, maximum: 10.megabytes})
     def upload_file(uploaded_io, settings = {})
       cached_name = uploaded_io.is_a?(ActionDispatch::Http::UploadedFile) ? uploaded_io.original_filename : nil
-      return { error: 'File is empty', file: nil, size: nil } unless uploaded_io.present?
+      return { error: 'File is empty', file: nil, size: nil } if uploaded_io.blank?
 
       if uploaded_io.is_a?(String) && uploaded_io.match(%r{^https?://}).present? # download url file
         tmp = cama_tmp_upload(uploaded_io)
@@ -102,7 +102,7 @@ module CamaleonCms
 
       # generate image versions
       if res['file_type'] == 'image'
-        settings[:versions].to_s.gsub(' ', '').split(',').each do |v|
+        settings[:versions].to_s.delete(' ').split(',').each do |v|
           version_path = cama_resize_upload(settings[:uploaded_io].path, v, { replace: false })
           cama_uploader.add_file(version_path, cama_uploader.version_path(res['key'], v), is_thumb: true,
                                                                                           same_name: true)
@@ -191,8 +191,8 @@ module CamaleonCms
       data = { img: img, w: w, h: h, w_offset: w_offset, h_offset: h_offset, resize: resize, replace: replace }
       hooks_run('before_crop_image', data)
       data[:img].combine_options do |i|
-        i.resize("#{w if w.present?}x#{h if h.present?}#{force}") if data[:resize]
-        i.crop "#{w if w.present?}x#{h if h.present?}+#{w_offset}+#{h_offset}#{force}" unless data[:resize]
+        i.resize("#{w.presence}x#{h.presence}#{force}") if data[:resize]
+        i.crop "#{w.presence}x#{h.presence}+#{w_offset}+#{h_offset}#{force}" unless data[:resize]
       end
 
       ext = File.extname(file_path)
@@ -271,12 +271,12 @@ module CamaleonCms
     # return: {file_path, error}
     def cama_tmp_upload(uploaded_io, args = {})
       tmp_path = args[:path] || File.join(Rails.public_path, 'tmp', current_site.id.to_s).to_s
-      FileUtils.mkdir_p(tmp_path) unless Dir.exist?(tmp_path)
+      FileUtils.mkdir_p(tmp_path)
       saved = false
       downloaded_tmp_file = nil
       if uploaded_io.is_a?(String) && uploaded_io.start_with?('data:') # create tmp file using base64 format
         _tmp_name = args[:name]
-        return { error: cama_t('camaleon_cms.admin.media.name_required').to_s } unless params[:name].present?
+        return { error: cama_t('camaleon_cms.admin.media.name_required').to_s } if params[:name].blank?
 
         err = validate_file_format_or_error(_tmp_name, args[:formats])
         return err if err
@@ -379,7 +379,7 @@ module CamaleonCms
     end
 
     def slugify(val)
-      val.to_s.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
+      val.to_s.downcase.strip.tr(' ', '-').gsub(/[^\w-]/, '')
     end
 
     def slugify_folder(val)
@@ -407,7 +407,9 @@ module CamaleonCms
 
       return { error: 'Redirects are not allowed for remote uploads.' } if response.is_a?(Net::HTTPRedirection)
 
-      return { error: "Unable to download remote file (HTTP #{response.code})." } unless response.is_a?(Net::HTTPSuccess)
+      unless response.is_a?(Net::HTTPSuccess)
+        return { error: "Unable to download remote file (HTTP #{response.code})." }
+      end
 
       # Enforce the site's maximum upload size to prevent memory exhaustion from oversized responses.
       max_bytes = current_site.get_option('filesystem_max_size', 100).to_f.megabytes
@@ -464,12 +466,6 @@ module CamaleonCms
                           end
 
       [horizontal_offset, vertical_offset]
-    end
-
-    # convert file path into thumb path format
-    # return the image name into thumb format: owewen.png into thumb/owen-png.png
-    def cama_parse_for_thumb_name(file_path)
-      "#{@fog_connection_hook_res[:thumb_folder_name]}/#{File.basename(file_path).parameterize}#{File.extname(file_path)}"
     end
 
     def clamp_to_image_dimension(value, img_size)

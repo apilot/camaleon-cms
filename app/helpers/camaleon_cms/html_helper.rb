@@ -12,7 +12,7 @@ module CamaleonCms
     def cama_assets_library_register(key, assets = {})
       key = key.to_sym
       cama_assets_libraries
-      @_cama_assets_libraries[key] = { css: [], js: [] } unless @_cama_assets_libraries[key].present?
+      @_cama_assets_libraries[key] = { css: [], js: [] } if @_cama_assets_libraries[key].blank?
       @_cama_assets_libraries[key][:css] += assets[:css] if assets[:css].present?
       @_cama_assets_libraries[key][:js] += assets[:js] if assets[:js].present?
     end
@@ -70,7 +70,7 @@ module CamaleonCms
     # return all js libraries added [aa.js, bb,js, ..]
     # def get_assets_js
     def cama_draw_custom_assets
-      cama_html_helpers_init unless @_assets_libraries.present?
+      cama_html_helpers_init if @_assets_libraries.blank?
       libs = []
       @_assets_libraries.each_value do |assets|
         libs += assets[:css] if assets[:css].present?
@@ -88,19 +88,6 @@ module CamaleonCms
       args = { stylesheets: stylesheets, javascripts: javascripts, js_html: js, css_html: css }
       hooks_run('draw_custom_assets', args)
       "#{args[:css_html]}\n#{args[:js_html]}\n#{@_assets_content.join('').html_safe}"
-    end
-
-    # return category tree for category dropdown
-    # each level is prefixed with -
-    # level: internal recursive control
-    def cama_get_options_html_from_items(terms, level = 0)
-      options = []
-      terms.all.each do |term|
-        options << [('—' * level) + term.name, term.id] unless @term.id == term.id
-        children = term.children
-        options += cama_get_options_html_from_items(children, level + 1) unless children.empty?
-      end
-      options
     end
 
     # create a html tooltip to include anywhere

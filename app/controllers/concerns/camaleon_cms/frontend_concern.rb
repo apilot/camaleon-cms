@@ -31,7 +31,7 @@ module CamaleonCms
     # save comment from a post
     def save_comment
       flash[:comment_submit] = {}
-      @post = current_site.posts.find_by_id(params[:post_id]).decorate
+      @post = current_site.posts.find_by(id: params[:post_id]).decorate
       user = cama_current_user
       comment_data = {}
       unless @post.can_commented?
@@ -61,7 +61,7 @@ module CamaleonCms
           comment_data[:approved] = current_site.front_comment_status
           comment_data[:agent] = request.user_agent.force_encoding('ISO-8859-1').encode('UTF-8')
           comment_data[:content] = params[:post_comment][:content]
-          @comment = params[:post_comment][:parent_id].present? ? @post.comments.find_by_id(params[:post_comment][:parent_id]).children.new(comment_data) : @post.comments.main.new(comment_data)
+          @comment = params[:post_comment][:parent_id].present? ? @post.comments.find_by(id: params[:post_comment][:parent_id]).children.new(comment_data) : @post.comments.main.new(comment_data)
           if @comment.save
             flash[:comment_submit][:notice] = t('camaleon_cms.admin.comments.message.created')
           else

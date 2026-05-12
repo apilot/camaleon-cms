@@ -64,7 +64,7 @@ module CamaleonCms
         end
 
         def set_post_type
-          @post_type = current_site.post_types.find_by_id(params[:id])
+          @post_type = current_site.post_types.find_by(id: params[:id])
         rescue StandardError
           flash[:error] = t('camaleon_cms.admin.post_type.message.error')
           redirect_to cama_admin_path

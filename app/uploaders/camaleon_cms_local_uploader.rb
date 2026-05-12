@@ -2,13 +2,13 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
   def after_initialize
     @root_folder = @current_site.upload_directory
 
-    FileUtils.mkdir_p(@root_folder) unless Dir.exist?(@root_folder)
+    FileUtils.mkdir_p(@root_folder)
   end
 
   def setup_private_folder
     @root_folder = Rails.root.join(self.class::PRIVATE_DIRECTORY).to_s
 
-    FileUtils.mkdir_p(@root_folder) unless Dir.exist?(@root_folder)
+    FileUtils.mkdir_p(@root_folder)
   end
 
   def browser_files(prefix = '/', _objects = {})
@@ -115,7 +115,7 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
 
     folder = File.join(@root_folder, key)
     FileUtils.rm_rf(folder) if Dir.exist? folder
-    get_media_collection.find_by_key(key).take.destroy
+    get_media_collection.by_key(key).take.destroy
   end
 
   # remove an existent file
@@ -125,7 +125,7 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
     file = File.join(@root_folder, key)
     FileUtils.rm(file) if File.exist? file
     @instance.hooks_run('after_delete', key)
-    get_media_collection.find_by_key(key).take.destroy
+    get_media_collection.by_key(key).take.destroy
   end
 
   # convert a real file path into file key

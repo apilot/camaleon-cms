@@ -9,7 +9,7 @@ module CamaleonCms
                               url: cama_admin_dashboard_path })
         items = []
 
-        current_site.post_types.eager_load(:metas).visible_menu.all.each do |pt|
+        current_site.post_types.eager_load(:metas).visible_menu.find_each do |pt|
           pt = pt.decorate
           items_i = []
           if can? :posts,
@@ -121,7 +121,7 @@ module CamaleonCms
           items << { icon: 'windows', title: t('camaleon_cms.admin.settings.theme_setting', default: 'Theme Settings'),
                      url: cama_admin_settings_theme_path }
         end
-        return unless items.present?
+        return if items.blank?
 
         admin_menu_add_menu('settings',
                             { icon: 'cogs', title: t('camaleon_cms.admin.sidebar.settings'), url: '', items: items,
@@ -143,7 +143,7 @@ module CamaleonCms
       # append sub menu to menu with key = key
       # menu: is hash like this: {icon: "dashboard", title: "My title", url: my_path, items: [sub menus]}
       def admin_menu_append_menu_item(key, menu)
-        return unless @_admin_menus[key].present?
+        return if @_admin_menus[key].blank?
 
         @_admin_menus[key][:items] = [] unless @_admin_menus[key].key?(:items)
         @_admin_menus[key][:items] << menu
@@ -152,7 +152,7 @@ module CamaleonCms
       # prepend sub menu to menu with key = key
       # menu: is hash like this: {icon: "dashboard", title: "My title", url: my_path, items: [sub menus]}
       def admin_menu_prepend_menu_item(key, menu)
-        return unless @_admin_menus[key].present?
+        return if @_admin_menus[key].blank?
 
         @_admin_menus[key][:items] = [] unless @_admin_menus[key].key?(:items)
         @_admin_menus[key][:items] = [menu] + @_admin_menus[key][:items]

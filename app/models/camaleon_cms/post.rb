@@ -42,7 +42,7 @@ module CamaleonCms
     validates_with CamaleonCms::PostUniqValidator
     attr_accessor :show_title_with_parent
 
-    before_create :fix_post_order, if: ->(p) { !p.post_order.present? || p.post_order == 0 }
+    before_create :fix_post_order, if: ->(p) { p.post_order.blank? || p.post_order == 0 }
 
     # return all parents for current page hierarchy ordered bottom to top
     def parents
@@ -171,7 +171,7 @@ module CamaleonCms
     # new_order_position: (Integer) position number
     # return nil
     def set_position(new_order_position)
-      update_column('post_order', new_order_position)
+      update_column(:post_order, new_order_position) # rubocop:disable Rails/SkipsModelValidations
     end
 
     # save the summary for current post

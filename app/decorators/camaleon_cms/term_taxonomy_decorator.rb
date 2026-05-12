@@ -55,7 +55,7 @@ module CamaleonCms
 
     # search a post with id (integer) or slug (string)
     def the_post(slug_or_id)
-      return nil unless slug_or_id.present?
+      return nil if slug_or_id.blank?
 
       if slug_or_id.is_a?(Integer)
         begin
@@ -67,7 +67,7 @@ module CamaleonCms
       return unless slug_or_id.is_a?(String)
 
       begin
-        object.posts.find_by_slug(slug_or_id).decorate
+        object.posts.find_by(slug: slug_or_id).decorate
       rescue StandardError
         nil
       end
@@ -94,7 +94,7 @@ module CamaleonCms
     # return html link
     # attrs: Hash of link tag attributes, sample: {id: "myid", class: "sss" }
     def the_edit_link(title = nil, attrs = {})
-      return '' unless h.cama_current_user.present?
+      return '' if h.cama_current_user.blank?
 
       attrs = { target: '_blank', style: 'font-size:11px !important;cursor:pointer;' }.merge(attrs)
       h.link_to("&rarr; #{title || h.ct('edit', default: 'Edit')}".html_safe, the_edit_url, attrs)

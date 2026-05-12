@@ -146,7 +146,7 @@ module CamaleonCms
     private
 
     def set_users_as_cilent
-      site.users.where(role: slug).update_all(role: 'client')
+      site.users.where(role: slug).update_all(role: 'client') # rubocop:disable Rails/SkipsModelValidations
     end
   end
 end

@@ -1,4 +1,4 @@
-unless PluginRoutes.static_system_info['user_model'].present?
+if PluginRoutes.static_system_info['user_model'].blank?
   module CamaleonCms
     class User < CamaleonRecord
       include CamaleonCms::UserMethods
