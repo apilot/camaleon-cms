@@ -64,9 +64,9 @@ module CamaleonCms
       @_user_role ||= site.user_roles.where(slug: role).first
     end
 
-    # assign a new site for current user
+    # Assign a new site for the current user
     def assign_site(site)
-      update_column(:site_id, site.id)
+      update_column(:site_id, site.id) # rubocop:disable Rails/SkipsModelValidations
     end
 
     def sites
@@ -126,20 +126,18 @@ module CamaleonCms
       all_posts.each do |p|
         s = p.post_type.site
         u = s.users.admin_scope.where.not(id: id).first
-        next unless u.present?
+        next if u.blank?
 
-        p.update_column(:user_id, u.id)
-        p.comments.where(user_id: id).each do |c|
-          c.update_column(:user_id, u.id)
-        end
+        p.update_column(:user_id, u.id) # rubocop:disable Rails/SkipsModelValidations
+        p.comments.where(user_id: id).update_all(user_id: u.id) # rubocop:disable Rails/SkipsModelValidations
       end
     end
 
     def reassign_comments
-      all_comments.includes(post: { post_type: :site }).each do |comment|
+      all_comments.includes(post: { post_type: :site }).find_each do |comment|
         site = comment.post.post_type.site
         user = site.get_anonymous_user
-        comment.update_column(:user_id, user.id)
+        comment.update_column(:user_id, user.id) # rubocop:disable Rails/SkipsModelValidations
       end
     end
   end

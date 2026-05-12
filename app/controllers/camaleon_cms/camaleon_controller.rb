@@ -35,11 +35,16 @@ module CamaleonCms
 
     # show page error
     def render_error(status = 404, exception = nil, message = '')
-      Rails.logger.debug "Camaleon CMS - 404 url: #{begin
-        request.original_url
-      rescue StandardError
-        nil
-      end} ==> message: #{exception.message if exception.present?} ==> #{params[:error_msg]} ==> #{caller.inspect}"
+      Rails.logger.debug do
+        original_url = begin
+          request.original_url
+        rescue StandardError
+          nil
+        end
+        "Camaleon CMS - 404 url: " \
+          "#{original_url} ==> message: #{exception&.message} ==> #{params[:error_msg]} ==> #{caller.inspect}"
+      end
+
       @message = "#{message} #{params[:error_msg] || (exception.present? ? "#{exception.message}<br><br>#{caller.inspect}" : '')}"
       @message = '' if Rails.env == 'production'
       respond_to do |format|
@@ -101,7 +106,7 @@ module CamaleonCms
     # check if current site exist, if not, this will be redirected to main domain
     # Also, check current site status
     def cama_site_check_existence
-      if !current_site.present?
+      if current_site.blank?
         if Cama::Site.main_site.present?
           url = Cama::Site.main_site.decorate.the_url
           # TODO: Remove this condition when Rails 6.x won't be supported
@@ -113,7 +118,7 @@ module CamaleonCms
         else
           redirect_to cama_admin_installers_path
         end
-      elsif (cama_current_user.present? && !cama_current_user.admin?) || !cama_current_user.present?
+      elsif (cama_current_user.present? && !cama_current_user.admin?) || cama_current_user.blank?
         # inactive page control
         if current_site.is_inactive?
           if request.original_url.to_s.match(%r{\A#{current_site.the_url}admin(/|\z)})
@@ -122,7 +127,7 @@ module CamaleonCms
               flash[:error] = 'Site is Inactive'
             end
           else
-            p = current_site.posts.find_by_id(current_site.get_option('page_inactive')).try(:decorate)
+            p = current_site.posts.find_by(id: current_site.get_option('page_inactive')).try(:decorate)
             if p
               redirect_to(p.the_url) unless params == { 'controller' => 'camaleon_cms/frontend', 'action' => 'post',
                                                         'slug' => p.the_slug }
@@ -135,7 +140,7 @@ module CamaleonCms
         # maintenance page and IP's control
         if current_site.is_maintenance? && !current_site.get_option('maintenance_ips',
                                                                     '').split(',').include?(request.remote_ip)
-          p = current_site.posts.find_by_id(current_site.get_option('page_maintenance')).try(:decorate)
+          p = current_site.posts.find_by(id: current_site.get_option('page_maintenance')).try(:decorate)
           if p
             redirect_to(p.the_url) if params != { 'controller' => 'camaleon_cms/frontend', 'action' => 'post',
                                                   'slug' => p.the_slug }

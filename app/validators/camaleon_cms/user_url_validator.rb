@@ -49,7 +49,7 @@ module CamaleonCms
     #
     # Returns an array with [<uri>, <original-hostname>].
     def validate(url, allow_localhost: false, allow_local_network: false, enforce_user: true, enforce_sanitizing: true)
-      return invalid_url unless url.present?
+      return invalid_url if url.blank?
 
       # Param url can be a string, URI or Addressable::URI
       return invalid_url unless (uri = parse_url(url))

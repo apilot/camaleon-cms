@@ -37,7 +37,7 @@ module CamaleonCms
           res += cama_hierarchy_post_list(posts_list, element.id)
         end
 
-        if !parent_id.present? && !skip_non_parent_posts
+        if parent_id.blank? && !skip_non_parent_posts
           @_cama_hierarchy_post_list_no_parent.each do |element|
             element.show_title_with_parent = true
             res << element

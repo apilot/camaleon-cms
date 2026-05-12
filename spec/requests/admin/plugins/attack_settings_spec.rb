@@ -26,7 +26,7 @@ RSpec.describe 'Plugin Attack Settings', type: :request do
 
       get '/admin/plugins/attack/settings'
 
-      expect(response).to have_http_status(200)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'allows saving attack settings' do

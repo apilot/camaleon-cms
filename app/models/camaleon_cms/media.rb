@@ -23,7 +23,7 @@ module CamaleonCms
     end
 
     # search file or folder by key
-    def self.find_by_key(key)
+    def self.by_key(key)
       key = key.cama_fix_media_key
       if key == '/'
         where(folder_path: File.dirname(key))

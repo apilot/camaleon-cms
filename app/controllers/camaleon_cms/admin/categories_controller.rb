@@ -65,7 +65,7 @@ module CamaleonCms
       # define parent post type
       def set_post_type
         begin
-          @post_type = current_site.post_types.find_by_id(params[:post_type_id]).decorate
+          @post_type = current_site.post_types.find_by(id: params[:post_type_id]).decorate
         rescue StandardError
           flash[:error] = t('camaleon_cms.admin.request_error_message')
           redirect_to cama_admin_path, { error: 'Error Post Type' }
@@ -76,7 +76,7 @@ module CamaleonCms
       end
 
       def set_category
-        @category = @post_type.categories.find_by_id(params[:id])
+        @category = @post_type.categories.find_by(id: params[:id])
         render_404 unless @category
       rescue StandardError
         flash[:error] = t('camaleon_cms.admin.post_type.message.error')

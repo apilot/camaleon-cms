@@ -3,7 +3,7 @@ if begin
 rescue StandardError
   false
 end
-  CamaleonCms::Site.all.each do |site|
+  CamaleonCms::Site.find_each do |site|
     site.set_option('refresh_cache', true)
   end
 end

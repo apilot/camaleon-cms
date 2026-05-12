@@ -65,7 +65,7 @@ end
 
 # define screenshot errors name
 Capybara::Screenshot.register_filename_prefix_formatter(:rspec) do |example|
-  "screenshot_#{example.description.gsub(' ', '-').gsub(%r{^.*/spec/}, '')}"
+  "screenshot_#{example.description.tr(' ', '-').gsub(%r{^.*/spec/}, '')}"
 end
 Capybara::Screenshot.prune_strategy = :keep_last_run
 

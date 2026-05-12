@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CamaleonRecord < ActiveRecord::Base
+class CamaleonRecord < ActiveRecord::Base # rubocop:disable Rails/ApplicationRecord
   TRANSLATION_TAG_HIDE_MAP = { '<!--' => '!--', '-->' => '--!' }.freeze
   TRANSLATION_TAG_HIDE_REGEX = Regexp.new(TRANSLATION_TAG_HIDE_MAP.keys.map { |x| Regexp.escape(x) }.join('|')).freeze
   TRANSLATION_TAG_RESTORE_MAP = { '--!' => '-->', '!--' => '<!--' }.freeze

@@ -1,7 +1,7 @@
 # load all custom initializers of plugins or themes
 Rails.application.config.to_prepare do |_config|
   PluginRoutes.all_apps.each do |ap|
-    next unless ap['path'].present?
+    next if ap['path'].blank?
 
     f = File.join(ap['path'], 'config', 'initializer.rb')
     load f if File.exist?(f)

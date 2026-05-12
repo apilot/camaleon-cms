@@ -53,8 +53,8 @@ module CamaleonCms
       app.config.i18n.load_path.unshift(*translation_files)
 
       # assets
-      app.config.assets.paths << Rails.root.join('app', 'apps')
-      app.config.assets.paths << Rails.root.join('app', 'assets', 'fonts')
+      app.config.assets.paths << Rails.root.join('app/apps')
+      app.config.assets.paths << Rails.root.join('app/assets/fonts')
       app.config.assets.paths << File.join($camaleon_engine_dir, 'app', 'apps')
       app.config.assets.paths << File.join($camaleon_engine_dir, 'app', 'assets', 'fonts')
       app.config.encoding = 'utf-8'

@@ -8,7 +8,7 @@ module CamaleonCms
         def index
           add_breadcrumb I18n.t('camaleon_cms.admin.sidebar.themes')
           authorize! :manage, :themes
-          return unless params[:set].present?
+          return if params[:set].blank?
 
           site_install_theme(params[:set])
           flash.now[:notice] = t('camaleon_cms.admin.themes.message.updated')

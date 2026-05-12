@@ -74,14 +74,14 @@ module CamaleonCms
       private
 
       def set_post_type
-        @post_type = current_site.post_types.find_by_id(params[:post_type_id]).decorate
+        @post_type = current_site.post_types.find_by(id: params[:post_type_id]).decorate
         authorize! :post_tags, @post_type
         add_breadcrumb @post_type.the_title, @post_type.the_admin_url
         add_breadcrumb t('camaleon_cms.admin.post_type.post_tags'), url_for({ action: :index })
       end
 
       def set_post_tag
-        @post_tag = @post_type.post_tags.find_by_id(params[:id])
+        @post_tag = @post_type.post_tags.find_by(id: params[:id])
       rescue StandardError
         flash[:error] = t('camaleon_cms.admin.post_type.message.error')
         redirect_to cama_admin_path

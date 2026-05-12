@@ -67,8 +67,8 @@ module CamaleonCms
           nil
         end
       end
-      post = the_posts.find_by_slug(slug_or_id) if slug_or_id.is_a?(String) # id
-      post.present? ? post.decorate : nil
+      post = the_posts.find_by(slug: slug_or_id) if slug_or_id.is_a?(String) # id
+      post&.decorate
     end
 
     # return a collection of categories
@@ -81,7 +81,7 @@ module CamaleonCms
     def the_categories(slug_or_id = nil)
       return the_post_type(slug_or_id).the_categories if slug_or_id.present?
 
-      object.categories unless slug_or_id.present?
+      object.categories if slug_or_id.blank?
     end
 
     # return the category object with id or slug = slug_or_id from this site
@@ -96,7 +96,7 @@ module CamaleonCms
       return unless slug_or_id.is_a?(String)
 
       begin
-        the_full_categories.find_by_slug(slug_or_id).decorate
+        the_full_categories.find_by(slug: slug_or_id).decorate
       rescue StandardError
         nil
       end
@@ -126,7 +126,7 @@ module CamaleonCms
       return unless slug_or_id.is_a?(String)
 
       begin
-        object.post_tags.find_by_slug(slug_or_id).decorate
+        object.post_tags.find_by(slug: slug_or_id).decorate
       rescue StandardError
         nil
       end
@@ -144,7 +144,7 @@ module CamaleonCms
       return unless id_or_username.is_a?(String)
 
       begin
-        object.users.find_by_username(id_or_username).decorate
+        object.users.find_by(username: id_or_username).decorate
       rescue StandardError
         nil
       end
@@ -165,14 +165,14 @@ module CamaleonCms
     def the_post_type(slug_or_id)
       if slug_or_id.is_a?(String)
         begin
-          return object.post_types.find_by_slug(slug_or_id).decorate
+          return object.post_types.find_by(slug: slug_or_id).decorate
         rescue StandardError
           nil
         end
       end
       if slug_or_id.is_a?(Array)
         begin
-          return object.post_types.find_by_slug(slug_or_id).decorate
+          return object.post_types.find_by(slug: slug_or_id).decorate
         rescue StandardError
           nil
         end
@@ -245,7 +245,7 @@ module CamaleonCms
       postfix = 'url'
       postfix = 'path' if args.delete(:as_path)
       skip_relative_url_root = args.delete(:skip_relative_url_root)
-      h.cama_current_site_host_port(args) unless args.keys.include?(:host)
+      h.cama_current_site_host_port(args) unless args.key?(:host)
       res = h.cama_url_to_fixed("cama_root_#{postfix}", args)
       if skip_relative_url_root && PluginRoutes.static_system_info['relative_url_root'].present?
         res = res.sub("/#{PluginRoutes.static_system_info['relative_url_root']}",

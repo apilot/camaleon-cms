@@ -42,7 +42,7 @@ module CamaleonCms
         posts_all = posts_all.where(user_id: cama_current_user) if cannot?(:edit_other, @post_type)
 
         @posts = posts_all
-        params[:s] = 'published' unless params[:s].present?
+        params[:s] = 'published' if params[:s].blank?
         @lists_tab = params[:s]
         case params[:s]
         when 'published', 'pending', 'trash'
@@ -117,7 +117,7 @@ module CamaleonCms
         if @post.draft_child? && @post.parent.present?
           # This is a draft (as a child of the original post)
           original_parent = @post.parent.parent
-          post_data[:post_parent] = original_parent.present? ? original_parent.id : nil
+          post_data[:post_parent] = original_parent&.id
           @post = @post.parent
           delete_drafts = true
         elsif @post.draft?
@@ -147,7 +147,7 @@ module CamaleonCms
         authorize! :destroy, @post
         @post.set_option('status_default', @post.status)
         # @post.children.destroy_all unless @post.draft? TODO: why delete children?
-        @post.update_column('status', 'trash')
+        @post.update_column(:status, 'trash') # rubocop:disable Rails/SkipsModelValidations
         @post.update_extra_data
         hooks_run('trashed_post', { post: @post, post_type: @post_type })
         flash[:notice] = t('camaleon_cms.admin.post.message.trash', post_type: @post_type.decorate.the_title)
@@ -157,7 +157,9 @@ module CamaleonCms
       def restore
         @post = @post_type.posts.find(params[:post_id])
         authorize! :update, @post
-        @post.update_column('status', @post.options[:status_default] || 'pending')
+        # rubocop:disable Rails/SkipsModelValidations
+        @post.update_column(:status, @post.options[:status_default] || 'pending')
+        # rubocop:enable Rails/SkipsModelValidations
         @post.update_extra_data
         hooks_run('restored_post', { post: @post, post_type: @post_type })
         flash[:notice] = t('camaleon_cms.admin.post.message.restore', post_type: @post_type.decorate.the_title)
@@ -195,8 +197,8 @@ module CamaleonCms
 
       # define post type parent
       def set_post_type
-        @post_type = current_site.post_types.find_by_id(params[:post_type_id])
-        unless @post_type.present?
+        @post_type = current_site.post_types.find_by(id: params[:post_type_id])
+        if @post_type.blank?
           flash[:error] = t('camaleon_cms.admin.request_error_message')
           redirect_to cama_admin_path
           return

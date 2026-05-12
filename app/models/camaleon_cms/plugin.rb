@@ -71,7 +71,7 @@ module CamaleonCms
     private
 
     def set_default
-      self.name = slug unless name.present?
+      self.name = slug if name.blank?
     end
 
     def destroy_custom_fields

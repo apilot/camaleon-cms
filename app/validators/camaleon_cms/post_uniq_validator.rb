@@ -5,7 +5,7 @@ module CamaleonCms
 
       slug_array = record.slug.to_s.translations_array
       ptype = record.post_type
-      return unless ptype.present? # only for posts that belongs to a post type model
+      return if ptype.blank? # only for posts that belongs to a post type model
 
       post_table = CamaleonCms::Post.table_name
 

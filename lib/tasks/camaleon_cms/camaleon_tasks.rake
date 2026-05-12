@@ -10,7 +10,8 @@ namespace :camaleon_cms do
     include Rails.application.routes.url_helpers
     $current_site = CamaleonCms::Site.find(ENV['site_id'].to_i)
     cama_uploader_init_connection
-    @fog_connection_bucket_dir.files.all.each do |file|
+    # TODO: The `fog` gem isn't used anymore - this whole task should be refactored
+    @fog_connection_bucket_dir.files.all.each do |file| # rubocop:disable Rails/FindEach
       puts file.inspect
       cama_uploader_generate_thumbnail(file.key, file.key, '')
     end

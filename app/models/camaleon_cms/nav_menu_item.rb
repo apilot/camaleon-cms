@@ -56,10 +56,12 @@ module CamaleonCms
     private
 
     def update_count
-      parent&.update_column('count', parent.children.size)
-      parent_item&.update_column('count', parent_item.children.size)
-      update_column(:term_group, main_menu.parent_id)
-      update_column(:term_order, CamaleonCms::NavMenuItem.where(parent_id: parent_id).count) # update position
+      parent&.update_column(:count, parent.children.size) # rubocop:disable Rails/SkipsModelValidations
+      parent_item&.update_column(:count, parent_item.children.size) # rubocop:disable Rails/SkipsModelValidations
+      # update group and position
+      update_columns( # rubocop:disable Rails/SkipsModelValidations
+        term_group: main_menu.parent_id, term_order: CamaleonCms::NavMenuItem.where(parent_id: parent_id).count
+      )
     end
 
     # fast access from site to menu items

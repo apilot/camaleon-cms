@@ -78,7 +78,7 @@ module CamaleonCms
 
     # do all before actions to save the content
     def before_saved
-      self.title = 'Untitled' unless title.present?
+      self.title = 'Untitled' if title.blank?
       self.content_filtered = if content.to_s.include?('<!--:-->')
                                 content.translations.transform_values do |value|
                                   value.squish.strip_tags

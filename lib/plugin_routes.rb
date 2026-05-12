@@ -24,7 +24,7 @@ class PluginRoutes
       settings = {}
 
       gem_settings = File.join($camaleon_engine_dir, 'config', 'system.json')
-      app_settings = Rails.root.join('config', 'system.json')
+      app_settings = Rails.root.join('config/system.json')
 
       settings.merge!(JSON.parse(File.read(gem_settings))) if File.exist?(gem_settings)
       settings.merge!(JSON.parse(File.read(app_settings))) if File.exist?(app_settings)
@@ -235,9 +235,7 @@ class PluginRoutes
       r = cache_variable('site_plugin_helpers')
       return r if r
 
-      res = enabled_apps(site).flat_map do |settings|
-        settings['helpers'] if settings['helpers'].present?
-      end
+      res = enabled_apps(site).flat_map { |settings| settings['helpers'].presence }
       cache_variable('site_plugin_helpers', res)
     end
 
@@ -246,9 +244,7 @@ class PluginRoutes
       r = cache_variable('plugins_helper')
       return r if r
 
-      res = all_apps.flat_map do |settings|
-        settings['helpers'] if settings['helpers'].present?
-      end
+      res = all_apps.flat_map { |settings| settings['helpers'].presence }
       cache_variable('plugins_helper', res.uniq)
     end
 
@@ -299,21 +295,9 @@ class PluginRoutes
       all_locales.split('|').map { |_l| I18n.t(key, **args.merge({ locale: _l })) }.uniq
     end
 
-    # return all locales for translated routes
-    def all_locales_for_routes
-      r = cache_variable('all_locales_for_routes')
-      return r if r
-
-      res = all_locales.split('|').each_with_object({}) do |locale, hsh|
-        hsh[locale] = "_#{locale}"
-      end
-      res[false] = ''
-      cache_variable('all_locales_for_routes', res)
-    end
-
     # return app's directory path
     def apps_dir
-      @apps_dir ||= Rails.root.join('app', 'apps').to_s
+      @apps_dir ||= Rails.root.join('app/apps').to_s
     end
 
     # return all plugins located in cms and in this project
@@ -401,7 +385,7 @@ class PluginRoutes
         p['version'] = gem.version.to_s
         p['path'] = path
         p['kind'] = 'plugin'
-        p['descr'] = gem.description unless p['descr'].present?
+        p['descr'] = gem.description if p['descr'].blank?
         p['gem_mode'] = true
         ary << p
       end
@@ -447,7 +431,7 @@ class PluginRoutes
       rescue StandardError
         ''
       end }
-      options.merge!({ protocol: 'https' }) if Rails.application.config.force_ssl
+      options[:protocol] = 'https' if Rails.application.config.force_ssl
       options
     end
 

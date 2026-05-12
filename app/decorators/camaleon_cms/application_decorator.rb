@@ -15,7 +15,7 @@ module CamaleonCms
     # return the keywords for this model
     def the_keywords
       k = object.get_option('keywords', '')
-      k = h.current_site.the_keywords if object.class.name != 'CamaleonCms::Site' && !k.present?
+      k = h.current_site.the_keywords if object.class.name != 'CamaleonCms::Site' && k.blank?
       k.to_s.translate(get_locale)
     end
 

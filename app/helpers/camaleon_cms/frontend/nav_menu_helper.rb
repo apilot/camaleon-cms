@@ -49,7 +49,7 @@ module CamaleonCms
         }
 
         args = args_def.merge!(args)
-        nav_menu = current_site.nav_menus.find_by_slug(args[:menu_slug])
+        nav_menu = current_site.nav_menus.find_by(slug: args[:menu_slug])
         nav_menu ||= current_site.nav_menus.first
         html = "<#{args[:container]} class='#{args[:container_class]}' "\
           "id='#{args[:container_id]}'>#{args[:container_prepend]}{__}#{args[:container_append]}</#{args[:container]}>"
@@ -65,7 +65,7 @@ module CamaleonCms
         html = ''
         parent_current = false
         index = 0
-        nav_menu.eager_load(:metas).each do |nav_menu_item|
+        nav_menu.eager_load(:metas).find_each do |nav_menu_item|
           _args = args.dup
           data_nav_item = cama_parse_menu_item(nav_menu_item)
           next if data_nav_item == false

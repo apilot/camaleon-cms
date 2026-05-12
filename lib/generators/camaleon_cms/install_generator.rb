@@ -1,5 +1,6 @@
 require 'rails/generators/base'
 require 'securerandom'
+
 module CamaleonCms
   module Generators
     class InstallGenerator < Rails::Generators::Base
@@ -9,13 +10,13 @@ module CamaleonCms
       def create_initializer_file
         copy_file 'system.json', 'config/system.json'
         copy_file 'plugin_routes.rb', 'lib/plugin_routes.rb'
-        Dir.mkdir Rails.root.join('app', 'apps').to_s unless Dir.exist?(Rails.root.join('app', 'apps').to_s)
+        FileUtils.mkdir_p(Rails.root.join('app/apps'))
         directory('apps', 'app/apps')
         directory(File.join($camaleon_engine_dir, 'app/apps/themes').to_s, 'app/apps/themes')
 
         sprokects_4_or_newer = defined?(Sprockets::BabelProcessor)
         if sprokects_4_or_newer
-          assets_config_dir = Rails.root.join('app', 'assets', 'config')
+          assets_config_dir = Rails.root.join('app/assets/config')
           FileUtils.makedirs(assets_config_dir)
           assets_config_file = assets_config_dir.join('manifest.js')
           FileUtils.touch(assets_config_file) unless File.file?(assets_config_file)
@@ -27,7 +28,7 @@ module CamaleonCms
             //= link_tree ../../apps/themes/default/assets
             //= link_tree ../../apps/themes/new/assets
           ASSETS
-          append_to_file Rails.root.join('config', 'initializers', 'assets.rb'),
+          append_to_file Rails.root.join('config/initializers/assets.rb'),
                          <<~PRECOMPILE_MANIFEST
 
                            Rails.application.config.assets.precompile += %w( manifest.js )
