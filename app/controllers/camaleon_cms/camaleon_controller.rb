@@ -49,7 +49,8 @@ module CamaleonCms
       @message = if Rails.env.production?
                    ''
                  else
-                   "#{message} #{error_msg || "#{exception&.message}<br><br>#{caller.inspect}"}"
+                   "#{message} " \
+                     "#{error_msg || (exception.present? ? "#{exception.message}<br><br>#{caller.inspect}" : '')}"
                  end
 
       respond_to do |format|
