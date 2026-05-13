@@ -129,12 +129,10 @@ module CamaleonCms
     # sample: {es: 'https://mydomain.com/es/articulo-3.html', en: 'https://mydomain.com/en/post-3.html'}
     def the_urls(*args)
       args = args.extract_options!
-      res = {}
-      h.current_site.the_languages.each do |l|
+      h.current_site.the_languages.each_with_object({}) do |l, hsh|
         args[:locale] = l
-        res[l] = the_url(args.clone)
+        hsh[l] = the_url(args.clone)
       end
-      res
     end
 
     # return edit url for this post
@@ -149,7 +147,7 @@ module CamaleonCms
     def the_edit_link(title = nil, attrs = {})
       return '' if h.cama_current_user.blank?
 
-      attrs = { target: '_blank', style: 'font-size:11px !important;cursor:pointer;' }.merge(attrs)
+      attrs = { target: '_blank', style: 'font-size:11px !important;cursor:pointer;' }.merge!(attrs)
       h.link_to("&rarr; #{title || h.ct('edit', default: 'Edit')}".html_safe, the_edit_url, attrs)
     end
 
@@ -161,7 +159,7 @@ module CamaleonCms
     end
 
     # show link and thumbnail included as html
-    # link_args: html attributes for link
+    # link_args: html attributes for the link
     # img_args: html attributes for image
     def the_link_thumb(link_args = {}, img_args = {})
       h.link_to(the_thumb(img_args), the_url, link_args)
@@ -208,7 +206,7 @@ module CamaleonCms
       object.comments.main.approveds.eager_load(:user)
     end
 
-    # check if the post can be visited by current visitor
+    # check if the post can be visited by the current user
     def can_visit?
       r = { flag: true, post: object }
       h.hooks_run('post_can_visit', r)
@@ -237,34 +235,29 @@ module CamaleonCms
 
     # return the post type of this post
     def the_post_type
-      object.post_type.decorate
+      @the_post_type ||= object.post_type.decorate
     end
 
-    # looks for the next post item related to parent element based on post_order attribute
-    # @param _parent: parent decorated model, like: (PostType *default), Category, PostTag, Site
+    # It looks for the next post item related to the parent element based on the post_order attribute
+    # @param parent: parent decorated model, like: (PostType *default), Category, PostTag, Site
     # @samples: my_post.the_next_post(), my_post.the_next_post(@category), my_post.the_next_post(current_site)
     def the_next_post(parent = nil)
       (parent.presence || the_post_type).the_posts.where(
-        "#{post_order_sql} > :position OR (#{post_order_sql} = :position and #{post_table}.created_at > :created_at)",
-        { position: object.post_order, created_at: object.created_at }
+        post_order_predicate_gt(object.post_order, object.created_at)
       ).where.not(id: object.id).take.try(:decorate)
     end
 
-    # looks for the next post item related to parent element based on post_order attribute
-    # @param _parent: parent decorated model, like: (PostType *default), Category, PostTag, Site
+    # looks for the next post item related to the parent element based on post_order attribute
+    # @param parent: parent decorated model, like: (PostType *default), Category, PostTag, Site
     # @samples: my_post.the_prev_post(), my_post.the_prev_post(@category), my_post.the_prev_post(current_site)
-    def the_prev_post(_parent = nil)
-      (_parent.presence || the_post_type)
-        .the_posts
-        .where(
-          "#{post_order_sql} < :position OR (#{post_order_sql} = :position and #{post_table}.created_at < :created_at)",
-          { position: object.post_order, created_at: object.created_at }
-        )
+    def the_prev_post(parent = nil)
+      (parent.presence || the_post_type).the_posts
+        .where(post_order_predicate_lt(object.post_order, object.created_at))
         .where.not(id: object.id).reorder(post_order: :asc, created_at: :asc).last.try(:decorate)
     end
 
     # return the title with hierarchy prefixed
-    # sample: title paren 1 - title parent 2 -.. -...
+    # sample: title paren 1 - title parent 2 -... -...
     # if add_parent_title: true will add parent title like: —— item 1.1.1 | item 1.1
     def the_hierarchy_title
       return the_title if object.post_parent.blank?
@@ -290,12 +283,14 @@ module CamaleonCms
 
     private
 
-    def post_table
-      @post_table ||= CamaleonCms::Post.table_name
+    def post_order_predicate_gt(position, created_at)
+      t = CamaleonCms::Post.arel_table
+      t[:post_order].gt(position).or(t[:post_order].eq(position).and(t[:created_at].gt(created_at)))
     end
 
-    def post_order_sql
-      @post_order_sql ||= "#{post_table}.post_order"
+    def post_order_predicate_lt(position, created_at)
+      t = CamaleonCms::Post.arel_table
+      t[:post_order].lt(position).or(t[:post_order].eq(position).and(t[:created_at].lt(created_at)))
     end
   end
 end
