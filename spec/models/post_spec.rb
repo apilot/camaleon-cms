@@ -63,7 +63,7 @@ RSpec.describe 'PostDecorator' do
     it 'does not fail when the last post has a nil post_order' do
       post_type = create(:post_type, site: @site)
       first_post = create(:post, post_type: post_type, post_order: 1)
-      first_post.update_column(:post_order, nil)
+      first_post.update_column(:post_order, nil) # rubocop:disable Rails/SkipsModelValidations
 
       new_post = build(:post, post_type: post_type, post_order: nil)
       expect { new_post.save }.not_to raise_error
