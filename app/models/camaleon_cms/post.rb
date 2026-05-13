@@ -250,7 +250,7 @@ module CamaleonCms
     # calculate a post order when it is empty
     def fix_post_order
       last_post = post_type.posts.where.not(id: nil).last
-      self.post_order = last_post.present? ? last_post.post_order + 1 : 1
+      self.post_order = last_post.present? ? (last_post.post_order || 0) + 1 : 1
     end
   end
 end
