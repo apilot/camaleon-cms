@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe 'Sidebar menu expand', :js do
+RSpec.describe 'Sidebar menu expand', :js do
   init_site
 
   it 'renders expandable menu items with data-key attributes' do
