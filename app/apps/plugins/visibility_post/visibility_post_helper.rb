@@ -117,52 +117,52 @@ module Plugins
             "#{t('camaleon_cms.admin.table.visibility')}: ".html_safe + tag.span(class: 'visibility_label')
           end << ' - ' <<
             tag.a(href: '#') { tag.span(t('camaleon_cms.admin.button.edit'), 'aria-hidden': 'true') } <<
-              tag.div(class: 'panel-options hidden') do
-                public_checked = post.visibility.blank? || post.visibility == 'public'
-                private_checked = post.visibility == 'private'
-                password_checked = post.visibility == 'password'
+            tag.div(class: 'panel-options hidden') do
+              public_checked = post.visibility.blank? || post.visibility == 'public'
+              private_checked = post.visibility == 'private'
+              password_checked = post.visibility == 'password'
 
-                result = []
-                result << tag.label(style: 'display: block;') do
-                  tag.input(
-                    name: 'post[visibility]', class: 'radio', type: 'radio', value: 'public', checked: public_checked
-                  ) + " #{t('camaleon_cms.admin.table.public')}"
-                end
-                result << tag.div
-
-                result << tag.label(style: 'display: block;') do
-                  tag.input(
-                    name: 'post[visibility]', class: 'radio', type: 'radio', value: 'private', checked: private_checked
-                  ) + " #{t('camaleon_cms.admin.table.private')}"
-                end
-
-                result << tag.div(style: 'padding-left: 20px;') { groups_list(post) }
-
-                result << tag.label(style: 'display: block;') do
-                  tag.input(
-                    name: 'post[visibility]', class: 'radio', type: 'radio',
-                    value: 'password', checked: password_checked
-                  ) + " #{t('camaleon_cms.admin.table.password_protection')}"
-                end
-
-                result << tag.div do
-                  tag.input(
-                    name: 'post[visibility_value]', class: 'form-control password_field_value', type: 'text',
-                    value: post.visibility == 'password' ? post.visibility_value : nil
-                  )
-                end
-
-                result << tag.p { tag.a(t('camaleon_cms.admin.table.hide'), class: 'lnk_hide', href: '#') }
-
-                safe_join(result)
+              result = []
+              result << tag.label(style: 'display: block;') do
+                tag.input(
+                  name: 'post[visibility]', class: 'radio', type: 'radio', value: 'public', checked: public_checked
+                ) + " #{t('camaleon_cms.admin.table.public')}"
               end
+              result << tag.div
+
+              result << tag.label(style: 'display: block;') do
+                tag.input(
+                  name: 'post[visibility]', class: 'radio', type: 'radio', value: 'private', checked: private_checked
+                ) + " #{t('camaleon_cms.admin.table.private')}"
+              end
+
+              result << tag.div(style: 'padding-left: 20px;') { groups_list(post) }
+
+              result << tag.label(style: 'display: block;') do
+                tag.input(
+                  name: 'post[visibility]', class: 'radio', type: 'radio',
+                  value: 'password', checked: password_checked
+                ) + " #{t('camaleon_cms.admin.table.password_protection')}"
+              end
+
+              result << tag.div do
+                tag.input(
+                  name: 'post[visibility_value]', class: 'form-control password_field_value', type: 'text',
+                  value: post.visibility == 'password' ? post.visibility_value : nil
+                )
+              end
+
+              result << tag.p { tag.a(t('camaleon_cms.admin.table.hide'), class: 'lnk_hide', href: '#') }
+
+              safe_join(result)
+            end
         end
 
         safe_join(html)
       end
 
       def groups_list(post)
-        current_groups = (post.visibility == 'private' && post.visibility_value) ? post.visibility_value.split(',') : []
+        current_groups = post.visibility == 'private' && post.visibility_value ? post.visibility_value.split(',') : []
         elements = []
         current_site.user_roles.each do |role|
           checked = current_groups.include?(role.slug.to_s)

@@ -48,19 +48,19 @@ module CamaleonCms
       params[:kind] = 'content' if params[:kind].blank?
       params[:q] = (params[:q] || '').downcase
       table_name = case params[:kind]
-        when 'post_type'
-          base_query = current_site.post_types
-          Cama::PostType.table_name
-        when 'category'
-          base_query = current_site.full_categories
-          Cama::Category.table_name
-        when 'tag'
-          base_query = current_site.post_tags
-          Cama::PostTag.table_name
-        else
-          base_query = current_site.posts
-          Cama::Post.table_name
-      end
+                   when 'post_type'
+                     base_query = current_site.post_types
+                     Cama::PostType.table_name
+                   when 'category'
+                     base_query = current_site.full_categories
+                     Cama::Category.table_name
+                   when 'tag'
+                     base_query = current_site.post_tags
+                     Cama::PostTag.table_name
+                   else
+                     base_query = current_site.posts
+                     Cama::Post.table_name
+                   end
       @items = base_query.where(
         items_sql_by_name(table_name), "%#{params[:q]}%", "%#{params[:q]}%", "%#{params[:q]}%"
       )
@@ -101,9 +101,7 @@ module CamaleonCms
 
     def items_sql_by_name(table_name)
       lower_name = "LOWER(#{table_name}"
-      if table_name == Cama::Post.table_name
-        return "#{lower_name}.title) LIKE ? OR #{lower_name}.slug) LIKE ? OR #{lower_name}.content_filtered) LIKE ?"
-      end
+      return "#{lower_name}.title) LIKE ? OR #{lower_name}.slug) LIKE ? OR #{lower_name}.content_filtered) LIKE ?" if table_name == Cama::Post.table_name
 
       "#{lower_name}.name) LIKE ? OR #{lower_name}.slug) LIKE ? OR #{lower_name}.description) LIKE ?"
     end

@@ -28,7 +28,8 @@ module Plugins
 
         label = tag.label(t('camaleon_cms.admin.table.author'), class: 'control-label')
         select = content_tag(
-          :select, safe_join(plugin_authoring_authors_list(post)), id: 'post_user_id', name: 'post[user_id]',
+          :select, safe_join(plugin_authoring_authors_list(post)),
+          id: 'post_user_id', name: 'post[user_id]',
           class: 'form-control select valid', disabled: disabled, 'aria-invalid' => 'false'
         )
 
