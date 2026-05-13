@@ -27,21 +27,21 @@ module CamaleonCms
     # input_args: attributes for input field
     def cama_captcha_tag(len = 5, img_args = { alt: '' }, input_args = {}, bootstrap_group_mode = false)
       if input_args[:placeholder].blank?
-        default_text = I18n.t('camaleon_cms.captcha_placeholder', default: 'Please enter the text of the image')
-        input_args[:placeholder] = default_text
+        input_args[:placeholder] =
+          I18n.t('camaleon_cms.captcha_placeholder', default: 'Please enter the text of the image')
       end
-
       img_args[:onclick] = "this.src = \"#{cama_captcha_url(len: len)}\"+\"&t=\"+(new Date().getTime());"
       img_args[:style] = 'cursor: pointer;'
 
-      img = image_tag(cama_captcha_url(len: len, t: Time.current.to_i), img_args)
-      input = tag(:input, type: 'text', name: 'captcha', **input_args)
+      helpers = ActionController::Base.helpers
+      img = helpers.image_tag(cama_captcha_url(len: len, t: Time.current.to_i), img_args)
+      input = helpers.tag(:input, type: 'text', name: 'captcha', **input_args)
 
       if bootstrap_group_mode
-        span = content_tag(:span, img, class: 'input-group-btn', style: 'vertical-align: top;')
-        content_tag(:div, safe_join([span, input]), class: 'input-group input-group-captcha')
+        span = helpers.content_tag(:span, img, class: 'input-group-btn', style: 'vertical-align: top;')
+        helpers.content_tag(:div, helpers.safe_join([span, input]), class: 'input-group input-group-captcha')
       else
-        content_tag(:div, safe_join([img, input]), class: 'input-group-captcha')
+        helpers.content_tag(:div, helpers.safe_join([img, input]), class: 'input-group-captcha')
       end
     end
 
