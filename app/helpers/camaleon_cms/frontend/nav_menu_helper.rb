@@ -120,7 +120,7 @@ module CamaleonCms
 
           item_open = "<#{_args[:item_container]}"
           item_open << " #{item_attrs_str}" if item_attrs_str.present?
-          item_open << ">"
+          item_open << '>'
 
           link_attr_parts = []
           link_attr_parts << r[:link_attrs] if r[:link_attrs].present?
@@ -145,7 +145,7 @@ module CamaleonCms
             html_children
           ].reject(&:blank?).join('')
           item_html = "#{item_open}#{item_inner}</#{_args[:item_container]}>"
-          items_html << item_html
+          items_html << item_html.html_safe
 
           index += 1
         end
