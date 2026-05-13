@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CamaleonCms
   module Admin
     module MenusHelper
@@ -113,10 +115,10 @@ module CamaleonCms
             {
               icon: 'plug',
               title: safe_join([
-                                 t('camaleon_cms.admin.sidebar.plugins'),
-                                 ' ',
-                                 content_tag(:small, plugin_count, class: 'label label-primary')
-                               ]),
+                                     t('camaleon_cms.admin.sidebar.plugins'),
+                                     ' ',
+                                     content_tag(:small, plugin_count, class: 'label label-primary')
+                                   ]),
               url: cama_admin_plugins_path,
               datas: "data-intro='#{t('camaleon_cms.admin.intro.plugins')}' data-position='right'"
             }
@@ -185,7 +187,7 @@ module CamaleonCms
         )
       end
 
-      # add menu item to admin menu at the the end
+      # add menu item to menu at the the end
       # key: key for menu
       # menu: is hash like this: {icon: "dashboard", title: "My title", url: my_path, items: [sub menus]}
       # - icon: font-awesome icon (it is already included "fa fa-")
@@ -249,7 +251,9 @@ module CamaleonCms
           css_class << 'active' if is_active_menu(menu[:key])
           css_class.strip!
           data_attrs = parse_datas(menu[:datas])
-          content_tag(:li, class: css_class.presence, data: data_attrs.presence) do
+          content_tag(:li, ''.html_safe,
+                      class: css_class.presence,
+                      data: { key: menu[:key] }.merge!(data_attrs.presence || {})) do
             safe_join([
               content_tag(:a, href: menu[:url]) do
                 safe_join([
@@ -259,7 +263,7 @@ module CamaleonCms
                   (content_tag(:i, nil, class: 'fa fa-angle-left pull-right') if menu.key?(:items))
                 ].compact)
               end,
-              (content_tag(:ul, class: 'treeview-menu') { _admin_menu_draw(menu[:items]) } if menu.key?(:items))
+              (_admin_menu_draw(menu[:items]) if menu.key?(:items))
             ].compact)
           end
         end)
@@ -325,7 +329,9 @@ module CamaleonCms
             css_class << 'active ' if is_active_menu(item[:key])
             css_class.strip!
             data_attrs = parse_datas(item[:datas])
-            content_tag(:li, class: css_class.presence, data: data_attrs.presence) do
+            content_tag(:li, ''.html_safe,
+                        class: css_class.presence,
+                        data: { key: item[:key] }.merge!(data_attrs.presence || {})) do
               safe_join([
                 content_tag(:a, href: item[:url]) do
                   safe_join([
