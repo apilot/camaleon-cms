@@ -35,18 +35,24 @@ module CamaleonCms
 
     # show page error
     def render_error(status = 404, exception = nil, message = '')
+      error_msg = params[:error_msg]
       Rails.logger.debug do
         original_url = begin
           request.original_url
         rescue StandardError
           nil
         end
-        "Camaleon CMS - 404 url: " \
-          "#{original_url} ==> message: #{exception&.message} ==> #{params[:error_msg]} ==> #{caller.inspect}"
+        'Camaleon CMS - 404 url: ' \
+          "#{original_url} ==> message: #{exception&.message} ==> #{error_msg} ==> #{caller.inspect}"
       end
 
-      @message = "#{message} #{params[:error_msg] || (exception.present? ? "#{exception.message}<br><br>#{caller.inspect}" : '')}"
-      @message = '' if Rails.env == 'production'
+      @message = if Rails.env.production?
+                   ''
+                 else
+                   "#{message} " \
+                     "#{error_msg || (exception.present? ? "#{exception.message}<br><br>#{caller.inspect}" : '')}"
+                 end
+
       respond_to do |format|
         format.html { render "camaleon_cms/#{status}", status: status }
         format.any { head status }
@@ -121,7 +127,7 @@ module CamaleonCms
       elsif (cama_current_user.present? && !cama_current_user.admin?) || cama_current_user.blank?
         # inactive page control
         if current_site.is_inactive?
-          if request.original_url.to_s.match(%r{\A#{current_site.the_url}admin(/|\z)})
+          if request.original_url.to_s.match?(%r{\A#{current_site.the_url}admin(/|\z)})
             if cama_current_user.present?
               cama_logout_user
               flash[:error] = 'Site is Inactive'

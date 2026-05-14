@@ -41,16 +41,13 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
       'folder_path' => File.dirname(key),
       'url' => if is_dir
                  ''
+               elsif is_private_uploader?
+                 url_path.sub("#{@root_folder}/", '')
                else
-                 (if is_private_uploader?
-                    url_path.sub("#{@root_folder}/",
-                                 '')
-                  else
-                    File.join(
-                      @current_site.decorate.the_url(as_path: true, locale: false,
-                                                     skip_relative_url_root: true), url_path
-                    )
-                  end)
+                 File.join(
+                   @current_site.decorate.the_url(as_path: true, locale: false,
+                                                  skip_relative_url_root: true), url_path
+                 )
                end,
       'is_folder' => is_dir,
       'file_size' => is_dir ? 0 : File.size(file_path).round(2),
@@ -60,8 +57,11 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
     }.with_indifferent_access
     res['key'] = File.join(res['folder_path'], res['name'])
     if res['file_type'] == 'image' && File.extname(file_path).downcase != '.gif'
-      res['thumb'] =
-        (is_private_uploader? ? "/admin/media/download_private_file?file=#{version_path(key).slice(1..-1)}" : version_path(res['url']))
+      res['thumb'] = if is_private_uploader?
+                       "/admin/media/download_private_file?file=#{version_path(key).slice(1..-1)}"
+                     else
+                       version_path(res['url'])
+                     end
     end
     if res['file_type'] == 'image'
       res['thumb'].sub! '.svg', '.jpg'
@@ -109,7 +109,7 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
     f
   end
 
-  # remove an existent folder
+  # Remove an existent folder
   def delete_folder(key)
     return { error: 'Invalid folder path' } if key.include?('..')
 
@@ -118,7 +118,7 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
     get_media_collection.by_key(key).take.destroy
   end
 
-  # remove an existent file
+  # Remove an existent file
   def delete_file(key)
     return { error: 'Invalid file path' } if key.include?('..')
 
@@ -128,7 +128,7 @@ class CamaleonCmsLocalUploader < CamaleonCmsUploader
     get_media_collection.by_key(key).take.destroy
   end
 
-  # convert a real file path into file key
+  # Convert a real file path into a file key
   def parse_key(file_path)
     file_path.sub(@root_folder, '').cama_fix_media_key
   end

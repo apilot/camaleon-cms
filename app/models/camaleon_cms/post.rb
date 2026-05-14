@@ -14,16 +14,16 @@ module CamaleonCms
     has_many :term_relationships, foreign_key: :objectid, dependent: :destroy, inverse_of: :object
     has_many :categories, class_name: 'CamaleonCms::Category', through: :term_relationships, source: :term_taxonomy
     has_many :post_tags, class_name: 'CamaleonCms::PostTag', through: :term_relationships, source: :term_taxonomy
-    has_many :comments, class_name: 'CamaleonCms::PostComment', foreign_key: :post_id, dependent: :destroy
+    has_many :comments, class_name: 'CamaleonCms::PostComment', dependent: :destroy
     has_many :drafts, lambda {
                         where(status: 'draft_child')
                       }, class_name: 'CamaleonCms::Post', foreign_key: :post_parent, dependent: :destroy
     has_many :children, class_name: 'CamaleonCms::Post', foreign_key: :post_parent, dependent: :destroy,
                         primary_key: :id
 
-    belongs_to :owner, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, required: false
-    belongs_to :parent, class_name: 'CamaleonCms::Post', foreign_key: :post_parent, required: false
-    belongs_to :post_type, foreign_key: :taxonomy_id, inverse_of: :posts, required: false
+    belongs_to :owner, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, optional: true
+    belongs_to :parent, class_name: 'CamaleonCms::Post', foreign_key: :post_parent, optional: true
+    belongs_to :post_type, foreign_key: :taxonomy_id, inverse_of: :posts, optional: true
 
     scope :visible_frontend, -> { where(status: 'published') }
     scope :public_posts, lambda {
@@ -66,22 +66,22 @@ module CamaleonCms
       end
     end
 
-    # return the post type of this post (DEPRECATED)
+    # Return the post type of this post (DEPRECATED), though used yet in migration, so let it stay
     def get_post_type_depre
       post_types.reorder(nil).first
     end
 
-    # check if this post was published
+    # Check if this post was published
     def published?
       status == 'published'
     end
 
-    # check if this is in pending status
+    # Check if this post is in the pending status
     def pending?
       status == 'pending'
     end
 
-    # check if this is in draft status
+    # Check if this post is in the draft status
     def draft?
       %w[draft draft_child].include?(status)
     end
@@ -90,12 +90,12 @@ module CamaleonCms
       status == 'draft_child'
     end
 
-    # check if this is in trash status
+    # Check if this post is in the trash status
     def trash?
       status == 'trash'
     end
 
-    # check if current post can manage content
+    # Check if the current post can manage content
     # return boolean
     def manage_content?(posttype = nil)
       get_option('has_content', (posttype || post_type).get_option('has_content', true))
@@ -106,34 +106,35 @@ module CamaleonCms
       get_option('has_layout', (posttype || post_type).get_option('has_layout', false))
     end
 
-    # check if current post can manage template
+    # Check if current post can manage template
     # return boolean
     def manage_template?(posttype = nil)
       get_option('has_template', (posttype || post_type).get_option('has_template', true))
     end
 
-    # check if current post can manage summary
+    # Check if the current post can manage summary
     # return boolean
     def manage_summary?(posttype = nil)
       get_option('has_summary', (posttype || post_type).get_option('has_summary', true))
     end
 
-    # check if current post can manage picture
+    # Check if the current post can manage picture
     # return boolean
     def manage_picture?(posttype = nil)
       get_option('has_picture', (posttype || post_type).get_option('has_picture', true))
     end
 
-    # check if current post can manage comments
+    # Check if the current post can manage comments
     # return boolean
     def manage_comments?(posttype = nil)
       get_option('has_comments', (posttype || post_type).get_option('has_comments', false))
     end
 
-    # check if the post can be commented
+    # Check if the post can be commented
     # sample: @post.can_commented?
-    # return Boolean (true/false)
-    # to enable comments for current post, use this: post.set_meta('has_comments', '1'). Note: Parent PostType should be enabled for comments too: post_type.set_option('has_comments', true)
+    # to enable comments for current post, use this: post.set_meta('has_comments', '1').
+    # Note: Parent PostType should be enabled for comments too: post_type.set_option('has_comments', true)
+    # @return [TrueClass, FalseClass]
     def can_commented?
       manage_comments? && get_meta('has_comments').to_s == '1'
     end
@@ -151,10 +152,15 @@ module CamaleonCms
     #   has_picture, boolean (default true)
     #   has_template, boolean (default false)
     #   has_comments, boolean (default false)
-    #   default_layout:  (string) (default layout) # this is still used if post type was inactivated layout and overwritten by dropdown in post view
-    #   default_template:  (string) (default template) # this is still used if post type was inactivated template and overwritten by dropdown in post view
+    #
+    #   the following is still used if post type was inactivated layout and overwritten by dropdown in post view
+    #   default_layout:  (string) (default layout)
+    #
+    #   the following is still used if post type was inactivated template and overwritten by dropdown in post view
+    #   default_template:  (string) (default template)
     #   has_layout:  (boolean) (default false)
-    #   skip_fields:  (array) (default empty) array of custom field keys to avoid for this post, sample: ["subtitle", "icon"]
+    #   skip_fields:  (array) (default empty) array of custom field keys to avoid for this post,
+    #     sample: ["subtitle", "icon"]
     # val: value for the setting
     def set_setting(key, val)
       set_option(key, val)

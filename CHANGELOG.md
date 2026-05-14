@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Style & tooling:** Add RuboCop plugin gems and fix all offenses, [#1167](https://github.com/owen2345/camaleon-cms/pull/1167)
+  - Added `rubocop-performance`, `rubocop-rails`, `rubocop-capybara`, `rubocop-factory_bot`, `rubocop-rake`, `rubocop-rspec_rails` to development dependencies
+  - Fixed hundreds of Layout, Style, Performance, and Rails offenses across 92 files
+  - Set maximum line length to 120; reformatted codebase to comply
+
 - **Style & testability:** Refactor HTML in Ruby code to Rails tags [#1172](https://github.com/owen2345/camaleon-cms/pull/1172)
   - Replaced raw HTML string concatenation with Rails helpers (`content_tag`, `tag`, `image_tag`, `link_to`, `safe_join`, `StringScanner`) across 12 files
   - Helpers refactored: `nav_menu_helper`, `html_helper`, `short_code_helper`, `captcha_helper`, `menus_helper`, `admin_controller`

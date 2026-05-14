@@ -4,7 +4,7 @@ module CamaleonCms
 
     # attrs:
     #   slug => plugin key
-    belongs_to :site, class_name: 'CamaleonCms::Site', foreign_key: :parent_id, required: false
+    belongs_to :site, class_name: 'CamaleonCms::Site', foreign_key: :parent_id, optional: true
 
     default_scope { where(taxonomy: :theme) }
 

@@ -6,7 +6,8 @@ module CamaleonCms
     # redirect_url (default nil): after initialized the session, this will be redirected to
     #   "redirect_url" if defined
     #   it doesn't redirect if redirect_url === false
-    #   return to previous page if defined the cookie['return_to'] or login url received extra param: return_to=https://mysite.com
+    #   return to previous page if defined the cookie['return_to'], or login
+    #     url received extra param: return_to=https://mysite.com
     def login_user(user, remember_me = false, redirect_url = nil)
       c = { value: [user.auth_token, request.user_agent, request.ip], expires: 24.hours.from_now }
       c[:domain] = :all if PluginRoutes.system_info['users_share_sites'].present? && CamaleonCms::Site.count > 1
@@ -41,7 +42,6 @@ module CamaleonCms
       @user&.authenticate(password)
     end
 
-    ##
     # User registration.
     #
     # user_data must contain:
@@ -50,7 +50,6 @@ module CamaleonCms
     # - username
     # - password
     # - password_confirmation
-
     def cama_register_user(user_data, meta)
       @user = current_site.users.new(user_data)
       r = { user: @user, params: params }
@@ -60,7 +59,11 @@ module CamaleonCms
         { result: false, type: :captcha_error, message: t('camaleon_cms.admin.users.message.error_captcha') }
       elsif @user.save
         @user.set_metas(meta)
-        message = current_site.need_validate_email? ? t('camaleon_cms.admin.users.message.created_pending_validate_email') : t('camaleon_cms.admin.users.message.created')
+        message = if current_site.need_validate_email?
+                    t('camaleon_cms.admin.users.message.created_pending_validate_email')
+                  else
+                    t('camaleon_cms.admin.users.message.created')
+                  end
         r = { user: @user, message: message, redirect_url: cama_admin_login_path }
         hooks_run('user_after_register', r)
         { result: true, message: r[:message], redirect_url: r[:redirect_url] }
@@ -111,13 +114,13 @@ module CamaleonCms
 
     alias signin? cama_sign_in?
 
-    # return the role for current user
+    # return the role for the current user
     # if not logged in, then return 'public'
     def cama_current_role
       current_site.visitor_role
     end
 
-    # return current user logged in
+    # return the current user logged in
     def cama_current_user
       return @cama_current_user if defined?(@cama_current_user)
 
@@ -127,7 +130,8 @@ module CamaleonCms
 
       return nil unless cookie_auth_token_complete?
 
-      @cama_current_user = current_site.users_include_admins.find_by(auth_token: user_auth_token_from_cookie).try(:decorate)
+      @cama_current_user = current_site.users_include_admins
+                                       .find_by(auth_token: user_auth_token_from_cookie).try(:decorate)
     end
 
     def cookie_auth_token_complete?

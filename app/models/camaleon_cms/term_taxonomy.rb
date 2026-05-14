@@ -14,7 +14,8 @@ module CamaleonCms
     end
 
     self.table_name = "#{PluginRoutes.static_system_info['db_prefix']}term_taxonomy"
-    # attr_accessible :taxonomy, :description, :parent_id, :count, :name, :slug, :term_group, :status, :term_order, :user_id
+    # attr_accessible :taxonomy, :description, :parent_id, :count, :name, :slug, :term_group, :status, :term_order,
+    #                 :user_id
     # attr_accessible :data_options
     # attr_accessible :data_metas
 
@@ -27,11 +28,11 @@ module CamaleonCms
     validates_with CamaleonCms::UniqValidator
 
     # relations
-    has_many :term_relationships, class_name: 'CamaleonCms::TermRelationship', foreign_key: :term_taxonomy_id,
+    has_many :term_relationships, class_name: 'CamaleonCms::TermRelationship',
                                   dependent: :destroy
     # has_many :posts, foreign_key: :objectid, through: :term_relationships, :source => :objects
-    belongs_to :parent, class_name: 'CamaleonCms::TermTaxonomy', foreign_key: :parent_id, required: false
-    belongs_to :owner, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, required: false
+    belongs_to :parent, class_name: 'CamaleonCms::TermTaxonomy', optional: true
+    belongs_to :owner, class_name: CamaManager.get_user_class_name, foreign_key: :user_id, optional: true
 
     # return all children taxonomy
     # sample: sub categories of a category

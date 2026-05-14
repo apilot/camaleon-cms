@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CamaleonCms
   module Admin
     module MenusHelper
@@ -105,18 +107,18 @@ module CamaleonCms
         end
 
         if can? :manage, :plugins
-          plugin_count = PluginRoutes.all_plugins.reject do |plugin|
-            plugin[:domain].present? && !plugin[:domain].split(',').include?(current_site.the_slug)
-          end.size
+          plugin_count = PluginRoutes.all_plugins.count do |plugin|
+            !(plugin[:domain].present? && !plugin[:domain].split(',').include?(current_site.the_slug))
+          end
           admin_menu_add_menu(
             'plugins',
             {
               icon: 'plug',
               title: safe_join([
-                t('camaleon_cms.admin.sidebar.plugins'),
-                ' ',
-                content_tag(:small, plugin_count, class: 'label label-primary')
-              ]),
+                                 t('camaleon_cms.admin.sidebar.plugins'),
+                                 ' ',
+                                 content_tag(:small, plugin_count, class: 'label label-primary')
+                               ]),
               url: cama_admin_plugins_path,
               datas: "data-intro='#{t('camaleon_cms.admin.intro.plugins')}' data-position='right'"
             }
@@ -185,19 +187,19 @@ module CamaleonCms
         )
       end
 
-      # add menu item to admin menu at the the end
-      # key: key for menu
-      # menu: is hash like this: {icon: "dashboard", title: "My title", url: my_path, items: [sub menus]}
+      # add a menu item to the menu at the end
+      # key: key for the menu
+      # menu: is hash like this: { icon: "dashboard", title: "My title", url: my_path, items: [sub menus] }
       # - icon: font-awesome icon (it is already included "fa fa-")
       # - title: title for the menu
       # - url: url for the menu
-      # - items: is an recursive array of the menus without a key
-      # - datas: html data text for this menu item
+      # - items: is a recursive array of the menus without a key
+      # - datas: HTML data text for this menu item
       def admin_menu_add_menu(key, menu)
         @_admin_menus[key] = menu
       end
 
-      # append sub menu to menu with key = key
+      # append sub menu to menu with a key = key
       # menu: is hash like this: {icon: "dashboard", title: "My title", url: my_path, items: [sub menus]}
       def admin_menu_append_menu_item(key, menu)
         return if @_admin_menus[key].blank?
@@ -206,8 +208,8 @@ module CamaleonCms
         @_admin_menus[key][:items] << menu
       end
 
-      # prepend sub menu to menu with key = key
-      # menu: is hash like this: {icon: "dashboard", title: "My title", url: my_path, items: [sub menus]}
+      # prepend submenu to menu with key = key
+      # menu: is hash like this: { icon: "dashboard", title: "My title", url: my_path, items: [sub menus] }
       def admin_menu_prepend_menu_item(key, menu)
         return if @_admin_menus[key].blank?
 
@@ -215,9 +217,9 @@ module CamaleonCms
         @_admin_menus[key][:items] = [menu] + @_admin_menus[key][:items]
       end
 
-      # add menu before menu with key = key_target
+      # add the menu before the menu with key = key_target
       # key_menu: key for menu
-      # menu: is hash like this: {icon: "dashboard", title: "My title", url: my_path, items: [sub menus]}
+      # menu: is hash like this: { icon: "dashboard", title: "My title", url: my_path, items: [sub menus] }
       def admin_menu_insert_menu_before(key_target, key_menu, menu)
         res = {}
         @_admin_menus.each do |key, val|
@@ -249,7 +251,10 @@ module CamaleonCms
           css_class << 'active' if is_active_menu(menu[:key])
           css_class.strip!
           data_attrs = parse_datas(menu[:datas])
-          content_tag(:li, class: css_class.presence, data: data_attrs.presence) do
+          content_tag(
+            :li, ''.html_safe,
+            class: css_class.presence, data: { key: menu[:key] }.merge!(data_attrs.presence || {})
+          ) do
             safe_join([
               content_tag(:a, href: menu[:url]) do
                 safe_join([
@@ -259,7 +264,7 @@ module CamaleonCms
                   (content_tag(:i, nil, class: 'fa fa-angle-left pull-right') if menu.key?(:items))
                 ].compact)
               end,
-              (content_tag(:ul, class: 'treeview-menu') { _admin_menu_draw(menu[:items]) } if menu.key?(:items))
+              (_admin_menu_draw(menu[:items]) if menu.key?(:items))
             ].compact)
           end
         end)
@@ -317,6 +322,7 @@ module CamaleonCms
 
       def _admin_menu_draw(items)
         return ''.html_safe if items.blank?
+
         content_tag(:ul, class: 'treeview-menu') do
           safe_join(items.each_with_index.map do |item, index|
             css_class = +"item_#{index + 1} "
@@ -324,7 +330,11 @@ module CamaleonCms
             css_class << 'active ' if is_active_menu(item[:key])
             css_class.strip!
             data_attrs = parse_datas(item[:datas])
-            content_tag(:li, class: css_class.presence, data: data_attrs.presence) do
+            content_tag(
+              :li, ''.html_safe,
+              class: css_class.presence,
+              data: { key: item[:key] }.merge!(data_attrs.presence || {})
+            ) do
               safe_join([
                 content_tag(:a, href: item[:url]) do
                   safe_join([
@@ -343,6 +353,7 @@ module CamaleonCms
 
       def parse_datas(datas_string)
         return {} if datas_string.blank?
+
         result = {}
         datas_string.scan(/data-(\w+)=['"]([^'"]*)['"]/).each do |key, value|
           result[key.to_sym] = value

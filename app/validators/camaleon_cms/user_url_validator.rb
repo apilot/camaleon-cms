@@ -136,7 +136,7 @@ module CamaleonCms
     def multiline_blocked?(parsed_url)
       url = parsed_url.to_s
 
-      return true if url =~ /[\n\r]/
+      return true if /[\n\r]/.match?(url)
       # Google Cloud Storage uses a multi-line, encoded Signature query string
       return false if %w[http https].include?(parsed_url.scheme&.downcase)
 
@@ -145,7 +145,7 @@ module CamaleonCms
 
     def validate_user(value)
       return if value.blank?
-      return if value =~ /\A\p{Alnum}/
+      return if /\A\p{Alnum}/.match?(value)
 
       @errors << I18n.t('camaleon_cms.admin.validate.username_alphanumeric')
     end
@@ -153,7 +153,7 @@ module CamaleonCms
     def validate_hostname(value)
       return if value.blank?
       return if IPAddress.valid?(value)
-      return if value =~ /\A\p{Alnum}/
+      return if /\A\p{Alnum}/.match?(value)
 
       @errors << I18n.t('camaleon_cms.admin.validate.host_or_ip_invalid')
     end

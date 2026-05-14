@@ -53,7 +53,10 @@ RSpec.describe 'CustomFields create/update permissions', type: :request do
 
       expect(response).to have_http_status(:found)
       expect(group.reload.fields.where(slug: 'eval_blocked')).to be_empty
-      expected_custom = I18n.t('camaleon_cms.admin.custom_field.message.select_eval_admin_only', default: 'The "Select Eval" field type is restricted to administrators.')
+      expected_custom = I18n.t(
+        'camaleon_cms.admin.custom_field.message.select_eval_admin_only',
+        default: 'The "Select Eval" field type is restricted to administrators.'
+      )
       expect(flash[:error]).to satisfy do |msg|
         msg = msg.to_s
         msg.include?(expected_custom) || msg.include?('You are not authorized')
@@ -101,7 +104,10 @@ RSpec.describe 'CustomFields create/update permissions', type: :request do
       expect(response).to have_http_status(:found)
 
       # and set an error message about select_eval restriction (either the custom message or the standard CanCan denial)
-      expected_custom = I18n.t('camaleon_cms.admin.custom_field.message.select_eval_admin_only', default: 'The "Select Eval" field type is restricted to administrators.')
+      expected_custom = I18n.t(
+        'camaleon_cms.admin.custom_field.message.select_eval_admin_only',
+        default: 'The "Select Eval" field type is restricted to administrators.'
+      )
       expect(flash[:error]).to satisfy do |msg|
         msg = msg.to_s
         msg.include?(expected_custom) || msg.include?('You are not authorized')
@@ -133,7 +139,8 @@ RSpec.describe 'CustomFields create/update permissions', type: :request do
       expect(group.fields.count).to eq(1)
 
       my_post.update_categories([])
-      get '/admin/settings/custom_fields/list', params: { post_type: post_type.id, post_id: my_post.id, categories: [category.id] }
+      get '/admin/settings/custom_fields/list',
+          params: { post_type: post_type.id, post_id: my_post.id, categories: [category.id] }
 
       expect(response.body).to include('Cat Group')
       expect(my_post.categories.reload).to include(category)
@@ -152,7 +159,8 @@ RSpec.describe 'CustomFields create/update permissions', type: :request do
       other_group.add_field({ name: 'Other Field', slug: 'other-field' }, { field_key: 'text' })
 
       my_post.update_categories([])
-      get '/admin/settings/custom_fields/list', params: { post_type: post_type.id, post_id: my_post.id, categories: [other_category.id] }
+      get '/admin/settings/custom_fields/list',
+          params: { post_type: post_type.id, post_id: my_post.id, categories: [other_category.id] }
 
       expect(response.body).not_to include('Other Group')
       expect(my_post.categories.reload).to be_empty

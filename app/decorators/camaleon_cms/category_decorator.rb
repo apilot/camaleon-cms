@@ -19,7 +19,8 @@ module CamaleonCms
       h.edit_cama_admin_post_type_category_url(object.post_type.id, object)
     end
 
-    # return all children categories for the current category (active_record) filtered by permissions + hidden posts + roles + etc...
+    # return all children categories for the current
+    # category (active_record) filtered by permissions + hidden posts + roles + etc...
     # in return object, you can add custom where's or pagination like here:
     # https://edgeguides.rubyonrails.org/active_record_querying.html
     def the_categories

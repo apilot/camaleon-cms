@@ -1,21 +1,22 @@
 #   Camaleon CMS is a content management system
 #   Copyright (C) 2015 by Owen Peredo Diaz
 #   Email: owenperedo@gmail.com
-#   This program is free software: you can redistribute it and/or modify   it under the terms of the GNU Affero General Public License as  published by the Free Software Foundation, either version 3 of the  License, or (at your option) any later version.
-#   This program is distributed in the hope that it will be useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   This program is free software: you can redistribute it and/or modify it under the terms of the
+#   GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
+#   or (at your option) any later version.
+#   This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #   See the  GNU Affero General Public License (GPLv3) for more details.
 module CamaleonCms
   module Frontend
     module ContentSelectHelper
-      # select single post of post type
+      # select a single post of post type
       # the_post_type('post') do
       #   the_post('first-blog-post')
       # end
       def the_post(slug)
         post = @object.the_post(slug)
-        process_in_block(post) do
-          yield(post) if block_given?
-        end
+        process_in_block(post) { yield(post) if block_given? }
         post
       end
 

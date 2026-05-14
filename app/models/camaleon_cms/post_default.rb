@@ -13,7 +13,8 @@ module CamaleonCms
 
     self.table_name = "#{PluginRoutes.static_system_info['db_prefix']}posts"
 
-    # attr_accessible :user_id, :title, :slug, :content, :content_filtered, :status,  :visibility, :visibility_value, :post_order, :post_type_key, :taxonomy_id, :published_at, :post_parent, :post_order, :is_feature
+    # attr_accessible :user_id, :title, :slug, :content, :content_filtered, :status,  :visibility, :visibility_value,
+    #                 :post_order, :post_type_key, :taxonomy_id, :published_at, :post_parent, :post_order, :is_feature
     attr_accessor :draft_id
 
     # attr_accessible :data_options
@@ -22,9 +23,9 @@ module CamaleonCms
     cattr_accessor :current_site
 
     has_many :term_relationships, foreign_key: :objectid, dependent: :destroy, primary_key: :id
-    has_many :children, lambda {
-                          where(post_class: 'PostDefault')
-                        }, class_name: 'CamaleonCms::PostDefault', foreign_key: :post_parent, dependent: :destroy, primary_key: :id
+    has_many :children, -> { where(post_class: 'PostDefault') },
+             class_name: 'CamaleonCms::PostDefault', foreign_key: :post_parent, dependent: :destroy, primary_key: :id
+
     scope :featured, -> { where(is_feature: true) }
 
     validates :title, :slug, presence: true

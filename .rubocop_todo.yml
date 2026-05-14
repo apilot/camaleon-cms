@@ -174,15 +174,6 @@ Style/GlobalVars:
     - 'lib/tasks/camaleon_cms/camaleon_tasks.rake'
     - 'lib/tasks/camaleon_cms/rspec_test.rake'
 
-# Offense count: 6
-# This cop supports safe autocorrection (--autocorrect).
-Style/IfUnlessModifier:
-  Exclude:
-    - 'app/controllers/camaleon_cms/admin/appearances/widgets/sidebar_controller.rb'
-    - 'app/helpers/camaleon_cms/admin/menus_helper.rb'
-    - 'app/helpers/camaleon_cms/site_helper.rb'
-    - 'app/helpers/camaleon_cms/uploader_helper.rb'
-
 # Offense count: 37
 # Configuration parameters: AllowedMethods.
 # AllowedMethods: respond_to_missing?
@@ -194,4 +185,4 @@ Style/OptionalBooleanParameter:
 # Configuration parameters: AllowHeredoc, AllowURI, AllowQualifiedName, URISchemes, AllowRBSInlineAnnotation, AllowCopDirectives, AllowedPatterns, SplitStrings.
 # URISchemes: http, https
 Layout/LineLength:
-  Max: 2326
+  Max: 120

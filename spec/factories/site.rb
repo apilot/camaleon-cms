@@ -8,8 +8,13 @@ FactoryBot.define do
       current_session = Capybara.current_session
       current_session.server ? "#{current_session.server.host}:#{current_session.server.port}" : 'key'
     end
-    # sequence(:slug) { |n| Capybara.current_session.server ? "#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}" : "site#{n}" }
+    # sequence(:slug) do |n|
+    #   next "site#{n}" unless Capybara.current_session.server
+    #
+    #   "#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"
+    # end
     description { Faker::Lorem.sentence }
+
     transient do
       theme { 'default' }
       skip_intro { true }

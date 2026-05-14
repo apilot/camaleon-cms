@@ -7,7 +7,8 @@ module CamaleonCms
       before_action :verificate_register_permission, only: [:register]
       layout 'camaleon_cms/login'
 
-      # you can pass return_to as a param (mysite.com/admin/login?return_to=my-url) and this will be used after user logged in
+      # you can pass return_to as a param (mysite.com/admin/login?return_to=my-url) and
+      # this will be used after user logged in
       def login
         return redirect_to(safe_redirect_url(params[:return_to]) || cama_admin_dashboard_path) if signin?
 
@@ -171,7 +172,8 @@ module CamaleonCms
       end
 
       def user_permit_data
-        params.require(:user).permit(:first_name, :last_name, :email, :username, :password, :password_confirmation, :is_valid_email)
+        params.require(:user)
+              .permit(:first_name, :last_name, :email, :username, :password, :password_confirmation, :is_valid_email)
       end
     end
   end

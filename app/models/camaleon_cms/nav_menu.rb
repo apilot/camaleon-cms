@@ -7,7 +7,7 @@ module CamaleonCms
 
     has_many :children, class_name: 'CamaleonCms::NavMenuItem', foreign_key: :parent_id, dependent: :destroy,
                         inverse_of: :parent
-    belongs_to :site, foreign_key: :parent_id, inverse_of: :nav_menus, required: false
+    belongs_to :site, foreign_key: :parent_id, inverse_of: :nav_menus, optional: true
 
     # add menu item for current menu
     # value: (Hash) is a hash object that contains label, type, link

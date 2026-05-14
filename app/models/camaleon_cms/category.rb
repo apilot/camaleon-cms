@@ -12,10 +12,10 @@ module CamaleonCms
 
     has_many :posts, foreign_key: :objectid, through: :term_relationships, source: :object
     has_many :children, class_name: 'CamaleonCms::Category', foreign_key: :parent_id, dependent: :destroy
-    belongs_to :parent, class_name: 'CamaleonCms::Category', foreign_key: :parent_id, required: false
+    belongs_to :parent, class_name: 'CamaleonCms::Category', optional: true
     belongs_to :post_type_parent, class_name: 'CamaleonCms::PostType', foreign_key: :parent_id,
-                                  inverse_of: :categories, required: false
-    belongs_to :site, required: false
+                                  inverse_of: :categories, optional: true
+    belongs_to :site, optional: true
 
     before_save :set_site
     before_destroy :set_posts_in_default_category

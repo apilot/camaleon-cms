@@ -6,8 +6,9 @@ module CamaleonCms
 
     # return theme full asset path
     # theme_name: theme name, if nil, then will use current theme
-    # asset: asset file name, if asset is present return full path to this asset
-    # sample: <script src="<%= theme_asset_path("js/admin.js") %>"></script> => return: /assets/themes/my_theme/assets/js/admin-54505620f.js
+    # asset: asset file name, if asset is present return the full path to this asset
+    # sample: <script src="<%= theme_asset_path("js/admin.js") %>"></script> =>
+    #   return: /assets/themes/my_theme/assets/js/admin-54505620f.js
     def theme_asset_path(asset = nil, theme_name = nil)
       return theme_asset_url(theme_name, current_theme.slug) if theme_name.present? && theme_name.include?('/')
 
@@ -22,11 +23,12 @@ module CamaleonCms
     alias theme_asset theme_asset_path
     alias theme_gem_asset theme_asset_path
 
-    # return the full url for asset of current theme:
+    # return the full url for asset of the current theme:
     # asset: (String) asset name
     # theme_name: (optional) theme name, default (current theme caller to this function)
     # sample:
-    #   theme_asset_url("css/main.css") => return: https://myhost.com/assets/themes/my_theme/assets/css/main-54505620f.css
+    #   theme_asset_url("css/main.css") =>
+    #     return: https://myhost.com/assets/themes/my_theme/assets/css/main-54505620f.css
     def theme_asset_url(asset, theme_name = nil)
       p = theme_asset_path(asset, theme_name)
       begin
@@ -36,7 +38,7 @@ module CamaleonCms
       end
     end
 
-    # return theme view path including the path of current theme
+    # return the theme view path including the path of current theme
     # view_name: name of the view or template
     # sample: theme_view("index") => "themes/my_theme/index"
     def theme_view(view_name, deprecated_attr = '')
@@ -49,7 +51,7 @@ module CamaleonCms
     end
 
     # assign the layout for this request
-    # asset: asset file name, if asset is present return full path to this asset
+    # asset: asset file name, if asset is present return the full path to this asset
     # layout_name: layout name
     def theme_layout(layout_name, _theme_name = nil)
       if current_theme.settings['gem_mode']
@@ -70,15 +72,19 @@ module CamaleonCms
       f.split(k).last.split('/').first
     end
 
-    # returns file system path to theme asset
-    # theme_name: theme name, if nil, then will use current theme
-    # asset: asset file name, if asset is present return full path to this asset
-    # sample: theme_asset_file_path('images/foo.jpg') => return: /home/camaleon/my-site/app/apps/themes/default/assets/images/foo.jpg
+    # returns the filesystem path to theme asset
+    # theme_name: theme name, if nil, then will use the current theme
+    # asset: asset file name, if asset is present, return the full path to this asset
+    # sample:
+    # theme_asset_file_path('images/foo.jpg') =>
+    #   return: /home/camaleon/my-site/app/apps/themes/default/assets/images/foo.jpg
     def theme_asset_file_path(asset = nil, theme_name = nil)
-      theme_path = current_theme.settings['path']
-      if theme_name && (theme = Theme.where(name: theme_name).first)
-        theme_path = theme.settings['path']
-      end
+      theme_path = if theme_name && (theme = Theme.where(name: theme_name).first)
+                     theme.settings['path']
+                   else
+                     current_theme.settings['path']
+                   end
+
       "#{theme_path}/assets/#{asset}"
     end
 
@@ -86,9 +92,7 @@ module CamaleonCms
     def theme_home_page
       current_site.the_post(current_theme.get_field('home_page')) ||
         current_site.the_posts('page').first ||
-        CamaleonCms::Post.new(title: 'Hello World!',
-                              content: 'Please add a page.',
-                              status: 'published')
+        CamaleonCms::Post.new(title: 'Hello World!', content: 'Please add a page.', status: 'published')
     end
   end
 end

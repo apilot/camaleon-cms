@@ -17,7 +17,9 @@ module CamaleonCms
       # taxonomies ->  (categories || post_tags)
       def post_type_list_taxonomy(taxonomies, color = 'primary')
         taxonomies.decorate.map do |f|
-          link_to(cama_admin_post_type_taxonomy_posts_path(@post_type.id, f.taxonomy, f.id), class: 'cama_ajax_request') do
+          link_to(
+            cama_admin_post_type_taxonomy_posts_path(@post_type.id, f.taxonomy, f.id), class: 'cama_ajax_request'
+          ) do
             content_tag(:span, f.the_title, class: "label label-#{color} label-form")
           end
         end.join(' ').html_safe
@@ -52,15 +54,17 @@ module CamaleonCms
       def post_type_taxonomy_html_(categories, taxonomy = 'categories', name = 'categories', type = 'checkbox',
                                    values = [], class_cat = '', required = false)
         if categories.count < 1
-          return t('camaleon_cms.admin.post_type.message.no_created_html',
-                   taxonomy: taxonomy == 'categories' ? t('camaleon_cms.admin.table.categories') : t('camaleon_cms.admin.table.tags'))
+          taxonomy == 'categories' ? t('camaleon_cms.admin.table.categories') : t('camaleon_cms.admin.table.tags')
+          return t('camaleon_cms.admin.post_type.message.no_created_html', taxonomy: taxonomy)
         end
 
         content_tag(:ul, class: class_cat) do
           categories.decorate.map do |f|
             content_tag(:li) do
               is_checked = Array(values).map(&:to_s).include?(f.id.to_s)
-              input_options = { class: (required ? 'required' : ''), data: { error_place: "#validation_error_list_#{name}" } }
+              input_options = {
+                class: (required ? 'required' : ''), data: { error_place: "#validation_error_list_#{name}" }
+              }
               input_tag = if type == 'radio'
                             radio_button_tag("#{name}[]", f.id, is_checked, input_options)
                           else

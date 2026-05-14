@@ -47,8 +47,8 @@ module CamaleonCms
         if params[:partial].present?
           render json: { next_page: @next_page,
                          html: render_to_string(partial: 'render_file_item', locals: { files: @files }) }
-        else
-          render 'index', layout: false if params[:partial].blank?
+        elsif params[:partial].blank?
+          render 'index', layout: false
         end
       end
 
@@ -93,9 +93,13 @@ module CamaleonCms
         params[:dimension] = nil if params[:skip_auto_crop].present?
         f = { error: 'File not found.' }
         if params[:file_upload].present?
-          f = upload_file(params[:file_upload],
-                          { folder: params[:folder], dimension: params['dimension'], formats: params[:formats], versions: params[:versions],
-                            thumb_size: params[:thumb_size] }.merge(settings))
+          f = upload_file(
+            params[:file_upload],
+            {
+              folder: params[:folder], dimension: params['dimension'], formats: params[:formats],
+              versions: params[:versions], thumb_size: params[:thumb_size]
+            }.merge!(settings)
+          )
         end
 
         if f[:error].present?

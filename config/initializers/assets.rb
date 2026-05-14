@@ -16,7 +16,7 @@ if sprockets_3
   Rails.application.config.assets.precompile << proc do |path|
     res = false
     dirname = File.dirname(path)
-    if dirname.start_with?('plugins/') || dirname.start_with?('themes/')
+    if dirname.start_with?('plugins/', 'themes/')
       name = File.basename(path)
       content_type = begin
         MIME::Types.type_for(name).first.content_type

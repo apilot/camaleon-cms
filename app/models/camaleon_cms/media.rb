@@ -2,7 +2,7 @@ module CamaleonCms
   class Media < CamaleonRecord
     self.table_name = "#{PluginRoutes.static_system_info['db_prefix']}media"
 
-    belongs_to :site, required: false
+    belongs_to :site, optional: true
     validates :name, uniqueness: {
       scope: %i[site_id is_folder folder_path is_public],
       message: 'Duplicates not allowed'

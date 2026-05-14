@@ -6,7 +6,7 @@ module CamaleonCms
 
     default_scope { where(taxonomy: :user_roles) }
 
-    belongs_to :site, class_name: 'CamaleonCms::Site', foreign_key: :parent_id, required: false
+    belongs_to :site, class_name: 'CamaleonCms::Site', foreign_key: :parent_id, optional: true
 
     def roles_post_type
       get_meta('_post_type')
@@ -133,7 +133,10 @@ module CamaleonCms
         {
           key: 'select_eval',
           label: I18n.t('camaleon_cms.admin.custom_field.select_eval', default: 'Select Eval').to_s,
-          description: I18n.t('camaleon_cms.admin.users.tool_tip.select_eval', default: 'Allow toggling and using select_eval custom fields in the admin UI.').to_s
+          description: I18n.t(
+            'camaleon_cms.admin.users.tool_tip.select_eval',
+            default: 'Allow toggling and using select_eval custom fields in the admin UI.'
+          ).to_s
         },
         {
           key: 'theme_settings',

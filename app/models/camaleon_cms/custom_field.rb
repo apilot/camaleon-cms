@@ -15,14 +15,13 @@ module CamaleonCms
     # attr_accessible :object_class, :objectid, :description, :parent_id, :count, :name, :slug,
     # :field_order, :status, :is_repeat
     has_many :metas, -> { where(object_class: 'CustomField') }, foreign_key: :objectid, dependent: :destroy
-    has_many :values, class_name: 'CamaleonCms::CustomFieldsRelationship',
-                      foreign_key: :custom_field_id, dependent: :destroy
-    belongs_to :custom_field_group, required: false
-    belongs_to :parent, class_name: 'CamaleonCms::CustomField', foreign_key: :parent_id, required: false
+    has_many :values, class_name: 'CamaleonCms::CustomFieldsRelationship', dependent: :destroy
+    belongs_to :custom_field_group, optional: true
+    belongs_to :parent, class_name: 'CamaleonCms::CustomField', optional: true
 
     validates :name, :object_class, presence: true
-    validates_uniqueness_of :slug, scope: %i[parent_id object_class],
-                                   unless: ->(o) { o.is_a?(CamaleonCms::CustomFieldGroup) }
+    validates :slug, uniqueness: { scope: %i[parent_id object_class],
+                                   unless: ->(o) { o.is_a?(CamaleonCms::CustomFieldGroup) } }
 
     before_validation :before_validating
     before_update :check_select_eval_authorization

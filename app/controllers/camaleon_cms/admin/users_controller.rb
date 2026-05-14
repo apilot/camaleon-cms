@@ -16,7 +16,8 @@ module CamaleonCms
 
       def profile
         add_breadcrumb I18n.t('camaleon_cms.admin.users.profile')
-        @user = params[:user_id].present? ? current_site.the_user(params[:user_id].to_i).object : cama_current_user.object
+        user_id = params[:user_id]
+        @user = user_id.present? ? current_site.the_user(user_id.to_i).object : cama_current_user.object
         edit
       end
 
@@ -133,7 +134,8 @@ module CamaleonCms
       private
 
       def validate_role
-        (user_id_param.present? && cama_current_user.id.to_s == user_id_param) || authorize!(:manage, :users)
+        user_id = user_id_param
+        (user_id.present? && cama_current_user.id.to_s == user_id) || authorize!(:manage, :users)
       end
 
       def user_id_param
