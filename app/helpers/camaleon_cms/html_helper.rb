@@ -29,9 +29,17 @@ module CamaleonCms
 
     alias add_asset_library cama_load_libraries
 
-    # add custom asset libraries (js, css or both) for the current request, also you can add extra css or js files for existent libraries
-    # sample: (add new library)
-    #   append_asset_libraries({"my_library_key"=> { js: [plugin_asset("js/my_js"), "plugins/myplugin/assets/js/my_js2"], css: [plugin_asset("css/my_css"), "plugins/myplugin/assets/css/my_css2"] }})
+    # add custom asset libraries (js, css or both) for the current request, also you can add extra css or js files for
+    # existent libraries
+    # sample: (add a new library)
+    #   append_asset_libraries(
+    #     {
+    #       "my_library_key"=> {
+    #         js: [plugin_asset("js/my_js"), "plugins/myplugin/assets/js/my_js2"],
+    #         css: [plugin_asset("css/my_css"), "plugins/myplugin/assets/css/my_css2"]
+    #       }
+    #     }
+    #   )
     # sample: (update existent library)
     #   append_asset_libraries({"colorpicker"=>{js: [plugin_asset("js/my_custom_js")] } })
     # return nil
@@ -90,11 +98,13 @@ module CamaleonCms
       "#{args[:css_html]}\n#{args[:js_html]}\n#{@_assets_content.join('').html_safe}"
     end
 
-    # create a html tooltip to include anywhere
+    # create an HTML tooltip to include anywhere
     # text: text of the tooltip
     # location: location of the tooltip (left | right | top |bottom)
     def cama_html_tooltip(text = 'Tooltip', location = 'left')
-      "<a href='javascript:;' title='#{text}' data-toggle='tooltip' data-placement='#{location}'><i class='fa fa-info-circle'></i></a>"
+      tag.a(href: 'javascript:;', title: text, data: { toggle: 'tooltip', placement: location }) do
+        tag.i(class: 'fa fa-info-circle')
+      end
     end
 
     private

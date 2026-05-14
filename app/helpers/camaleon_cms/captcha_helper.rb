@@ -28,19 +28,20 @@ module CamaleonCms
     def cama_captcha_tag(len = 5, img_args = { alt: '' }, input_args = {}, bootstrap_group_mode = false)
       if input_args[:placeholder].blank?
         input_args[:placeholder] =
-          I18n.t('camaleon_cms.captcha_placeholder',
-                 default: 'Please enter the text of the image')
+          I18n.t('camaleon_cms.captcha_placeholder', default: 'Please enter the text of the image')
       end
-      img_args['onclick'] = "this.src = \"#{cama_captcha_url(len: len)}\"+\"&t=\"+(new Date().getTime());"
-      img = "<img style='cursor: pointer;' src='#{cama_captcha_url(len: len,
-                                                                   t: Time.current.to_i)}' #{img_args.collect do |k, v|
-                                                                                               "#{k}='#{v}'"
-                                                                                             end.join(' ')} />"
-      input = "<input type='text' name='captcha' #{input_args.collect { |k, v| "#{k}='#{v}'" }.join(' ')} />"
+      img_args[:onclick] = "this.src = \"#{cama_captcha_url(len: len)}\"+\"&t=\"+(new Date().getTime());"
+      img_args[:style] = 'cursor: pointer;'
+
+      helpers = ActionController::Base.helpers
+      img = helpers.image_tag(cama_captcha_url(len: len, t: Time.current.to_i), img_args)
+      input = helpers.tag(:input, type: 'text', name: 'captcha', **input_args)
+
       if bootstrap_group_mode
-        "<div class='input-group input-group-captcha'><span class='input-group-btn' style='vertical-align: top;'>#{img}</span>#{input}</div>"
+        span = helpers.content_tag(:span, img, class: 'input-group-btn', style: 'vertical-align: top;')
+        helpers.content_tag(:div, helpers.safe_join([span, input]), class: 'input-group input-group-captcha')
       else
-        "<div class='input-group-captcha'>#{img}#{input}</div>"
+        helpers.content_tag(:div, helpers.safe_join([img, input]), class: 'input-group-captcha')
       end
     end
 

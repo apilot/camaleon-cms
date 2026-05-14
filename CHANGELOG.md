@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Style & testability:** Refactor HTML in Ruby code to Rails tags [#1172](https://github.com/owen2345/camaleon-cms/pull/1172)
+  - Replaced raw HTML string concatenation with Rails helpers (`content_tag`, `tag`, `image_tag`, `link_to`, `safe_join`, `StringScanner`) across 12 files
+  - Helpers refactored: `nav_menu_helper`, `html_helper`, `short_code_helper`, `captcha_helper`, `menus_helper`, `admin_controller`
+  - Plugins refactored: `authoring_post_helper`, `visibility_post_helper`
+  - Models: use `ActionController::Base.helpers` for default site content generation in `site_default_settings`; fix nil-handling in `fix_post_order`
+  - Added FactoryBot factories for `nav_menu` and `nav_menu_item`
+  - Added full specs for captcha helper, nav menu helper, and post `fix_post_order`
+
 - **Security fix:** Fix two unprotected redirects via `params[:return_to]` in `sessions_controller.rb` and `session_helper.rb` [#1168](https://github.com/owen2345/camaleon-cms/pull/1168)
   - Both used `params[:return_to]` directly in `redirect_to`, allowing open redirect attacks
   - Fixed by routing through the existing `safe_redirect_url` helper
@@ -10,10 +18,8 @@
   - Fixed `Style/IfUnlessModifier`, `Rails/Output`, `Rails/FilePath`, `Performance/InefficientHashSearch`, `Performance/RedundantMerge`, `Performance/StringReplacement`, `Rails/Presence`, `RSpecRails/HttpStatus`, `Rails/DynamicFindBy`, `Rails/FindEach`, `Rails/SkipsModelValidations`, `Rails/Time`, `Rails/Date`, `Rails/ApplicationRecord`, `Rails/Blank`
   - Removed dead code: `cama_draw_timer`, `all_locales_for_routes`, `cama_get_options_html_from_items`, `cama_parse_for_thumb_name`
   - Set `TargetRailsVersion` to `6.1` in `.rubocop.yml`
+
 - **Security fix:** Bump gems — Nokogiri to 1.19.3, action_text-trix, aws-sdk, puma, rubyzip, selenium-webdriver, sqlite3, Bundler 2.7.2 [#1170](https://github.com/owen2345/camaleon-cms/pull/1170)
-  - Nokogiri fixes: CSS selector tokenizer regexp backtracking, XSLT memory leak
-  - puma fix: `prune_bundler` was stripping user-configured `BUNDLE_*` env vars on re-exec
-  - DOMPurify upgraded to 3.4.2 in action_text-trix
 
 - **Fix:** Decorator locale resolution and language context mixing (fixes issue #233), [#1166](https://github.com/owen2345/camaleon-cms/pull/1166)
   - **Phase 1:** Fix locale accessibility and language context mixing
@@ -26,12 +32,13 @@
     - Cleaner code: removed try-rescue overhead, direct I18n.locale fallback
   - Result: Decorators now correctly use site's frontend language in frontend context, admin language in admin context
   - Add 8 comprehensive locale resolution tests
-  - All 388 specs pass, RuboCop: 0 violations
+
 - **Bug fix:** Fix thread-safety issues with `PluginRoutes.reload` causing persistent 500 errors, [#1163](https://github.com/owen2345/camaleon-cms/pull/1163)
   - Remove unnecessary `PluginRoutes.reload` from `plugins#index` and `themes#index` actions
   - Refactor class variables (`@@`) to class instance variables (`@`) with `Monitor` for thread-safe route reloading and cache access
   - Fix `return` in blocks by using `find` instead of `each`
   - Add 27 tests for `PluginRoutes`, `plugins`, and `themes` controllers
+
 - **Optimize PluginRoutes.draw_gems and apps_dir methods** Micro-optimizations for memory consumption and performance, [#1164](https://github.com/owen2345/camaleon-cms/pull/1164)
 
 ## [2.9.2](https://github.com/owen2345/camaleon-cms/tree/2.9.2) (2026-05-01)
