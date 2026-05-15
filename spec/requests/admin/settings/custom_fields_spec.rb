@@ -133,6 +133,7 @@ RSpec.describe 'CustomFields create/update permissions', type: :request do
       expect(group.fields.count).to eq(1)
 
       my_post.update_categories([])
+
       get '/admin/settings/custom_fields/list', params: { post_type: post_type.id, post_id: my_post.id, categories: [category.id] }
 
       expect(response.body).to include('Cat Group')
